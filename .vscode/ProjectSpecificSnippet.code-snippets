@@ -1,0 +1,144 @@
+{
+	// Place your eWallie workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	"Transaction Recorder Details": {
+		"scope": "php",
+		"prefix": "transDetails",
+		"body": [
+			"$${1:varName} = [",
+			"\t\"user_id\"        => ${2:'user_id'},",
+			"\t\"user_type\"      => ${3:'user_type'},",
+			"\t\"type\"           => ${4:'type'},",
+			"\t\"amount\"         => ${5:'amount'},",
+			"\t\"new_balance\"    => ${6:'new_balance'},",
+			"\t\"service_charge\" => ${7:'service_charge'},",
+			"\t\"description_1\"  => ${8:'user_specific_description'},",
+			"\t\"description_2\"  => ${9:'general_description'}",
+			"\t$0",
+			"];"
+		],
+		"description": "Template for Transacton Recorder details"
+	},
+
+	"ErrorSetter": {
+		"scope": "php",
+		"prefix": "seterror",
+		"body": [
+			"$$this->set_error_no(${1:\"errorCode\"});",
+			"$$this->set_error(\"${2:msg}\");"
+		],
+		"description": "Sets error code and error on failure"
+	},
+
+	"SuccessSetter": {
+		"scope": "php",
+		"prefix": "setsuccess",
+		"body": [
+			"$$this->set_status(${1:\"errorCode\"});",
+			"$$this->set_msg(\"${2:msg}\");"
+		],
+		"description": "Sets status code and message on success"
+	},
+
+	"Server Respond":{
+		"scope": "php",
+		"prefix": "serverResponse",
+		"body": [
+			"(new ${1:server_responder}(${2:HTTPCode}, ${3:message}$0))->send_response();"
+		],
+		"description": "Template for server response"
+	},
+	"Admin Server Respond":{
+		"scope": "php",
+		"prefix": "adminServerResponse",
+		"body": [
+			"AdminAdapter::server_responder(${1:HTTPCode}, ${2:message}$0)->send_response(true);"
+		],
+		"description": "Template for admin server response"
+	},
+	"PageLessComponent Generator": {
+		"scope": "javascript",
+		"prefix": "pagelesscomponent",
+		"body": [
+			"${1:varName} = new PageLessComponent(\"${2:component-tag}\", {",
+			"\tdata: {",
+			"\t\t${3:title}: ${4:\"My Title\"},",
+			"\t},",
+			"\t${5:props: {",
+			"\t\t${6:key}: ${7:function(){\\}},",
+			"\t\\},}",
+			"\tview: function(){",
+			"\t\treturn /*html*/`",
+			"\t\t\t${8:<div></div>}",
+			"\t\t`;",
+			"\t},",
+			"\t${9:callback: function(){",
+			"\t\t$0",
+			"\t\\}}",
+			"});"
+		],
+		"description": "Template for PageLess Components"
+	},
+	"Widget Request": {
+		"scope": "javascript",
+		"prefix": "wrequest",
+		"body": [
+			"Widget.Request({",
+			"\turl: ${1:Widget.API()},",
+			"\tmethod: \"${2:GET}\",",
+			"\tdata: ${3:\"\"},",
+			"\t${4:beforeSend: ${5:()=>{\\}}}",
+			"\\}).then(result=>{",
+			"\t$0",
+			"\\});"
+		],
+		"description": "Template for PageLess Components"
+	},
+
+	"MainContentBody": {
+		"scope": "javascript",
+		"prefix": "maincontent",
+		"body": [
+			"<div class=\"row main-content\">",
+			"\t<!-- main content header -->",
+			"\t<main-content-header title=\"${1:${this.title\\}}\"></main-content-header>",
+			"\t<!-- main content body -->",
+			"\t<div class=\"main-content-body\">",
+			"\t\t<div class=\"content\">",
+			"\t\t\t<div class=\"w-100 p-0 p-sm-1 p-md-3 p-xl-5 h-100 d-flex flex-column\">",
+			"\t\t\t\t<div class=\"w-100\">",
+			"\t\t\t\t\t<div class=\"row result-container p-1 pb-0\"></div>",
+			"\t\t\t\t</div>",
+			"\t\t\t\t<div class=\"w-100 flex-1 scroll-y p-1\">",
+			"\t\t\t\t\t<div class=\"w-100 border-radius-10 main-content-item container-shadow\">${2:}</div>",
+			"\t\t\t\t</div>",
+			"\t\t\t</div>",
+			"\t\t</div>",
+			"\t</div>",
+			"</div>",
+		],
+		"description": "Template for Main content body"
+	},
+
+	"Form Builder": {
+		"scope": "javascript",
+		"prefix": "buildform",
+		"body": [
+			"Modal.BuildForm({",
+			"\ttitle: \"${1:Form}\",",
+			"\t${2:icon: \"${3:file-alt}\",}",
+			"\t${4:description: `${5:}`,}",
+			"\tinputs: /*html*/ `\n\t\t${6:}\n\t`,",
+			"\tsubmitText: \"${7:Continue}\",",
+			"\t${8:closable: ${9:false},}",
+			"\t${10:autoClose: ${11:false},}",
+			"\\}${12:, values=>{\n\t${13://submit handler}\n\\}})${14:.then(values=>{\n\t${15://submit handler}\n\\})};"
+		],
+		"description": "Template for Form Builder"
+	}
+}
