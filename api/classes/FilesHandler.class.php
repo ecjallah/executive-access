@@ -16,6 +16,18 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/api/classes/Autoloader.class.php';
 */
 
 class FilesHandler{
+    public $userId;
+    public $user_type;
+
+    public $method;
+    public $url;
+        
+    public $location;
+    public $fileLocation;
+    public $file;
+    public $fileName;
+    public $file_new_name;
+    public $repair_file_name;
     function __construct(string $location, $saveLocation, $files, string $fileName, $file_repair_name = null){
         if(isset($_SESSION['user_id'])){
             $this->userId          = $_SESSION['user_id'];
@@ -68,7 +80,6 @@ class FilesHandler{
 
         $imageCompressor  = new ImageCompressor($imageObject);
         $returnedImage    = $imageCompressor->getResizedImage();
-        
         $fileExt          = $imageCompressor->get_extension();
         return  $this->fileLocation.$this->file_new_name.'.'.$fileExt;
     }
