@@ -14,7 +14,7 @@ export class Widget extends PageLess{
         super(url);
         this.mainContentContainer = document.querySelector('.main-content-container');
         this.toastContainer       = this.mainContentContainer;
-        this.appName              = 'RERM';
+        this.appName              = 'Exective Access';
         this.API                  = '/api';
         this.modulesLocation      = "/js/modules/public";
         this.routes.push(

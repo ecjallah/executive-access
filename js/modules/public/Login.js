@@ -4,7 +4,7 @@ import { Modal } from './Modals.js';
 import "../Components.js";
 export const widget = new PageLessComponent("login-widget", {
         data: {
-            title: 'Political Party Login',
+            title: 'Executive Access',
         },
         props: {
             onsubmit: function(event){
@@ -96,23 +96,20 @@ export const widget = new PageLessComponent("login-widget", {
             return /*html*/`
                 <form class="main-content" onsubmit="{{this.props.onsubmit}}" style="overflow: hidden !important;">
                     <div class="row login-container no-gutters">
-                        <div class="col-12 col-sm-11 col-md-7 col-lg-6 col-xl-5 login-form-container">
+                        <div class="col-12 col-sm-5 col-md-4 col-lg-3 login-form-container">
                             <div class="login-form" id="login-form">
-                                <div class="flex-1 w-100 p-1 p-sm-2 p-md-3 p-xl-4 scroll-y">
+                                <div class="flex-1 w-100 p-1 p-sm-2 scroll-y">
                                     <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-start align-content-center">
-                                        <img class="w-100px mt-4" style="height: auto;" alt="waste-art" src="/media/images/logo.png">
+                                        <img class="w-100px mt-4" style="height: auto;" alt="waste-art" src="/media/images/seal.png">
                                         <div class="description text-left py-4">
-                                            Real-time Elections Result Management
+                                            ${this.title}
                                         </div>
                                         <div class="w-100">
                                             <text-input icon="user" text="Username" identity="username" required="required"></text-input>
                                             <password-input icon="key" text="Password" identity="password" required="required"></password-input>
                                         </div>
                                         <div class="w-100 d-flex justify-content-center mt-3">
-                                            <pageless-button type="submit" classname="btn btn-primary col-7 col-lg-6 col-xl-5" text="Login"></pageless-button>
-                                        </div>
-                                        <div class="w-100 d-flex justify-content-center mt-3">
-                                            <pageless-button type="button" classname="btn btn-clean col-7 col-lg-6 col-xl-5" text="Forgot Password?" onclick="{{this.props.onforgotpassword}}"></pageless-button>
+                                            <pageless-button type="submit" classname="btn btn-primary col-11 col-lg-10 col-xl-9" text="Login"></pageless-button>
                                         </div>
                                     </div>
                                 </div>
