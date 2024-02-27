@@ -17,7 +17,6 @@ RewriteRule ^view-user-account-group-modules/([0-9]+)/?$ modules/user_management
 RewriteRule ^assign-modules-to-account-group/?$ modules/user_management/UserHandler.class.php
 
 #STAFF MANAGEMENT
-# RewriteRule ^lookup-users/?$ modules/staff_management/StaffManagementHandler.class.php
 RewriteRule ^add-staff-role/?$ modules/staff_management/StaffManagementHandler.class.php
 RewriteRule ^assign-module-rights-to-role/?$ modules/staff_management/StaffManagementHandler.class.php
 RewriteRule ^create-new-staff/?$ modules/staff_management/StaffManagementHandler.class.php
@@ -31,85 +30,9 @@ RewriteRule ^unassign-watcher-from-center/?$ modules/staff_management/StaffManag
 RewriteRule ^search-precincts/?$ modules/staff_management/StaffManagementHandler.class.php
 RewriteRule ^search-polling-centers/?$ modules/staff_management/StaffManagementHandler.class.php
 
-#POLITICAL PARTY MANAGEMEMNT
-RewriteRule ^view-all-pending-parties/?$ modules/party_management/PartyManagementHandler.class.php
-RewriteRule ^view-all-approved-parties/?$ modules/party_management/PartyManagementHandler.class.php
-RewriteRule ^update-party-approval-status/?$ modules/party_management/PartyManagementHandler.class.php
-RewriteRule ^block-and-unblock-political-party/?$ modules/party_management/PartyManagementHandler.class.php
-
-#ISSUES ENDPOINTS
-RewriteRule ^add-new-issue/?$ modules/issue_management/IssuesHandler.class.php
-RewriteRule ^view-all-issues/?$ modules/issue_management/IssuesHandler.class.php
-RewriteRule ^update-issue/?$ modules/issue_management/IssuesHandler.class.php
-RewriteRule ^remove-issue/?$ modules/issue_management/IssuesHandler.class.php
-
-#ELECTION MANAGEMENT ENDPOINTS
-RewriteRule ^add-new-election/?$ modules/election_management/ElectionManagementHandler.class.php
-RewriteRule ^view-all-elections/?$ modules/election_management/ElectionManagementHandler.class.php
-RewriteRule ^update-election/?$ modules/election_management/ElectionManagementHandler.class.php
-RewriteRule ^remove-election/?$ modules/election_management/ElectionManagementHandler.class.php
-RewriteRule ^view-public-elections/?$ classes/Registration.class.php
-
-#PARTY PRIORITIES ENDPOINTS
-RewriteRule ^get-party-issues-priorities/?$ modules/party_issue_priority/PartyIssuePriorityHandler.class.php
-RewriteRule ^set-party-issues-priorities/?$ modules/party_issue_priority/PartyIssuePriorityHandler.class.php
-
-#COUNTY AND DISTRICT ENDPOINTS
-RewriteRule ^view-all-counties/?$ modules/county/CountyHandler.class.php
-RewriteRule ^view-district-by-id/([0-9]+)/?$ modules/county/CountyHandler.class.php?id=$1
-RewriteRule ^add-new-county/?$ modules/county/CountyHandler.class.php
-RewriteRule ^add-new-county-district/?$ modules/county/CountyHandler.class.php
-RewriteRule ^update-county/?$ modules/county/CountyHandler.class.php
-RewriteRule ^update-county-district/?$ modules/county/CountyHandler.class.php
-RewriteRule ^remove-county/?$ modules/county/CountyHandler.class.php
-RewriteRule ^remove-district/?$ modules/county/CountyHandler.class.php
-
-#CANDIDATES ENDPOINTS
-RewriteRule ^add-candidate/?$ modules/candidates/CandidatesHandler.class.php
-RewriteRule ^view-candidate-list/?$ modules/candidates/CandidatesHandler.class.php
-RewriteRule ^lookup-candidate/([0-9]+)/?$ modules/candidates/CandidatesHandler.class.php?candidate_id=$1
-RewriteRule ^edit-candidate/?$ modules/candidates/CandidatesHandler.class.php
-RewriteRule ^remove-candidate-from-list/?$ modules/candidates/CandidatesHandler.class.php
-
-#PRECINCTS ENDPOINT
-RewriteRule ^add-new-precinct/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^get-precincts/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^get-precincts-by-county/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^get-precinct-details/([0-9]+)/?$ modules/pollingmanagement/PollingManagementHandler.class.php?id=$1
-RewriteRule ^update-precincts/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^remove-precinct/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^add-new-polling-center/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^update-polling-center/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-RewriteRule ^remove-polling-center/?$ modules/pollingmanagement/PollingManagementHandler.class.php
-
-#VOTER ENDPOINTS
-RewriteRule ^add-voter/?$                      modules/voter_module/VoterHandler.class.php
-RewriteRule ^get-political-parties/?$          modules/voter_module/VoterHandler.class.php
-RewriteRule ^get-all-issues/?$                 modules/voter_module/VoterHandler.class.php
-RewriteRule ^get-voter-issue-prioritization/?$ modules/voter_module/VoterHandler.class.php
-RewriteRule ^vote-for-party/?$                 modules/voter_module/VoterHandler.class.php
-RewriteRule ^confirm-vote-for-party/?$         modules/voter_module/VoterHandler.class.php
-RewriteRule ^recommend-parties-to-voter/?$     modules/voter_module/VoterHandler.class.php
-
-#WATCHER ENDPOINT
-RewriteRule ^get-watcher-assigned-polling-centers-counts/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^get-watcher-unsubmitted-precincts-and-centers/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^get-watcher-precincts-and-centers/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^get-watcher-precincts-and-centers/([0-9]+)$  modules/watcher/WatcherHandler.class.php?staff-id=$1
-RewriteRule ^get-watcher-precinct/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^get-watcher-centers/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^add-candidate-votes/?$  modules/watcher/WatcherHandler.class.php
-RewriteRule ^get-national-candidates-list/?$  modules/watcher/WatcherHandler.class.php
-
 #DASHBOARD ENDPOINTS
 RewriteRule ^get-candidate-vote-reports/?$ modules/dashboard/DashboardHandler.class.php
 RewriteRule ^get-county-vote-reports/?$ modules/dashboard/DashboardHandler.class.php
-
-
-# RewriteRule ^create-user/?$ modules/user_management/UserHandler.class.php
-# RewriteRule ^view-users/?$ modules/user_management/UserHandler.class.php
-# RewriteRule ^edit-user/?$ modules/user_management/UserHandler.class.php
-# RewriteRule ^delete-user-account/?$ modules/user_management/UserHandler.class.php
 
 # #GENERIC USER ENDPOINTS
 # RewriteRule ^epad-get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php

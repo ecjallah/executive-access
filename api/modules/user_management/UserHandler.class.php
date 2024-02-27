@@ -21,6 +21,12 @@ Auth::module_registration(USERHANDLER_MODULE_ID, USERHANDLER_MODULE_NAME);
 */
 
 class UserHandler{
+    public $userId;
+    public $user_type;
+    public $account_character;
+    public $method;
+    public $url;
+
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId              = $_SESSION['user_id'];
