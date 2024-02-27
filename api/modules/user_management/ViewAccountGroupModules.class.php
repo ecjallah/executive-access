@@ -20,6 +20,12 @@ Auth::module_function_registration(VIEW_USER_GROUP_MODULES_FUNCTION_ID, VIEW_USE
  */
 
  class ViewAccountGroupModules{
+    public $userId;
+    public $user_type;
+    public $account_character;
+    public $method;
+    public $url;
+    public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId              = $_SESSION['user_id'];
@@ -65,7 +71,6 @@ Auth::module_function_registration(VIEW_USER_GROUP_MODULES_FUNCTION_ID, VIEW_USE
                         //Get already assign modlue to role
                         $assinedModules             = $this->return_all_assign_role_modules($roleId);
                         $data['assigned_modules']   = $assinedModules;
-    
                     }
                     return $data;
                 }else{

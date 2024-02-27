@@ -20,6 +20,12 @@ Auth::module_function_registration(CREATE_STAFFS_FUNCTION_ID, CREATE_STAFFS_FUNC
  */
 
 class AddStaff{
+    public $userId;
+    public $user_type; 
+    public $account_character;
+    public $method;             
+    public $url; 
+    public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId              = $_SESSION['user_id'];

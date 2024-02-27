@@ -20,6 +20,12 @@ Auth::module_function_registration(ASSIGN_USER_GROUP_MODULES_FUNCTION_ID, ASSIGN
  */
 
  class AssignAccountGroupModules{
+    public $userId;
+    public $user_type; 
+    public $account_character;
+    public $method;             
+    public $url; 
+    public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId              = $_SESSION['user_id'];
