@@ -1,7 +1,5 @@
 <?php
 // include_once($_SERVER['DOCUMENT_ROOT'].'/api/classes/Autoloader.class.php');
-
-
 class Db {
   private $host;
   private $user;
@@ -26,5 +24,3 @@ class Db {
   
 } $conn = new Db();
   $conn->connect();
-
-?>

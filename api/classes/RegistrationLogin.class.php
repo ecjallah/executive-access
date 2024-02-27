@@ -19,7 +19,8 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
  // WAITING TO BE IN USED
  
 class RegistrationLogin extends Auth{
-
+    public $method;
+    public $url;
     function __construct()
     {
         $this->method    = $_SERVER['REQUEST_METHOD'];

@@ -16,9 +16,7 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
     * *********************************************************************************************************
     */
 class InputCleaner{
-
    public $dirtyInput;
-
    function __construct($dirtyInput)
    {
        

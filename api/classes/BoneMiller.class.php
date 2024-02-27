@@ -28,6 +28,8 @@ require $_SERVER['DOCUMENT_ROOT'].'/api/classes/phpMiller/src/SMTP.php';
  */
 
 class BoneMiller{
+    public $method;
+    public $url;
     function __construct()
     {
         $this->method       = $_SERVER['REQUEST_METHOD'];

@@ -257,5 +257,4 @@ class AppLogin extends Auth{
         }
     }
 }
-
 (new AppLogin);

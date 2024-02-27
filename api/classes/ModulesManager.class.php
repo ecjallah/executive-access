@@ -16,11 +16,13 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
  */
 
 class ModulesManager{
+    public $method;
+    public $url;
+    public $userId;
+    public $user_type;
     function __construct(){
-
-        $this->method      = $_SERVER['REQUEST_METHOD'];
-        $this->url         = $_SERVER['REQUEST_URI'];
-
+        $this->method          = $_SERVER['REQUEST_METHOD'];
+        $this->url             = $_SERVER['REQUEST_URI'];
         if(isset($_SESSION['user_id'])){
             $this->userId      = $_SESSION['user_id'];
             $this->user_type   = $_SESSION['user_type'];
@@ -112,5 +114,4 @@ class ModulesManager{
         }
     }
 }
-
 (new ModulesManager);

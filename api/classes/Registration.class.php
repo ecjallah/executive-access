@@ -16,6 +16,8 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
 */
 
 class Registration{
+    public $method;
+    public $url;
     function __construct(){
         $this->method      = $_SERVER['REQUEST_METHOD'];
         $this->url         = $_SERVER['REQUEST_URI'];
@@ -23,24 +25,6 @@ class Registration{
             if($this->url == '/api/app-registration')
             {
                 $this->new_account_registration();
-            }
-        }else if($this->method == "GET"){
-            if($this->url == '/api/get-registration-types'){
-                $this->return_registration_account_types();
-            }
-            else if($this->url == '/api/view-public-elections'){
-                $viewElection         = new ViewElections();
-                $result               = $viewElection->get_all_elections();
-                if($result === 500){
-                    $response         = new Response(500, "Error returning issues.");
-                    $response->send_response();
-                }else if($result === 404){
-                    $response         = new Response(404, "No issue created at this time.");
-                    $response->send_response();
-                }else{
-                    $response         = new Response(200, "Created Elections.", $result);
-                    $response->send_response();
-                }
             }
         }else{
             $response = new Response(300, "This endpoint accepts the POST method", $this->method);
