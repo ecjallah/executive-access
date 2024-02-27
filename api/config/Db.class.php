@@ -14,7 +14,7 @@ class Db {
     // $this->user        = "vote-advisor";
     $this->user        = "root";
     $this->password    = "password@123";
-    $this->database    = "rerm";
+    $this->database    = "executive_access";
 
     $connection = mysqli_connect($this->host, $this->user, $this->password, $this->database);
     if($connection == false){

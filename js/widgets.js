@@ -14,7 +14,7 @@ PageLess.Request({
 
     
     if (result.status == 200 || result.status == 404) {
-        import('./modules/political-party/Index.js').then(module=>{
+        import('./modules/admin/Index.js').then(module=>{
             const Widget = module.Widget;
             Widget.BuildSidebar();
             let path = window.location.pathname;
