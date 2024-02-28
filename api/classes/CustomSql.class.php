@@ -119,12 +119,11 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
     $sql    = "UPDATE `$table` SET $values WHERE $identityDetails";
     $query  = self::$conn->query($sql);
     if ($query == true) {
-          return true;
+        return true;
     } 
     else {
-        return self::$conn->error;
+      return self::$conn->error;
     }
-
   }
 
   //Deletes data from datatbase
@@ -138,7 +137,6 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
   public static function raw_delete($statment){
     $sql     = "DELETE '{$statment}' ";
     $query   = self::$conn->query($sql);
-    
     return $query;
   }
 
@@ -158,4 +156,3 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
   }
 
 }
-
