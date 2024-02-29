@@ -34,6 +34,24 @@ RewriteRule ^search-polling-centers/?$ modules/staff_management/StaffManagementH
 RewriteRule ^get-candidate-vote-reports/?$ modules/dashboard/DashboardHandler.class.php
 RewriteRule ^get-county-vote-reports/?$ modules/dashboard/DashboardHandler.class.php
 
+#DEPARTMENT ENDPOINTS
+RewriteRule ^get-departments/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?pager=$1
+RewriteRule ^create-new-department/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^update-department/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^get-department-details/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department_id=$1
+RewriteRule ^delete-department/?$ modules/departments/DepartmentsHandler.class.php
+#DEPARTMENT APPOINTMENT
+RewriteRule ^assign-staff-to-department/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^unassign-staff-from-department/?$ modules/departments/DepartmentsHandler.class.php
+
+#EXECUTIVE ENDPOINTS
+RewriteRule ^get-executive-members/([0-9]+)/([a-z]+)/?$ modules/executivelist/ExecutiveListHandler.class.php?pager=$1&filter=$2
+RewriteRule ^add-new-executive-member/?$ modules/executivelist/ExecutiveListHandler.class.php
+RewriteRule ^executive-get-departments/?$ modules/executivelist/ExecutiveListHandler.class.php
+RewriteRule ^get-executive-member-details/([0-9]+)/?$ modules/executivelist/ExecutiveListHandler.class.php?executive_id=$1
+RewriteRule ^update-executive-member-info/?$ modules/executivelist/ExecutiveListHandler.class.php
+RewriteRule ^delete-executive_member/?$ modules/executivelist/ExecutiveListHandler.class.php
+
 # #GENERIC USER ENDPOINTS
 # RewriteRule ^epad-get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php
 # RewriteRule ^epad-get-user-security-details/?$ modules/generic_users_module/GenericUserHandler.class.php

@@ -39,27 +39,23 @@ class AppLogin extends Auth{
                     $response = new Response(301, "Expected data not sent(username/usernumber, password)");
                     $response->send_response();
                 }else{
-                    
                     $number      = InputCleaner::sanitize($_POST['username']);
                     $password    = InputCleaner::sanitize($_POST['password']);
                     $app         = key_exists('app', $_POST) ? InputCleaner::sanitize($_POST['app']) : false;
                     $login       = $this->auth_user_login($number, $password);
                     if($login === 200){
                         //Get user assigned modules icons
-                        $userId            = $_SESSION['user_id'];
-                        $returnDetails     = null;
-                        if ($app !== false) {
-                            $getSessions = new ModulesManager();
-                            $sessions    = $getSessions->return_active_user_session();
-                            $roleDetails = $this->side_bar_items(is_array($sessions)?$sessions['userType']:$sessions, is_array($sessions)?$sessions['userId']:$sessions, $sessions['account_character']);
+                        $userId             = $_SESSION['user_id'];
+                        $returnDetails      = null;
+                            $getSessions    = new ModulesManager();
+                            $sessions       = $getSessions->return_active_user_session();
+                            $roleDetails    = $this->side_bar_items(is_array($sessions)?$sessions['userType']:$sessions, is_array($sessions)?$sessions['userId']:$sessions, $sessions['account_character']);
                             $roleDetails['side_bar_items'] = "N/A";
                             $returnDetails = [
-                                'user_id' => $userId, 
+                                'user_id'            => $userId, 
                                 'hashed_credentials' => base64_encode("$number<>$password"),
-                                'role_details' => $roleDetails
+                                'role_details'       => $roleDetails
                             ];
-                        }
-
                         $response = new Response(200, "Login Successful", $returnDetails);
                         $response->send_response();
                     }else if($login == 404){

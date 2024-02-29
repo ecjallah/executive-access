@@ -16,7 +16,8 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
  */
 
 class Helper{
-
+    public $userId;
+    public $user_type;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId      = $_SESSION['user_id'];
@@ -80,44 +81,6 @@ class Helper{
             }
         }
     }
-
-    //This function lookups beneficiary by EMPLOYEE ID OR USER ID
-    public static function lookup_employee($searchValue, $hospitalId){
-        $query        = CustomSql::quick_select(" SELECT * FROM `beneficiary` WHERE id = '$searchValue' OR employee_id LIKE '%$searchValue%'  OR first_name LIKE '%$searchValue%' OR last_name LIKE '%$searchValue%' OR full_name LIKE '%$searchValue%'");
-        if($query === false){
-            return 500;
-        }else{
-            $count    = $query->num_rows;
-            if($count >= 1){
-                //check hospital ia in business with beneficiary ministry
-                $data = [];
-                $serviceProvider   = new ProviderPackages();
-                while ($row = mysqli_fetch_assoc($query)) {
-                    //Check if hospital is already linked to ministry
-                    $linkChecker   = $serviceProvider->return_linked_hospital_by_id($row['business_id'], $hospitalId);
-                    if(is_array($linkChecker)){
-                        $data[] = [
-                            "id"           => $row['id'],
-                            "business_id"  => $row['business_id'],
-                            'package_id'   => $row['package_id'],
-                            "employee_id"  => $row['employee_id'],
-                            "email"        => $row['email'],
-                            "number"       => $row['number'],
-                            "image"        => $row['image'],
-                            "sex"          => $row['sex'],
-                            "county"       => $row['county'],
-                            "full_name"    => $row['full_name'],
-                            'hospital_name'=> $linkChecker['full_name']
-                        ];
-                    }
-                }
-                return $data;
-            }else{
-                return 404;
-            }
-        }
-    }
-
     //This function returns a given user role
     public static function get_user_role_title($roleId){
         $query  = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE role_id = $roleId ");
