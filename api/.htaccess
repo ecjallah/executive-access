@@ -60,6 +60,9 @@ RewriteRule ^delete-appointment/?$ modules/appointment/AppointmentHandler.class.
 RewriteRule ^get-all-appointments/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?pager=$1
 RewriteRule ^get-appointment-details/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?id=$1
 
+#APPOINTMENT SECURITY
+RewriteRule ^lookup-appointment/?$ modules/appointmentsecurity/AppointmentSecurityHandler.class.php
+
 # #GENERIC USER ENDPOINTS
 # RewriteRule ^epad-get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php
 # RewriteRule ^epad-get-user-security-details/?$ modules/generic_users_module/GenericUserHandler.class.php
