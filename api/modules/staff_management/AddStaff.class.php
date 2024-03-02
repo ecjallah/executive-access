@@ -42,8 +42,8 @@ class AddStaff{
     //This function creates a new user account
     public function create_new_staff_account(array $details){
         //Generate user id
-        $personalUserId         = $this->id_generator('900');
         // "staff_personal_id" => $personalUserId,
+        $personalUserId         = $this->id_generator('900');
         $basic_details          = [
             'user_id'           => $personalUserId,
             'user_type'         => $details['account_type'],
@@ -71,7 +71,7 @@ class AddStaff{
             $response        = new Response(500, "Error crreating new account");
             $response->send_response();
         }else if($result === 200){
-
+            return 200;
         }
     }
     
@@ -127,7 +127,12 @@ class AddStaff{
                 }else{
                     //ADD USER AS STAFF
                     $accountType                         = Helper::return_user_type_from_id($details['user_id']);
-                    if($accountType == 'staff'){
+
+                    // print_r($details['user_id']);
+                    // exit;
+
+                    // if($accountType == 'staff'){
+
                         //Check staff status at a particular business
                         $staff_check                     = $this->check_staff_status($staff_details['business_id'], $details['user_id']);
                         if($staff_check == 200){
@@ -154,10 +159,11 @@ class AddStaff{
                         }else{
                             return $staff_check;
                         }
-                    }else{
-                        CustomSql::rollback();
-                        return 400;
-                    }
+
+                    // }else{
+                    //     CustomSql::rollback();
+                    //     return 400;
+                    // }
                 }
             }
         }else{

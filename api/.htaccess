@@ -40,6 +40,7 @@ RewriteRule ^create-new-department/?$ modules/departments/DepartmentsHandler.cla
 RewriteRule ^update-department/?$ modules/departments/DepartmentsHandler.class.php
 RewriteRule ^get-department-details/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department_id=$1
 RewriteRule ^delete-department/?$ modules/departments/DepartmentsHandler.class.php
+
 #DEPARTMENT APPOINTMENT
 RewriteRule ^assign-staff-to-department/?$ modules/departments/DepartmentsHandler.class.php
 RewriteRule ^unassign-staff-from-department/?$ modules/departments/DepartmentsHandler.class.php
@@ -51,6 +52,16 @@ RewriteRule ^executive-get-departments/?$ modules/executivelist/ExecutiveListHan
 RewriteRule ^get-executive-member-details/([0-9]+)/?$ modules/executivelist/ExecutiveListHandler.class.php?executive_id=$1
 RewriteRule ^update-executive-member-info/?$ modules/executivelist/ExecutiveListHandler.class.php
 RewriteRule ^delete-executive_member/?$ modules/executivelist/ExecutiveListHandler.class.php
+
+#APPOINTMENT
+RewriteRule ^add-new-appointment/?$ modules/appointment/AppointmentHandler.class.php
+RewriteRule ^update-appointment/?$ modules/appointment/AppointmentHandler.class.php
+RewriteRule ^delete-appointment/?$ modules/appointment/AppointmentHandler.class.php
+RewriteRule ^get-all-appointments/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?pager=$1
+RewriteRule ^get-appointment-details/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?id=$1
+
+#APPOINTMENT SECURITY
+RewriteRule ^lookup-appointment/?$ modules/appointmentsecurity/AppointmentSecurityHandler.class.php
 
 # #GENERIC USER ENDPOINTS
 # RewriteRule ^epad-get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php
