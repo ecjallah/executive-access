@@ -92,5 +92,31 @@ class Viewdepartments {
             }
         }
     }
+
+    //This method get department staff
+    public function get_department_staff($companyId, $departmentId){
+        $query          = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE `company_id` = $companyId AND `department_id` = $departmentId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count      = $query->num_rows;
+            if($count >= 1){
+                $data   = [];
+                $staffDetails = new ViewStaffs();
+                while ($row = mysqli_fetch_assoc($query)) {
+                    $details = $staffDetails->return_staff_details($companyId, $row['staff_id'])[0];
+                    $data[]  = [
+                        "user_id"   => $details['user_id'],
+                        "full_name" => $details['full_name'],
+                        "image"     => $details['image'],
+                        "number"    => $details['number']
+                    ];
+                }
+                return $data;
+            }else{
+                return 404;
+            }
+        }
+    }
 }
             

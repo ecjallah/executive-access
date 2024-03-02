@@ -56,6 +56,25 @@ class Viewappointment {
         }
     }
 
+    //This method returns department appointments
+    public function return_department_appointments($companyId, $departmentId, $pager){
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND department_id =$departmentId AND status != 'delete' ORDER BY `id` DESC LIMIT 15 OFFSET $pager ");
+        if($query === false){
+            return 500;
+        }else{
+            $count      = $query->num_rows;
+            if($count >= 1){
+                $data   = [];
+                while ($row = mysqli_fetch_assoc($query)) {
+                    $data[] = $row;
+                }
+                return $data;
+            }else{
+                return 404;
+            }
+        }
+    }
+
     //This method returns appointment details
     public function get_appointment_details($companyId, $id){
         $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND id = $id AND status != 'delete' ");

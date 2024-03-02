@@ -41,6 +41,7 @@
                     $this->get_appointment();
                     $this->get_appointment_details();
                     $this->update_appointment_status();
+                    $this->get_department_appointment();
                 }else{
                     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
                     $response->send_response();
@@ -60,6 +61,38 @@
                     $getAppointment     = new Viewappointment();
                     if($getAppointment->permission === 200){
                         $result         = $getAppointment->return_all_appointments($companyId, $pager);
+                        if($result === 500){
+                            $response   = new Response(500, "Error returning appointments.");
+                            $response->send_response();
+                        }else if($result === 404){
+                            $response   = new Response(404, "There is no appointment at this time.");
+                            $response->send_response();
+                        }else{
+                            $response   = new Response(200, "Active appointment list.", $result);
+                            $response->send_response();
+                        }
+                    }else{
+                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response->send_response();
+                    }
+                }else{                
+                    $response = new Response(300, "This endpoint accepts the GET method");
+                    $response->send_response();
+                }
+            }
+        }
+
+        //GET DEPARTMENT APPOINTMENT ENDPOINT
+        public function get_department_appointment(){
+            if(strpos($this->url, "/api/get-department-appointments") !== false)
+            {
+                if($this->method == "GET"){
+                    $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                    $pager              = InputCleaner::sanitize($_GET['pager']);
+                    $departmentId       = InputCleaner::sanitize($_GET['department']);
+                    $getAppointment     = new Viewappointment();
+                    if($getAppointment->permission === 200){
+                        $result         = $getAppointment->return_department_appointments($companyId, $departmentId, $pager);
                         if($result === 500){
                             $response   = new Response(500, "Error returning appointments.");
                             $response->send_response();
@@ -118,8 +151,8 @@
             {
                 if($this->method == "POST"){
                     $_POST                 = json_decode(file_get_contents("php://input"), true);
-                    if(empty($_POST['executive_id']) || empty($_POST['department_id']) || empty($_POST['visitor_name']) || empty($_POST['purpose'])|| empty($_POST['number']) || empty($_POST['visit_date'])){
-                        $response          = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, and status");
+                    if(empty($_POST['executive_id']) || empty($_POST['department_id']) || empty($_POST['visitor_name']) || empty($_POST['purpose'])|| empty($_POST['number']) || empty($_POST['visit_date']) || empty($_POST['start_time']) || empty($_POST['end_time'])){
+                        $response          = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, start_time, end_time and status");
                         $response->send_response();
                     }else{
                         $companyId         = Helper::get_business_id($this->userId, $this->account_character);
@@ -129,6 +162,8 @@
                             $department_id = InputCleaner::sanitize($_POST['department_id']);
                             $visitor_name  = InputCleaner::sanitize($_POST['visitor_name']);
                             $purpose       = InputCleaner::sanitize($_POST['purpose']);
+                            $start_time    = InputCleaner::sanitize($_POST['start_time']);
+                            $end_time      = InputCleaner::sanitize($_POST['end_time']);
                             $number        = InputCleaner::sanitize($_POST['number']);
                             $visit_date    = InputCleaner::sanitize($_POST['visit_date']);
 
@@ -138,6 +173,8 @@
                                 "department_id"  => $department_id,
                                 "visitor_name"   => $visitor_name,
                                 "purpose"        => $purpose,
+                                "start_time"     => $start_time,
+                                "end_time"       => $end_time,
                                 "visitor_number" => $number,
                                 "visit_date"     => $visit_date,
                                 "added_by"       => $this->userId
@@ -232,17 +269,17 @@
                             $appointment_status  = InputCleaner::sanitize($_POST['appointment_status']);
                             $updated_date        = Helper::get_current_date();
 
-                            $details     = [
+                            $details        = [
                                 "status"        => $appointment_status,
                                 "date_updated"  => $updated_date
                             ];
                             $identity         = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointment_id]];
                             $result           = $editAppointment->update_executive_appointment($details, $identity);
                             if($result === 500){
-                                $response     = new Response(500, " Error updating appointment. ");
+                                $response     = new Response(500, "Error updating appointment.");
                                 $response->send_response();
                             }else{
-                                $response     = new Response(200, " Appointment updated successfully. ", $result);
+                                $response     = new Response(200, "Appointment updated successfully.", $result);
                                 $response->send_response();
                             }
                         }else{

@@ -71,8 +71,6 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
     //This function gets a given staff details
     public function return_staff_details($businessId, $userId){
         $query         = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = $businessId AND `staff_id` = $userId AND `block` = 0 OR `business_id` = $businessId AND `staff_personal_id` = $userId AND `block` = 0 ");
-        // print_r($query);
-        // exit;
         if($query === false){
             return 500;
         }else{
@@ -80,15 +78,18 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
             if($count == 1){
                 $data  = [];
                 while ($row  = mysqli_fetch_assoc($query)) {
+                    $roleTitle      = '';
                     $userDetails    = Helper::user_details($row['staff_personal_id'])[0];
-                    $roleTitle      = Helper::get_user_role_title($row['role_id'])['role_title'];
+                    $role           = Helper::get_user_role_title($row['role_id']);
+                    if(!empty($role)){
+                        $roleTitle  = $role['role_title'];
+                    }
                     $details        = [
                         "user_id"             => $userDetails['user_id'],
                         "full_name"           => $userDetails['full_name'],
                         "image"               => $userDetails['image'],
                         "number"              => $userDetails['number'],
                         "username"            => $userDetails['username'],
-                        "number"              => $userDetails['number'],
                         "email"               => $userDetails['email'],
                         "gender"              => $userDetails['gender'],
                         "user_role_id"        => $row['role_id'],
