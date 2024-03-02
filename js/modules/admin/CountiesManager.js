@@ -2,7 +2,7 @@ import { PageLess } from '../../PageLess/PageLess.min.js';
 import { PageLessComponent } from '../../PageLess/PageLess.min.js';
 import { Modal } from './Modals.js';
 import "../Components.js";
-import "./PoliticalPartyComponents.js";
+import "./Components.js";
 export const widget = new PageLessComponent("counties-manager-widget", {
     data: {
         title: "Counties",

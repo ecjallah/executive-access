@@ -3,21 +3,23 @@ import { PageLessComponent } from '../../PageLess/PageLess.min.js';
 import { Modal } from './Modals.js';
 import "../Components.js";
 import "./Components.js";
-export const widget = new PageLessComponent("user-type-manager-widget", {
+export const widget = new PageLessComponent("appointment-manager-widget", {
     data: {
-        title: "Account Type Manager",
+        title: "Appointment Manager",
     },
     props: {
         addnew: function(){
             Modal.BuildForm({
-                title: "Add New Role",
-                icon: "key",
+                title: "Create New",
+                icon: "user-tie",
                 description: `Please enter the details below`,
                 inputs: /*html*/ `
-                    <text-input text="Title" icon="key" identity="title" required="required"></text-input>
-                    <text-input text="Account Type" icon="user-shield" identity="account-type" required="required"></text-input>
-                    <text-input text="Icon" icon="icons" identity="icon" required="required"></text-input>
-                    <text-input text="Color" icon="palette" identity="color" required="required"></text-input>
+                    <text-input icon="user" text="First Name" identity="firstname" required="required"></text-input>
+                    <text-input icon="user" text="Middle Name" identity="middlename"></text-input>
+                    <text-input icon="user" text="Last Name" identity="lastname" required="required"></text-input>
+                    <number-input icon="user" text="Phone Number" identity="number" required="required"></number-input>
+                    <date-input text="Date"></date-input>
+                    <executive-department-select></executive-department-select>
                 `,
                 submitText: "Add",
                 closable: false,
@@ -25,13 +27,14 @@ export const widget = new PageLessComponent("user-type-manager-widget", {
             }, values=>{
                 let submitBtn = values.modal.querySelector('button[type=submit]');
                 PageLess.Request({
-                    url: `/api/create-user-account-group`,
+                    url: `/api/add-new-executive-member`,
                     method: "POST",
                     data: {
-                        account_type: values['account-type'],
-                        title: values.title,
-                        icon: values.icon,
-                        color: values.color,
+                        first_name: values.firstname,
+                        middle_name: values.middlename,
+                        last_name: values.lastname,
+                        number: values.number,
+                        department_id: values.department
                     },
                     beforeSend: ()=>{
                         PageLess.ChangeButtonState(submitBtn, 'Adding');
@@ -52,27 +55,28 @@ export const widget = new PageLessComponent("user-type-manager-widget", {
         onload: function(){
             return new Promise(resolve => {
                 this.setRequest({
-                    url: `/api/view-all-account-groups`,
+                    url: `/api/get-departments/0`,
                     method: "GET",
                 });
 
-                this.setChild(data=>{
-                    return /*html*/ `<account-type id="${data.id}" name="${data.title}" icon="${data.icon}" color="${data.color}" accounttype="${data.account_type}"></account-type>`;
+                this.setChild(details=>{
+                    const data = details.staff_info;
+                    return /*html*/ `<appointment-group></appointment-group>`;
                 });
 
                 resolve();
             });
-        }
+        },
     },
     view: function(){
         return /*html*/`
             <div class="main-content">
                 <main-content-header title="${this.title}"></main-content-header>
                 <div class="tool-bar">
-                    <pageless-button class="tool" text="Add New" onclick="{{this.props.addnew}}"></pageless-button>
+                    <pageless-button class="tool" text="Create New" onclick="{{this.props.addnew}}"></pageless-button>
                 </div>
                 <div class="main-content-body">
-                    <vertical-scroll-view nodataicon="fa-key" preloader="list" onload="{{this.props.onload}}" scrollable="false"></vertical-scroll-view>
+                    <vertical-scroll-view nodataicon="fa-calendar-check" preloader="list" onload="{{this.props.onload}}" scrollable="false"></vertical-scroll-view>
                 </div>
             </div>
         `;

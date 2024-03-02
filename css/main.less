@@ -1527,7 +1527,6 @@ form {
     padding: 20px;
     min-height: 100px;
     background-color: @containerColor;
-    .containerShadow(0.09);
     .borderRadius(15px);
 
     .user-image-container {
@@ -1848,8 +1847,8 @@ form {
     }
 
     &.toast-success {
-        @bgColor: lighten(@MWPrimary, 25%);
-        color: darken(@MWPrimary, 20%);
+        @bgColor: lighten(@success, 25%);
+        color: darken(@success, 20%);
         background: @bgColor;
         border: 1px solid @bgColor;
 
@@ -1863,7 +1862,7 @@ form {
         }
 
         &>button {
-            color: darken(@MWPrimary, 20%);
+            color: darken(@success, 20%);
         }
     }
 
@@ -1957,6 +1956,125 @@ form {
     &.container-shadow {
         .containerShadow(0.08);
     }
+}
+
+
+.appointment-group {
+    .displayFlex();
+    align-items: center;
+    width: 100%;
+
+    .details {
+        .flex(1);
+        .displayFlex();
+        align-items: center;
+
+        .body {
+            .flex(1);
+            padding-left: 10px;
+
+            .title {
+                padding: 5px 0;
+                font-weight: bold;
+            }
+        }
+
+        
+        .appointment-item {
+            width: 100%;
+            display: flex; 
+            align-items: center;
+
+            .time-container {
+                display: flex; 
+                white-space: nowrap;
+                padding: 0 10px;
+
+                .dot{
+                    align-self: center;
+                    width: 10px;
+                    height: 10px; 
+                    position: absolute;
+                    right: -5.5px;
+                    background-color: lighten(@MWPrimary, 10%);
+                    .borderRadius(50%);
+                }
+            }
+
+            .details-container {
+                display: flex;
+                align-items: center;
+                flex: 1; 
+                border-left: 2px solid lighten(@MWPrimary, 10%);
+
+                .details{
+                    display: flex;
+                    border-radius: 10px; 
+                    background-color: @containerColor;
+
+                    .properties {
+                        flex: 1;
+                        .property{
+                            width: 100%;
+                        }
+                    }
+                    .action{
+                        position: relative;
+                    }
+
+                    &.bg-secondary{
+                        background-color: fade(lightseagreen, 20%) !important;
+                    }
+                    &.bg-primary{
+                        background-color: fade(lightblue, 40%) !important;
+                    }
+                    &.bg-danger{
+                        background-color: fade(lightpink, 70%) !important;
+                    }
+                    &.bg-success{
+                        background-color: fade(lightgreen, 30%) !important;
+                    }
+                    &.bg-light-blue{
+                        background-color: fade(lightblue, 95%) !important;
+                    }
+                    &.bg-gold{
+                        background-color: fade(lightyellow, 95%) !important;
+                    }
+                    &.bg-brown{
+                        background-color: fade(burlywood, 20% )!important;
+                    }
+                    &.bg-coral{
+                        background-color: fade(lightcoral, 20%) !important;
+                    }
+                    &.bg-orange{
+                        background-color: fade(lightsalmon, 30%) !important;
+                    }
+                }
+
+
+            }
+
+            &:last-of-type{
+                .details-container{
+                    padding-bottom: 20px !important;
+                }
+            }
+
+            &.container-shadow {
+                .containerShadow(0.08);
+            }
+        }
+
+    }
+
+    .settings-action {
+        .flexAndCenter();
+        justify-content: flex-end;
+        align-items: center;
+        height: 100%;
+        width: 50px;
+    }
+
 }
 
 /* 404 page styling */

@@ -2,7 +2,7 @@ import { PageLess } from '../../PageLess/PageLess.min.js';
 import { PageLessComponent } from '../../PageLess/PageLess.min.js';
 import { Modal } from './Modals.js';
 import "../Components.js";
-import "./PoliticalPartyComponents.js";
+import "./Components.js";
 export const widget = function(){
     return new PageLessComponent("staff-assingment-manager-widget", {
         data: {
