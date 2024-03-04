@@ -42,6 +42,8 @@
                     $this->delete_department();
                     $this->assign_staff_to_department();
                     $this->unassign_staff_from_department();
+                    $this->get_department_executives();
+                    $this->get_department_staff();
                 }else{
                     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
                     $response->send_response();
@@ -135,6 +137,71 @@
                             $response->send_response();
                         }else{
                             $response         = new Response(200, "Department created successfully.");
+                            $response->send_response();
+                        }
+                    }else{
+                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response->send_response();
+                    }
+                }else{                
+                    $response = new Response(300, "This endpoint accepts the POST method");
+                    $response->send_response();
+                } 
+            }
+        }
+
+        //GET DEPARTMENT EXECUTIVES ENDPOINT
+        public function get_department_executives(){
+            if($this->url == "/api/get-department-executives")
+            {
+                if($this->method == "POST"){
+                    $_POST               = json_decode(file_get_contents("php://input"), true);
+                    $departmentId        = InputCleaner::sanitize($_POST['department_id']);
+                    $pager               = InputCleaner::sanitize($_POST['pager']);
+                    $companyId           = Helper::get_business_id($this->userId, $this->account_character);
+                    $executive           = new ViewexecutiveList();
+                    if($executive->permission === 200){
+                        $result          = $executive->return_department_executive_list($companyId, $departmentId, $pager);
+                        if($result === 500){
+                            $response         = new Response(500, "Error creating dapartments");
+                            $response->send_response();
+                        }else if($result === 404){
+                            $response         = new Response(404, "There is no executive member assigned to this department.");
+                            $response->send_response();
+                        }else{
+                            $response         = new Response(200, "Department executives.", $result);
+                            $response->send_response();
+                        }
+                    }else{
+                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response->send_response();
+                    }
+                }else{                
+                    $response = new Response(300, "This endpoint accepts the POST method");
+                    $response->send_response();
+                } 
+            }
+        }
+
+        //GET DEPARTMENT STAFF ENDPOINT
+        public function get_department_staff(){
+            if($this->url == "/api/get-department-staff")
+            {
+                if($this->method == "POST"){
+                    $_POST              = json_decode(file_get_contents("php://input"), true);
+                    $departmentId       = InputCleaner::sanitize($_POST['department_id']);
+                    $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                    $departments        = new Viewdepartments();
+                    if($departments->permission === 200){
+                        $result         = $departments->get_department_staff($companyId, $departmentId);
+                        if($result === 500){
+                            $response   = new Response(500, "Error returing dapartment staff.");
+                            $response->send_response();
+                        }else if($result === 404){
+                            $response   = new Response(400, "There is no staff assigned to this department.");
+                            $response->send_response();
+                        }else{
+                            $response   = new Response(200, "Department executives.", $result);
                             $response->send_response();
                         }
                     }else{

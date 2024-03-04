@@ -82,5 +82,24 @@ class ViewexecutiveList {
             }
         }
     }
+
+    //This method returns all executive members from a department
+    public function return_department_executive_list($companyId, $departmentId, $pager){
+        $query              = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE `company_id` = $companyId AND `department_id` = $departmentId ORDER BY `id` DESC LIMIT 15 OFFSET $pager");
+        if($query === false){
+            return 500;
+        }else{
+            $count          = $query->num_rows;
+            if($count >= 1){
+                $data       = [];
+                while ($row = mysqli_fetch_assoc($query)) {
+                    $data[] = ['staff_info'  => $row ];
+                }
+                return $data;
+            }else{
+                return 404;
+            }
+        }
+    }
 }
             

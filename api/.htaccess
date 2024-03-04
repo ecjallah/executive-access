@@ -44,6 +44,8 @@ RewriteRule ^delete-department/?$ modules/departments/DepartmentsHandler.class.p
 #DEPARTMENT APPOINTMENT
 RewriteRule ^assign-staff-to-department/?$ modules/departments/DepartmentsHandler.class.php
 RewriteRule ^unassign-staff-from-department/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^get-department-executives/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^get-department-staff/?$ modules/departments/DepartmentsHandler.class.php
 
 #EXECUTIVE ENDPOINTS
 RewriteRule ^get-executive-members/([0-9]+)/([a-z]+)/?$ modules/executivelist/ExecutiveListHandler.class.php?pager=$1&filter=$2
@@ -59,6 +61,7 @@ RewriteRule ^update-appointment/?$ modules/appointment/AppointmentHandler.class.
 RewriteRule ^delete-appointment/?$ modules/appointment/AppointmentHandler.class.php
 RewriteRule ^get-all-appointments/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?pager=$1
 RewriteRule ^get-appointment-details/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?id=$1
+RewriteRule ^get-department-appointments/([0-9]+)/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?pager=$1&department=$2
 
 #APPOINTMENT SECURITY
 RewriteRule ^lookup-appointment/?$ modules/appointmentsecurity/AppointmentSecurityHandler.class.php

@@ -39,7 +39,7 @@ class DepartmentAppointment {
 
     //This method assignes staff to a department
     public function assign_staff_department($details){
-        $query    = CustomSql::insert_array("department_appointment", $details);
+        $query    = CustomSql::insert_array("department_staff", $details);
         if($query === false){
             return 500;
         }else{
@@ -52,7 +52,7 @@ class DepartmentAppointment {
         $companyId      = $details['company_id'];
         $departmentId   = $details['department_id'];
         $staffId        = $details['staff_id'];
-        $query          = CustomSql::delete_sql("department_appointment", " `company_id` = $companyId AND `department_id` = $departmentId AND `staff_id` = $staffId ");
+        $query          = CustomSql::delete_sql("department_staff", " `company_id` = $companyId AND `department_id` = $departmentId AND `staff_id` = $staffId ");
         if($query === false){
             return 500;
         }else{
