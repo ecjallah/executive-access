@@ -364,7 +364,7 @@ export const Components = {
             return /*html*/`
                 <div class="row p-2 form-content-row ${(this.description != '') ? 'align-items-center' : ''}">
                     <div class="input-icon pr-2 text-muted">
-                        <span><i class="fad fa-lg fa-${this.icon}"></i></span>
+                        <span><i class="fa fa-lg fa-${this.icon}"></i></span>
                     </div>
                     <div class="form-textarea-container">
                         <textarea class="form-textarea ${this.identity} ${this.classname}" id="${this.identity}" name="${this.identity}" placeholder="${this.text}" ${this.attributes}
@@ -802,6 +802,52 @@ export const Components = {
         },
 
         callback: function(){
+        }
+    }),
+
+    TimeInput : new PageLessComponent('time-input', {
+        data: {
+
+            identity: 'time',
+            icon: 'clock',
+            text: 'Time',
+            items: [],
+            className: '',
+            required: null,
+            attributes: '',
+            selectedvalue: '',
+            description: '',
+            halfhour: true
+        },
+        view: function(){
+            let items = [];
+            for (let index=0; index < 24; index++) {
+                const time1 = `${index.toString().padStart(2, 0)}:00`;
+                const time2 = `${index.toString().padStart(2, 0)}:30`;
+
+                items.push({text: time1, value: time1+":00"});
+                if (this.halfhour === true) {
+                    items.push({text: time2, value: time2+":00"});
+                }
+            }
+            return /*html*/`
+                <div class="row p-2 form-content-row ${(this.description != '') ? 'align-items-center' : ''}">
+                    <div class="input-icon pr-2 text-muted">
+                        <span><i class="far fa-lg fa-${this.icon}"></i></span>
+                    </div>
+                    <div class="form-input-container">
+                        <native-select
+                            identity="${this.identity}"
+                            placeholder="${this.text}"
+                            attributes='${this.attributes}'
+                            items='${JSON.stringify(items)}'
+                            selectedValue="${this.selectedvalue}"
+                            ${(this.required != null) ? `required="${this.required}"` : ''}
+                        ></native-select>
+                        <span>${this.description}</span>
+                    </div>                    
+                </div>
+            `;
         }
     }),
 
@@ -1408,6 +1454,9 @@ export const Components = {
                             this.pageNum = this.pageNum+1;
                             if (this.requestData.data['page-num'] !== undefined) {
                                 this.requestData.data['page-num'] = this.pageNum;
+                            }
+                            if (this.requestData.data['pager'] !== undefined) {
+                                this.requestData.data['pager'] = this.pageNum;
                             }
                             this.setLoadingState(true);
                             PageLess.Request(this.requestData, this.requestFullAsync).then(result=>{

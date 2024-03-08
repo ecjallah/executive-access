@@ -14,33 +14,37 @@ export const widget = new PageLessComponent("appointment-manager-widget", {
                 icon: "user-tie",
                 description: `Please enter the details below`,
                 inputs: /*html*/ `
-                    <text-input icon="user" text="First Name" identity="firstname" required="required"></text-input>
-                    <text-input icon="user" text="Middle Name" identity="middlename"></text-input>
-                    <text-input icon="user" text="Last Name" identity="lastname" required="required"></text-input>
-                    <number-input icon="user" text="Phone Number" identity="number" required="required"></number-input>
+                    <text-input icon="user" text="Visitor Name" identity="visitor-name" required="required"></text-input>
+                    <department-select includeexecutives=true></department-select>
+                    <long-text-input icon="align-justify" text="Purpose" identity="purpose"></long-text-input>
+                    <number-input icon="phone-alt" text="Visitor Phone Number" identity="number"></number-input>
                     <date-input text="Date"></date-input>
-                    <executive-department-select></executive-department-select>
+                    <time-input icon="clock" text="Start Time" identity="start-time" required="required"></time-input>
+                    <time-input icon="clock" text="End Time" identity="end-time" required="required"></time-input>
                 `,
                 submitText: "Add",
                 closable: false,
                 autoClose: false,
             }, values=>{
-                let submitBtn = values.modal.querySelector('button[type=submit]');
+                console.log(values);
                 PageLess.Request({
-                    url: `/api/add-new-executive-member`,
+                    url: `/api/add-new-appointment`,
                     method: "POST",
                     data: {
-                        first_name: values.firstname,
-                        middle_name: values.middlename,
-                        last_name: values.lastname,
+                        executive_id: values.executive,
+                        department_id: values.department,
+                        visitor_name: values['visitor-name'],
                         number: values.number,
-                        department_id: values.department
+                        purpose: values.purpose,
+                        visit_date: `${values.year}-${values.month}-${values.day}`,
+                        start_time: values['start-time'],
+                        end_time: values['end-time']
                     },
                     beforeSend: ()=>{
-                        PageLess.ChangeButtonState(submitBtn, 'Adding');
+                        PageLess.ChangeButtonState(values.submitBtn, 'Adding');
                     }
                 }, true).then(result=>{
-                    PageLess.RestoreButtonState(submitBtn);
+                    PageLess.RestoreButtonState(values.submitBtn);
                     if (result.status == 200) {
                         this.parentComponent.querySelector('.scroll-view').update();
                         PageLess.Toast('success', result.message);
@@ -55,13 +59,15 @@ export const widget = new PageLessComponent("appointment-manager-widget", {
         onload: function(){
             return new Promise(resolve => {
                 this.setRequest({
-                    url: `/api/get-departments/0`,
+                    url: `/api/get-all-appointments`,
                     method: "GET",
+                    data: {
+                        pager: this.getPageNum()
+                    }
                 });
 
-                this.setChild(details=>{
-                    const data = details.staff_info;
-                    return /*html*/ `<appointment-group></appointment-group>`;
+                this.setChild(data=>{
+                    return /*html*/ `<appointment-group date="${data.formatted_date}" items='${JSON.stringify(data.appointments)}'></appointment-group>`;
                 });
 
                 resolve();
@@ -76,7 +82,7 @@ export const widget = new PageLessComponent("appointment-manager-widget", {
                     <pageless-button class="tool" text="Create New" onclick="{{this.props.addnew}}"></pageless-button>
                 </div>
                 <div class="main-content-body">
-                    <vertical-scroll-view nodataicon="fa-calendar-check" preloader="list" onload="{{this.props.onload}}" scrollable="false"></vertical-scroll-view>
+                    <vertical-scroll-view nodataicon="fa-calendar-check" preloader="list" onload="{{this.props.onload}}"></vertical-scroll-view>
                 </div>
             </div>
         `;

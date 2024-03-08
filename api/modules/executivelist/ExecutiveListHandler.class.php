@@ -33,10 +33,10 @@
                 $this->method               = $_SERVER["REQUEST_METHOD"];
                 $this->url                  = $_SERVER["REQUEST_URI"];
                 $moduelCheck                = Auth::module_security(EXECUTIVELIST_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
+                $this->get_executive_members();
                 if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
                     $this->add_executive_member();
-                    $this->get_executive_members();
                     $this->executive_get_departments();
                     $this->get_executive_details();
                     $this->update_executive_member();
@@ -57,9 +57,9 @@
                 if($this->method == "GET"){
                     $businessId          = Helper::get_business_id($this->userId, $this->account_character);
                     $executiveList       = new ViewexecutiveList();
-                    if($executiveList->permission === 200){
-                        $pager           = InputCleaner::sanitize($_GET["pager"]);
-                        $filter          = InputCleaner::sanitize($_GET["filter"]);
+                    // if($executiveList->permission === 200){
+                        $pager           = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET["pager"]) : null;
+                        $filter          = key_exists('filter', $_GET) ? InputCleaner::sanitize($_GET["filter"]) : null;
                         $result          = $executiveList->return_executive_list($businessId, $pager, $filter);
                         if($result === 500){
                             $response    = new Response(500, "Error returning executive memebers.");
@@ -71,10 +71,10 @@
                             $response    = new Response(200, "Executive memebers list", $result);
                             $response->send_response();
                         }
-                    }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
-                        $response->send_response();
-                    }
+                    // }else{
+                    //     $response = new Response(301, "Unauthorized Module: Contact Admin");
+                    //     $response->send_response();
+                    // }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the GET method");
                     $response->send_response();

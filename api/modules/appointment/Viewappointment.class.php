@@ -39,16 +39,44 @@ class Viewappointment {
 
     //This method returns all appointments
     public function return_all_appointments($companyId, $pager){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND status != 'delete' ORDER BY `id` DESC LIMIT 15 OFFSET $pager ");
+        $pageCond  = '';
+        if ($pager != null) {
+            $count    = 15; 
+            $pageNum  = intval($pager);
+            $offset   = $pageNum * $count;
+            $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
+        }
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
             $count      = $query->num_rows;
             if($count >= 1){
+                $keys   = [];
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $data[] = $row;
+                    $row['start_time'] = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
+                    $row['end_time']   = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
+                    $formatted         = date("l, M d, Y", strtotime($row['visit_date']));
+                    $dateKey           = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
+                    $index             = count($keys);
+
+                    if (in_array($dateKey, $keys)) {
+                        $index = array_keys($keys, $dateKey)[0];
+                    } else {
+                        $keys[] = $dateKey;
+                    }
+
+                    if (!key_exists($index, $data)) {
+                        $data[$index] = [
+                            'formatted_date' => $formatted,
+                            'appointments'   => [$row]
+                        ];
+                    } else {
+                        $data[$index]['appointments'][] = $row; 
+                    }
                 }
+
                 return $data;
             }else{
                 return 404;
@@ -58,16 +86,43 @@ class Viewappointment {
 
     //This method returns department appointments
     public function return_department_appointments($companyId, $departmentId, $pager){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND department_id =$departmentId AND status != 'delete' ORDER BY `id` DESC LIMIT 15 OFFSET $pager ");
+        $pageCond  = '';
+        if ($pager != null) {
+            $count    = 15; 
+            $pageNum  = intval($pager);
+            $offset   = $pageNum * $count;
+            $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
+        }
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND department_id =$departmentId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
+            $count = $query->num_rows;
             if($count >= 1){
+                $keys   = [];
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $data[] = $row;
+
+                    $formatted = date("l, M d, Y", strtotime($row['visit_date']));
+                    $dateKey   = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
+                    $index     = count($keys);
+
+                    if (in_array($dateKey, $keys)) {
+                        $index = array_keys($keys, $dateKey)[0];
+                    } else {
+                        $keys[] = $dateKey;
+                    }
+
+                    if (!key_exists($index, $data)) {
+                        $data[$index] = [
+                            'formatted_date' => $formatted,
+                            'appointments'   => [$row]
+                        ];
+                    } else {
+                        $data[$index]['appointments'][] = $row; 
+                    }
                 }
+
                 return $data;
             }else{
                 return 404;

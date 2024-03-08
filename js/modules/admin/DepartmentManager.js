@@ -46,8 +46,11 @@ export const widget = new PageLessComponent("department-manager-widget", {
         onload: function(){
             return new Promise(resolve => {
                 this.setRequest({
-                    url: `/api/get-departments/${this.getPageNum()}`,
+                    url: `/api/get-departments`,
                     method: "GET",
+                    data: {
+                        pager: this.getPageNum()
+                    }
                 });
 
                 this.setChild(data=>{

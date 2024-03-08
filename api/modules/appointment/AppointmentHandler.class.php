@@ -57,7 +57,7 @@
             {
                 if($this->method == "GET"){
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);
-                    $pager              = InputCleaner::sanitize($_GET['pager']);
+                    $pager              = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
                     $getAppointment     = new Viewappointment();
                     if($getAppointment->permission === 200){
                         $result         = $getAppointment->return_all_appointments($companyId, $pager);
@@ -68,7 +68,7 @@
                             $response   = new Response(404, "There is no appointment at this time.");
                             $response->send_response();
                         }else{
-                            $response   = new Response(200, "Active appointment list.", $result);
+                            $response   = new Response(200, "Active appointment list. $pager", $result);
                             $response->send_response();
                         }
                     }else{
@@ -158,36 +158,47 @@
                         $companyId         = Helper::get_business_id($this->userId, $this->account_character);
                         $addAppointment    = new Addappointment();
                         if($addAppointment->permission === 200){
-                            $executive_id  = InputCleaner::sanitize($_POST['executive_id']);
-                            $department_id = InputCleaner::sanitize($_POST['department_id']);
-                            $visitor_name  = InputCleaner::sanitize($_POST['visitor_name']);
-                            $purpose       = InputCleaner::sanitize($_POST['purpose']);
-                            $start_time    = InputCleaner::sanitize($_POST['start_time']);
-                            $end_time      = InputCleaner::sanitize($_POST['end_time']);
-                            $number        = InputCleaner::sanitize($_POST['number']);
-                            $visit_date    = InputCleaner::sanitize($_POST['visit_date']);
-
-                            $details     = [
-                                "company_id"     => $companyId,
-                                "executive_id"   => $executive_id,
-                                "department_id"  => $department_id,
-                                "visitor_name"   => $visitor_name,
-                                "purpose"        => $purpose,
-                                "start_time"     => $start_time,
-                                "end_time"       => $end_time,
-                                "visitor_number" => $number,
-                                "visit_date"     => $visit_date,
-                                "added_by"       => $this->userId
-                            ];
-
-                            $result           = $addAppointment->add_new_appointments($details);
-                            if($result === 500){
-                                $response     = new Response(500, " Error adding new appointment. ");
-                                $response->send_response();
-                            }else{
-                                $response     = new Response(200, " Appointment added successfully. ", $result);
+                            $executive_id     = InputCleaner::sanitize($_POST['executive_id']);
+                            $department_id    = InputCleaner::sanitize($_POST['department_id']);
+                            $visitor_name     = InputCleaner::sanitize($_POST['visitor_name']);
+                            $purpose          = InputCleaner::sanitize($_POST['purpose']);
+                            $start_time       = InputCleaner::sanitize($_POST['start_time']);
+                            $end_time         = InputCleaner::sanitize($_POST['end_time']);
+                            $number           = InputCleaner::sanitize($_POST['number']);
+                            $visit_date       = InputCleaner::sanitize($_POST['visit_date']);
+                            $final_visit_date = "$visit_date $start_time";
+                            $currentDate      = gmdate("Y-m-d H:i:s");
+                            $currentTimestamp = strtotime($currentDate);
+                            $VisitTimestamp   = strtotime($final_visit_date);
+                            if ($currentTimestamp < $VisitTimestamp) {
+                                $details     = [
+                                    "company_id"     => $companyId,
+                                    "executive_id"   => $executive_id,
+                                    "department_id"  => $department_id,
+                                    "visitor_name"   => $visitor_name,
+                                    "purpose"        => $purpose,
+                                    "start_time"     => $start_time,
+                                    "end_time"       => $end_time,
+                                    "visitor_number" => $number,
+                                    "visit_date"     => $final_visit_date,
+                                    "date_added"     => $currentDate,
+                                    "added_by"       => $this->userId
+                                ];
+    
+                                $result           = $addAppointment->add_new_appointments($details);
+                                if($result === 500){
+                                    $response     = new Response(500, " Error adding new appointment. ");
+                                    $response->send_response();
+                                }else{
+                                    $response     = new Response(200, " Appointment added successfully. ", $result);
+                                    $response->send_response();
+                                }
+                            } else {
+                                $response     = new Response(400, " Appointment date and time cannot be a date or time of the past");
                                 $response->send_response();
                             }
+                            
+
                         }else{
                             $response = new Response(301, "Unauthorized Module: Contact Admin");
                             $response->send_response();

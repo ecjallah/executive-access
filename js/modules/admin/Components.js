@@ -1346,30 +1346,48 @@ export const Components = {
         }
     }),
 
-    ExecutiveDepartmentSelect : new PageLessComponent("executive-department-select", {
+    DepartmentSelect : new PageLessComponent("department-select", {
         data: {
             userid: '',
             selectedvalue: '',
-            options: [{text: 'Loading...', value: ''}],
+            executives: '',
+            includeexecutives: false,
+            options: [{text: 'Loading...', value: '...'}],
         },
         view: function(){
             return /*html*/`
                 <div>
                     <custom-select
                         identity="department"
-                        icon="lock"
-                        text="User Role"
+                        icon="sitemap"
+                        text="Department"
                         items='${JSON.stringify(this.options)}'
                         required="required"
                         selectedvalue="${this.selectedvalue}"
+                        onchange="{{this.props.onchange}}"
                     ></custom-select>
+                    ${this.includeexecutives !== false ? this.executives : ''}
                 </div>
             `;
+        },
+        props: {
+            onchange: function(){
+                const value      = this.querySelector('select').value;
+                let executives = ''
+                if (value != '') {
+                    executives = /*html*/ `<executive-select departmentid="${value}"></executive-select>`
+                }
+
+                this.parentComponent.setData({
+                    selectedvalue: value, 
+                    executives: executives
+                });
+            }
         },
         callback: function(){
             this.ready(()=>{
                 PageLess.Request({
-                    url: `/api/executive-get-departments`,
+                    url: `/api/get-departments`,
                     method: "GET",
                 }).then(result=>{
                     if(result.status == 200){
@@ -1386,7 +1404,68 @@ export const Components = {
                         });
                     } else {
                         this.setData({
-                            options: [{text: 'No department have been added', value: "..."}]
+                            options: [{text: 'No department has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    ExecutiveSelect : new PageLessComponent("executive-select", {
+        data: {
+            departmentid: '',
+            selectedvalue: '',
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="executive"
+                        icon="user-tie"
+                        text="Meeting With"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                    ></custom-select>
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                let request;
+                if (this.department != '') {
+                    request = {
+                        url: '/api/get-department-executives',
+                        method: 'POST',
+                        data: {
+                            department_id: this.departmentid
+                        }
+                    }
+                } else {
+                    request = {
+                        url: '/api/get-departments',
+                        method: 'GET'
+                    }
+                }
+
+                PageLess.Request(request, true).then(result=>{
+                    if(result.status == 200){
+                        const data  = result.response_body;
+                        let options = [];
+                        data.forEach(executive=>{
+                            options.push({
+                                text: executive.full_name,
+                                value: executive.id
+                            });
+                        });
+                        this.setData({
+                            options: options
+                        });
+                    } else {
+                        this.setData({
+                            options: [{text: 'No executive has been added', value: "..."}]
                         });
                     }
                 });
@@ -1425,7 +1504,7 @@ export const Components = {
                                     <text-input value="${parent.middlename}" icon="user" text="Middle Name" identity="middlename"></text-input>
                                     <text-input value="${parent.lastname}" icon="user" text="Last Name" identity="lastname" required="required"></text-input>
                                     <number-input value="${parent.number}" icon="user" text="Phone Number" identity="number" required="required"></number-input>
-                                    <executive-department-select selectedvalue="${parent.departmentid}"></executive-department-select>
+                                    <department-select selectedvalue="${parent.departmentid}"></department-select>
                                 `,
                                 submitText: "Update",
                                 closeText: 'Close',
@@ -1513,7 +1592,7 @@ export const Components = {
         data: {
             userid: '',
             selectedvalue: '',
-            options: [{text: 'Loading...', value: ''}],
+            options: [{text: 'Loading...', value: '...'}],
         },
         view: function(){
             return /*html*/`
@@ -1564,11 +1643,37 @@ export const Components = {
             status: "",
             starttime: "",
             endtime: "",
-            colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
+            // colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
+            colors: {earlyMorning: "bg-primary", lateMorning: 'bg-secondary',  noon: "bg-gold", earlyAfternoon: 'bg-coral', lateAfternoon: "bg-orange", evening: "bg-danger"},
+            bgColor: ''
+        },
+
+        props: {
+            setColor: function(){
+                let   bgColor;
+                const intStartTime = parseInt(this.starttime.replace(':', ''));
+                
+                if (intStartTime <= 900) {
+                    bgColor = this.colors.earlyMorning;
+                } else if (intStartTime < 1200) {
+                    bgColor = this.colors.lateMorning;
+                } else if (intStartTime <= 1230) {
+                    bgColor = this.colors.noon;
+                } else if (intStartTime <= 1500) {
+                    bgColor = this.colors.earlyAfternoon;
+                } else if (intStartTime <= 1700) {
+                    bgColor = this.colors.lateAfternoon;
+                } else {
+                    bgColor = this.colors.evening;
+                }
+
+                this.setData({
+                    bgColor: bgColor
+                })
+            }
         },
         
         view: function(){
-            const bgColorClass = this.colors[Math.floor(Math.random() * 9)];
             return /*html*/`
                 <div class="appointment-item">
                     <div class="time-container position-relative">
@@ -1576,20 +1681,26 @@ export const Components = {
                         <div class="dot"></div>
                     </div>
                     <div class="details-container pl-3 p-2">
-                        <div class="details p-2 p-sm-3 text-dark ${bgColorClass}">
+                        <div class="details p-2 p-sm-3 text-dark ${this.bgColor}">
                             <div class="properties">
                                 <div class="name h6 font-weight-bold">${this.name}</div>
                                 <div class="property text-muted">${this.purpose}</div>
                                 <div class="property small text-muted">${this.status.toUpperCase()}</div>
                             </div>
                             <div class="action">
-                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncontextclick}}"></pageless-button>
+                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>'></pageless-button>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
         },
+
+        callback: function(){
+            this.ready(()=>{
+                this.props.setColor.call(this);
+            });
+        }
         
     }),
 
@@ -1597,78 +1708,79 @@ export const Components = {
         data: {
             date: '',
             items: '',
+            appointments: '',
         },
         props: {
             oncontextclick: function(event){
                 event.stopPropagation();
                 let parent = this.parentComponent;
                 PageLess.ContextMenu([
-                    {
-                        text: "Edit",
-                        callback: ()=>{
+                    // {
+                    //     text: "Edit",
+                    //     callback: ()=>{
                             
-                            Modal.BuildForm({
-                                title: "Update Department",
-                                icon: "sitemap",
-                                description: ``,
-                                inputs: /*html*/ `
-                                    <text-input value="${parent.name}" icon="user" text="Department Name" identity="name" required="required"></text-input>
-                                `,
-                                submitText: "Update",
-                                closeText: 'Cancel',
-                                closable: false,
-                                autoClose: false,
-                            }, values=>{
-                                PageLess.Request({
-                                    url: `/api/update-department`,
-                                    method: "POST",
-                                    data: {
-                                        department_id: parent.id,
-                                        title: values.name,
-                                    },
-                                    beforeSend: ()=>{
-                                        PageLess.ChangeButtonState(values.submitBtn);
-                                    }
-                                }, true).then(result=>{
-                                    PageLess.RestoreButtonState(values.submitBtn);
-                                    if (result.status == 200) {
-                                        PageLess.Toast('success', result.message);
-                                        Modal.Close(values.modal);
-                                        parent.setData({
-                                            name: values.name,
-                                        });
-                                    } else{
-                                        PageLess.Toast('danger', result.message, 5000);
-                                    }
-                                });
-                            });
-                        }
-                    },
-                    {
-                        text: "Delete",
-                        callback: ()=>{
-                            Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
-                                PageLess.Request({
-                                    url: `/api/delete-department`,
-                                    method: "POST",
-                                    data: {
-                                        department_id: parent.id
-                                    },
-                                    beforeSend: ()=>{
-                                        PageLess.ChangeButtonState(this, '');
-                                    }
-                                }, true).then(result=>{
-                                    PageLess.RestoreButtonState(this);
-                                    if (result.status == 200) {
-                                        PageLess.Toast('success', result.message);
-                                        parent.remove();
-                                    } else {
-                                        PageLess.Toast('success', result.message, 5000);
-                                    }
-                                });
-                            });
-                        }
-                    }
+                    //         Modal.BuildForm({
+                    //             title: "Update Department",
+                    //             icon: "sitemap",
+                    //             description: ``,
+                    //             inputs: /*html*/ `
+                    //                 <text-input value="${parent.name}" icon="user" text="Department Name" identity="name" required="required"></text-input>
+                    //             `,
+                    //             submitText: "Update",
+                    //             closeText: 'Cancel',
+                    //             closable: false,
+                    //             autoClose: false,
+                    //         }, values=>{
+                    //             PageLess.Request({
+                    //                 url: `/api/update-department`,
+                    //                 method: "POST",
+                    //                 data: {
+                    //                     department_id: parent.id,
+                    //                     title: values.name,
+                    //                 },
+                    //                 beforeSend: ()=>{
+                    //                     PageLess.ChangeButtonState(values.submitBtn);
+                    //                 }
+                    //             }, true).then(result=>{
+                    //                 PageLess.RestoreButtonState(values.submitBtn);
+                    //                 if (result.status == 200) {
+                    //                     PageLess.Toast('success', result.message);
+                    //                     Modal.Close(values.modal);
+                    //                     parent.setData({
+                    //                         name: values.name,
+                    //                     });
+                    //                 } else{
+                    //                     PageLess.Toast('danger', result.message, 5000);
+                    //                 }
+                    //             });
+                    //         });
+                    //     }
+                    // },
+                    // {
+                    //     text: "Delete",
+                    //     callback: ()=>{
+                    //         Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
+                    //             PageLess.Request({
+                    //                 url: `/api/delete-department`,
+                    //                 method: "POST",
+                    //                 data: {
+                    //                     department_id: parent.id
+                    //                 },
+                    //                 beforeSend: ()=>{
+                    //                     PageLess.ChangeButtonState(this, '');
+                    //                 }
+                    //             }, true).then(result=>{
+                    //                 PageLess.RestoreButtonState(this);
+                    //                 if (result.status == 200) {
+                    //                     PageLess.Toast('success', result.message);
+                    //                     parent.remove();
+                    //                 } else {
+                    //                     PageLess.Toast('success', result.message, 5000);
+                    //                 }
+                    //             });
+                    //         });
+                    //     }
+                    // }
                 ], this);
             },
         },
@@ -1680,17 +1792,26 @@ export const Components = {
                         <div class="appointment-group">
                             <div class="details">
                                 <div class="body">
-                                    <div class="title text-muted">Wednesday, March 31, 2024 </div>
-
-                                    <appointment-item name="Enoch C. Jallah" purpose="Meeting with the president" status="pending" starttime="12:00" endtime="15:30"></appointment-item>
-                                    <appointment-item name="Enoch C. Jallah" purpose="Meeting with the president" status="pending" starttime="14:00" endtime="15:30"></appointment-item>
-                                    <appointment-item name="Enoch C. Jallah" purpose="Meeting with the president" status="pending" starttime="17:00" endtime="19:30"></appointment-item>
+                                    <div class="title text-muted">${this.date}</div>
+                                    ${this.appointments}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+        }, 
+        callback: function(){
+            this.ready(()=>{
+                let appointments = '';
+                this.items.forEach(item=>{
+                    appointments += /*html*/ `<appointment-item id="${item.id}" name="${item.visitor_name}" number="${item.number}" purpose="${item.purpose}" status="${item.status}" starttime="${item.start_time}" endtime="${item.end_time}"></appointment-item>`
+                });
+
+                this.setData({
+                    appointments: appointments
+                })
+            });
         }
     }),
     

@@ -19,7 +19,7 @@ export const widget = new PageLessComponent("executives-manager-widget", {
                     <text-input icon="user" text="Last Name" identity="lastname" required="required"></text-input>
                     <number-input icon="user" text="Phone Number" identity="number" required="required"></number-input>
                     <date-input text="Date"></date-input>
-                    <executive-department-select></executive-department-select>
+                    <department-select></department-select>
                 `,
                 submitText: "Add",
                 closable: false,
@@ -55,8 +55,12 @@ export const widget = new PageLessComponent("executives-manager-widget", {
         onload: function(){
             return new Promise(resolve => {
                 this.setRequest({
-                    url: `/api/get-executive-members/${this.getPageNum()}/active`,
+                    url: `/api/get-executive-members`,
                     method: "GET",
+                    data: {
+                        pager: this.getPageNum(),
+                        filter: 'active'
+                    }
                 });
 
                 this.setChild(details=>{
