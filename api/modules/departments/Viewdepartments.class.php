@@ -39,8 +39,15 @@ class Viewdepartments {
     }
 
     //This method get departments with pagination
-    public function get_all_departments($companyId, $pager){
-        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = $companyId AND `delete` = 0 ORDER BY `date_added` DESC LIMIT 15 OFFSET $pager ");
+    public function get_all_departments($companyId, $pager = null){
+        $pageCond  = '';
+        if ($pager != null) {
+            $count    = 15; 
+            $pageNum  = intval($pager);
+            $offset   = $pageNum * $count;
+            $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
+        }
+        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = $companyId AND `delete` = 0 ORDER BY `date_added` DESC $pageCond");
         if($query === false){
             return 500;
         }else{

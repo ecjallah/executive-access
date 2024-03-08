@@ -35,7 +35,7 @@ export const widget = new PageLessComponent("political-party-home-widget", {
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4 col-md-6 order-1 order-sm-2 d-flex align-items-center">
-                                        <img class="instructional-image" src="/media/images/voteclipart.png">
+                                        <img class="instructional-image" src="/media/images/appointment-clipart.png">
                                     </div>
                                 </div>
                             </div>

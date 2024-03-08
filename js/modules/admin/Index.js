@@ -41,16 +41,16 @@ export class Widget extends PageLess{
                 routePattern: /^\/staff-account-management\/roles\/?$/
             },
             {
-                widget: "CountiesManager",
-                routePattern: /^\/counties\/?$/
+                widget: "DepartmentManager",
+                routePattern: /^\/departments-manager\/?$/
             },
             {
-                widget: "DistrictsManager",
-                routePattern: /^\/counties\/([0-9]+)\/districts\/?$/
+                widget: "ExecutivesManager",
+                routePattern: /^\/executives-manager\/?$/
             },
             {
-                widget: "StaffAssignmentManager",
-                routePattern: /^\/polling-places\/([0-9]+)\/assignment\/?$/
+                widget: "AppointmentManager",
+                routePattern: /^\/appointments\/?$/
             },
         );
     }

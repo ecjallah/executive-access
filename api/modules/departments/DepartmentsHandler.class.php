@@ -33,10 +33,10 @@
                 $this->method               = $_SERVER["REQUEST_METHOD"];
                 $this->url                  = $_SERVER["REQUEST_URI"];
                 $moduelCheck                = Auth::module_security(DEPARTMENTS_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
+                $this->get_company_department();
                 if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
                     $this->add_department();
-                    $this->get_company_department();
                     $this->update_department();
                     $this->get_department_by_params();
                     $this->delete_department();
@@ -60,8 +60,8 @@
                 if($this->method == "GET"){
                     $businessId          = Helper::get_business_id($this->userId, $this->account_character);
                     $departmetnView      = new Viewdepartments();
-                    if($departmetnView->permission === 200){
-                        $pager           = InputCleaner::sanitize($_GET["pager"]);
+                    // if($departmetnView->permission === 200){
+                        $pager           = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET["pager"]) : null;
                         $result          = $departmetnView->get_all_departments($businessId, $pager);
                         if($result === 500){
                             $response    = new Response(500, "Error returning departments.");
@@ -73,10 +73,10 @@
                             $response    = new Response(200, "Departments list", $result);
                             $response->send_response();
                         }
-                    }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
-                        $response->send_response();
-                    }
+                    // }else{
+                    //     $response = new Response(301, "Unauthorized Module: Contact Admin");
+                    //     $response->send_response();
+                    // }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the GET method");
                     $response->send_response();
@@ -157,7 +157,7 @@
                 if($this->method == "POST"){
                     $_POST               = json_decode(file_get_contents("php://input"), true);
                     $departmentId        = InputCleaner::sanitize($_POST['department_id']);
-                    $pager               = InputCleaner::sanitize($_POST['pager']);
+                    $pager               = key_exists('pager', $_POST) ? InputCleaner::sanitize($_POST['pager']) : null;
                     $companyId           = Helper::get_business_id($this->userId, $this->account_character);
                     $executive           = new ViewexecutiveList();
                     if($executive->permission === 200){

@@ -2,7 +2,7 @@ import { PageLess } from '../../PageLess/PageLess.min.js';
 import { PageLessComponent } from '../../PageLess/PageLess.min.js';
 import { Modal } from './Modals.js';
 import "../Components.js";
-import "./PoliticalPartyComponents.js";
+import "./Components.js";
 export const widget = new PageLessComponent("staff-management-widget", {
     data: {
         title: "Staff Management"
@@ -22,7 +22,6 @@ export const widget = new PageLessComponent("staff-management-widget", {
                     <gender-select></gender-select>
                     <number-input text="Phone Number" icon="phone-alt" identity="phone-no" required="required"></number-input>
                     <email-input required="required"></email-input>
-                    <county-select required="required"></county-select>
                     <staff-role-select></staff-role-select>
                 `,
                 submitText: "Add Staff",
@@ -39,7 +38,7 @@ export const widget = new PageLessComponent("staff-management-widget", {
                         address : values.address,
                         sex : values.gender,
                         email : values.email,
-                        county : values.county,
+                        county : 'N/A',
                         number : values['phone-no'],
                         username : values.username,
                     },
@@ -49,7 +48,7 @@ export const widget = new PageLessComponent("staff-management-widget", {
                 }, true).then(result=>{
                     PageLess.RestoreButtonState(values.submitBtn);
                     if (result.status == 200) {
-                        PageLess.Toast('success', result.message);
+                        Modal.Success('Completed Successfully', result.message);
                         this.parentComponent.querySelector('.scroll-view').update();
                         Modal.Close(values.modal);
                     } else {

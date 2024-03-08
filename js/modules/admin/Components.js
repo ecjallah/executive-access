@@ -856,7 +856,7 @@ export const Components = {
             return /*html*/`
                 <li class="sidebar-menu-item" onclick="{{this.props.onclick}}">
                     <div class="sidebar-menu-item-content pl-4 pr-3 slow-trans">
-                        <span class="sidebar-menu-item-icon" title="${this.title}"><i class="fal fa-lg fa-${this.icon}"></i></span>
+                        <span class="sidebar-menu-item-icon" title="${this.title}"><i class="fad fa-lg fa-${this.icon}"></i></span>
                         <span class="sidebar-menu-item-desc">&emsp;${this.text}</span>
                     </div>
                 </li>
@@ -934,22 +934,18 @@ export const Components = {
                     <div class="sidebar">
                         <div class="text-white">
                             <div class="sidebar-title">
-                                <div class="app-logo w-33px h-33px border-radius-5 bg-mw-primary"></div>
                                 <div class="app-name">${this.title}</div>
                             </div>
                         </div>
 
                         <ul class="sidebar-menu-container p-relative">
                             <div class="w-100 d-flex pl-3 pr-3 align-items-center py-3">
-                                <div class="user-profile-img-container d-flex justify-content-center align-items-center">
-                                    <bg-image classname=" w-50px h-50px d-flex justify-content-center align-items-center" src="${this.userimage}"></bg-image>
+                                <div class="w-100 d-flex justify-content-center align-items-center">
+                                    <bg-image classname=" w-75px h-75px d-flex justify-content-center align-items-center" src="${this.userimage}"></bg-image>
                                 </div>
-
-                                <div class="flex-1">
-                                    <div class="w-100 justify-content-left p-2">
-                                        <span class="text-white">${this.username}</span>
-                                    </div>
-                                </div>
+                            </div>
+                            <div class="w-100 d-flex justify-content-center p-2 mb-3">
+                                <span class="text-white">${this.username}</span>
                             </div>
                             ${this.items}
                         </ul>
@@ -975,7 +971,6 @@ export const Components = {
                         items += /*html*/ `<sidebar-item text="Logout" link="logout" icon="door-open"></sidebar-item>`;
 
                         this.setData({
-                            userimage: data.full_image != "" ? data.full_image : this.userimage,
                             username: data.username,
                             usertype: data.user_type,
                             items: items
@@ -1037,7 +1032,7 @@ export const Components = {
                         });
                     } else {
                         this.setData({
-                            options: [{text: 'No role have been added', value: "..."}]
+                            options: [{text: 'No role has been added', value: "..."}]
                         });
                     }
                 });
@@ -1249,6 +1244,576 @@ export const Components = {
                 </div>
             `;
         }
-    })
+    }),
+
+    DepartmentItem: new PageLessComponent("department-item", {
+        data: {
+            id: '',
+            name: '',
+            actionicon: 'ellipsis-v'
+        },
+        props: {
+            oncontextclick: function(event){
+                event.stopPropagation();
+                let parent = this.parentComponent;
+                PageLess.ContextMenu([
+                    {
+                        text: "Edit",
+                        callback: ()=>{
+                            
+                            Modal.BuildForm({
+                                title: "Update Department",
+                                icon: "sitemap",
+                                description: ``,
+                                inputs: /*html*/ `
+                                    <text-input value="${parent.name}" icon="user" text="Department Name" identity="name" required="required"></text-input>
+                                `,
+                                submitText: "Update",
+                                closeText: 'Cancel',
+                                closable: false,
+                                autoClose: false,
+                            }, values=>{
+                                PageLess.Request({
+                                    url: `/api/update-department`,
+                                    method: "POST",
+                                    data: {
+                                        department_id: parent.id,
+                                        title: values.name,
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(values.submitBtn);
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(values.submitBtn);
+                                    if (result.status == 200) {
+                                        PageLess.Toast('success', result.message);
+                                        Modal.Close(values.modal);
+                                        parent.setData({
+                                            name: values.name,
+                                        });
+                                    } else{
+                                        PageLess.Toast('danger', result.message, 5000);
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    {
+                        text: "Delete",
+                        callback: ()=>{
+                            Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
+                                PageLess.Request({
+                                    url: `/api/delete-department`,
+                                    method: "POST",
+                                    data: {
+                                        department_id: parent.id
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(this, '');
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(this);
+                                    if (result.status == 200) {
+                                        PageLess.Toast('success', result.message);
+                                        parent.remove();
+                                    } else {
+                                        PageLess.Toast('success', result.message, 5000);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                ], this);
+            },
+        },
+        view: function(){
+            return /*html*/`
+                <div class="col-12" onclick="{{this.props.onclick}}">
+                    <div class="row p-1 p-sm-1 p-xl-2" >
+                        <div class="settings-container border-radius-10 main-content-item">
+                            <div class="settings-details">
+                                <div class="settings-body">
+                                    <div class="settings-title text-muted">${this.name}</div>
+                                </div>
+                            </div>
+                            <div class="settings-action position-relative d-flex align-items-center">
+                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncontextclick}}"></pageless-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }),
+
+    DepartmentSelect : new PageLessComponent("department-select", {
+        data: {
+            userid: '',
+            selectedvalue: '',
+            executives: '',
+            includeexecutives: false,
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="department"
+                        icon="sitemap"
+                        text="Department"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                        onchange="{{this.props.onchange}}"
+                    ></custom-select>
+                    ${this.includeexecutives !== false ? this.executives : ''}
+                </div>
+            `;
+        },
+        props: {
+            onchange: function(){
+                const value      = this.querySelector('select').value;
+                let executives = ''
+                if (value != '') {
+                    executives = /*html*/ `<executive-select departmentid="${value}"></executive-select>`
+                }
+
+                this.parentComponent.setData({
+                    selectedvalue: value, 
+                    executives: executives
+                });
+            }
+        },
+        callback: function(){
+            this.ready(()=>{
+                PageLess.Request({
+                    url: `/api/get-departments`,
+                    method: "GET",
+                }).then(result=>{
+                    if(result.status == 200){
+                        let data    = result.response_body;
+                        let options = [];
+                        data.forEach(department=>{
+                            options.push({
+                                text: department.title,
+                                value: department.id
+                            });
+                        });
+                        this.setData({
+                            options: options
+                        });
+                    } else {
+                        this.setData({
+                            options: [{text: 'No department has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    ExecutiveSelect : new PageLessComponent("executive-select", {
+        data: {
+            departmentid: '',
+            selectedvalue: '',
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="executive"
+                        icon="user-tie"
+                        text="Meeting With"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                    ></custom-select>
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                let request;
+                if (this.department != '') {
+                    request = {
+                        url: '/api/get-department-executives',
+                        method: 'POST',
+                        data: {
+                            department_id: this.departmentid
+                        }
+                    }
+                } else {
+                    request = {
+                        url: '/api/get-departments',
+                        method: 'GET'
+                    }
+                }
+
+                PageLess.Request(request, true).then(result=>{
+                    if(result.status == 200){
+                        const data  = result.response_body;
+                        let options = [];
+                        data.forEach(executive=>{
+                            options.push({
+                                text: executive.full_name,
+                                value: executive.id
+                            });
+                        });
+                        this.setData({
+                            options: options
+                        });
+                    } else {
+                        this.setData({
+                            options: [{text: 'No executive has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    ExecutiveItem: new PageLessComponent("executive-item", {
+        data: {
+            image: '/media/images/default_other_avatar.png',
+            fullname: '',
+            firstname: "",
+            middlename: "",
+            lastname: "",
+            number: "",
+            department: "",
+            departmentid: "",
+            actionicon: 'ellipsis-v',
+            number: ''
+        },
+        props: {
+            oncontextclick: function(event){
+                event.stopPropagation();
+                let parent = this.parentComponent;
+                PageLess.ContextMenu([
+                    {
+                        text: "View Details",
+                        callback: ()=>{
+                            
+                            Modal.BuildForm({
+                                title: "Executive Details",
+                                icon: "user-tie",
+                                description: ``,
+                                inputs: /*html*/ `
+                                    <text-input value="${parent.firstname}" icon="user" text="First Name" identity="firstname" required="required"></text-input>
+                                    <text-input value="${parent.middlename}" icon="user" text="Middle Name" identity="middlename"></text-input>
+                                    <text-input value="${parent.lastname}" icon="user" text="Last Name" identity="lastname" required="required"></text-input>
+                                    <number-input value="${parent.number}" icon="user" text="Phone Number" identity="number" required="required"></number-input>
+                                    <department-select selectedvalue="${parent.departmentid}"></department-select>
+                                `,
+                                submitText: "Update",
+                                closeText: 'Close',
+                                closable: false,
+                                autoClose: false,
+                            }, values=>{
+                                PageLess.Request({
+                                    url: `/api/update-executive-member-info`,
+                                    method: "POST",
+                                    data: {
+                                        executive_id: parent.id,
+                                        first_name: values.firstname,
+                                        middle_name: values.middlename,
+                                        last_name: values.lastname,
+                                        number: values.number,
+                                        department_id: values.department,
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(values.submitBtn);
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(values.submitBtn);
+                                    if (result.status == 200) {
+                                        PageLess.Toast('success', result.message);
+                                        Modal.Close(values.modal);
+                                        parent.parentComponents('vertical-scroll-view').update()
+                                    } else{
+                                        PageLess.Toast('danger', result.message, 5000);
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    {
+                        text: "Delete",
+                        callback: ()=>{
+                            Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
+                                PageLess.Request({
+                                    url: `/api/delete-executive_member`,
+                                    method: "POST",
+                                    data: {
+                                        executive_id: parent.id
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(this, '');
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(this);
+                                    if (result.status == 200) {
+                                        PageLess.Toast('success', result.message);
+                                        parent.remove();
+                                    } else {
+                                        PageLess.Toast('success', result.message, 5000);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                ], this);
+            },
+        },
+        view: function(){
+            return /*html*/`
+                <div class="col-12" onclick="{{this.props.onclick}}">
+                    <div class="row p-1 p-sm-1 p-xl-2" >
+                        <div class="settings-container border-radius-10 main-content-item">
+                            <div class="settings-details">
+                                <bg-image classname="w-50px h-50px" src="${this.image}" rounded="true"></bg-image>
+                                <div class="settings-body">
+                                    <div class="settings-title text-muted">${this.fullname}</div>
+                                    <div class="settings-details text-muted">${this.department}</div>
+                                </div>
+                            </div>
+                            <div class="settings-action position-relative d-flex align-items-center">
+                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncontextclick}}"></pageless-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }),
+
+    StaffSelect : new PageLessComponent("staff-select", {
+        data: {
+            userid: '',
+            selectedvalue: '',
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="role"
+                        icon="lock"
+                        text="User Role"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                    ></custom-select>
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                PageLess.Request({
+                    url: `/api/view-staffs`,
+                    method: "GET",
+                }).then(result=>{
+                    if(result.status == 200){
+                        let data    = result.response_body;
+                        let options = [];
+                        data.forEach(staff=>{
+                            options.push({
+                                text: staff.full_name,
+                                value: staff.user_id
+                            });
+                        });
+                        this.setData({
+                            options: options
+                        });
+                    } else {
+                        this.setData({
+                            options: [{text: 'No user has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    AppointmentItem: new PageLessComponent("appointment-item", {
+        data: {
+            name: "",
+            purpose: "",
+            status: "",
+            starttime: "",
+            endtime: "",
+            // colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
+            colors: {earlyMorning: "bg-primary", lateMorning: 'bg-secondary',  noon: "bg-gold", earlyAfternoon: 'bg-coral', lateAfternoon: "bg-orange", evening: "bg-danger"},
+            bgColor: ''
+        },
+
+        props: {
+            setColor: function(){
+                let   bgColor;
+                const intStartTime = parseInt(this.starttime.replace(':', ''));
+                
+                if (intStartTime <= 900) {
+                    bgColor = this.colors.earlyMorning;
+                } else if (intStartTime < 1200) {
+                    bgColor = this.colors.lateMorning;
+                } else if (intStartTime <= 1230) {
+                    bgColor = this.colors.noon;
+                } else if (intStartTime <= 1500) {
+                    bgColor = this.colors.earlyAfternoon;
+                } else if (intStartTime <= 1700) {
+                    bgColor = this.colors.lateAfternoon;
+                } else {
+                    bgColor = this.colors.evening;
+                }
+
+                this.setData({
+                    bgColor: bgColor
+                })
+            }
+        },
+        
+        view: function(){
+            return /*html*/`
+                <div class="appointment-item">
+                    <div class="time-container position-relative">
+                        <div class="small">${this.starttime} - ${this.endtime}</div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="details-container pl-3 p-2">
+                        <div class="details p-2 p-sm-3 text-dark ${this.bgColor}">
+                            <div class="properties">
+                                <div class="name h6 font-weight-bold">${this.name}</div>
+                                <div class="property text-muted">${this.purpose}</div>
+                                <div class="property small text-muted">${this.status.toUpperCase()}</div>
+                            </div>
+                            <div class="action">
+                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>'></pageless-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        callback: function(){
+            this.ready(()=>{
+                this.props.setColor.call(this);
+            });
+        }
+        
+    }),
+
+    AppointmentGroup: new PageLessComponent("appointment-group", {
+        data: {
+            date: '',
+            items: '',
+            appointments: '',
+        },
+        props: {
+            oncontextclick: function(event){
+                event.stopPropagation();
+                let parent = this.parentComponent;
+                PageLess.ContextMenu([
+                    // {
+                    //     text: "Edit",
+                    //     callback: ()=>{
+                            
+                    //         Modal.BuildForm({
+                    //             title: "Update Department",
+                    //             icon: "sitemap",
+                    //             description: ``,
+                    //             inputs: /*html*/ `
+                    //                 <text-input value="${parent.name}" icon="user" text="Department Name" identity="name" required="required"></text-input>
+                    //             `,
+                    //             submitText: "Update",
+                    //             closeText: 'Cancel',
+                    //             closable: false,
+                    //             autoClose: false,
+                    //         }, values=>{
+                    //             PageLess.Request({
+                    //                 url: `/api/update-department`,
+                    //                 method: "POST",
+                    //                 data: {
+                    //                     department_id: parent.id,
+                    //                     title: values.name,
+                    //                 },
+                    //                 beforeSend: ()=>{
+                    //                     PageLess.ChangeButtonState(values.submitBtn);
+                    //                 }
+                    //             }, true).then(result=>{
+                    //                 PageLess.RestoreButtonState(values.submitBtn);
+                    //                 if (result.status == 200) {
+                    //                     PageLess.Toast('success', result.message);
+                    //                     Modal.Close(values.modal);
+                    //                     parent.setData({
+                    //                         name: values.name,
+                    //                     });
+                    //                 } else{
+                    //                     PageLess.Toast('danger', result.message, 5000);
+                    //                 }
+                    //             });
+                    //         });
+                    //     }
+                    // },
+                    // {
+                    //     text: "Delete",
+                    //     callback: ()=>{
+                    //         Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
+                    //             PageLess.Request({
+                    //                 url: `/api/delete-department`,
+                    //                 method: "POST",
+                    //                 data: {
+                    //                     department_id: parent.id
+                    //                 },
+                    //                 beforeSend: ()=>{
+                    //                     PageLess.ChangeButtonState(this, '');
+                    //                 }
+                    //             }, true).then(result=>{
+                    //                 PageLess.RestoreButtonState(this);
+                    //                 if (result.status == 200) {
+                    //                     PageLess.Toast('success', result.message);
+                    //                     parent.remove();
+                    //                 } else {
+                    //                     PageLess.Toast('success', result.message, 5000);
+                    //                 }
+                    //             });
+                    //         });
+                    //     }
+                    // }
+                ], this);
+            },
+        },
+
+        view: function(){
+            return /*html*/`
+                <div class="col-12" onclick="{{this.props.onclick}}">
+                    <div class="row" >
+                        <div class="appointment-group">
+                            <div class="details">
+                                <div class="body">
+                                    <div class="title text-muted">${this.date}</div>
+                                    ${this.appointments}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }, 
+        callback: function(){
+            this.ready(()=>{
+                let appointments = '';
+                this.items.forEach(item=>{
+                    appointments += /*html*/ `<appointment-item id="${item.id}" name="${item.visitor_name}" number="${item.number}" purpose="${item.purpose}" status="${item.status}" starttime="${item.start_time}" endtime="${item.end_time}"></appointment-item>`
+                });
+
+                this.setData({
+                    appointments: appointments
+                })
+            });
+        }
+    }),
+    
 
 }
