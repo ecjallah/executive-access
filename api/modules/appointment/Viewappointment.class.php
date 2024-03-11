@@ -55,11 +55,15 @@ class Viewappointment {
                 $keys   = [];
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $row['start_time'] = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
-                    $row['end_time']   = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
-                    $formatted         = date("l, M d, Y", strtotime($row['visit_date']));
-                    $dateKey           = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
-                    $index             = count($keys);
+                    $row['start_day']         = gmdate('d', strtotime($row['visit_date']));
+                    $row['start_month']       = gmdate('m', strtotime($row['visit_date']));
+                    $row['start_year']        = gmdate('Y', strtotime($row['visit_date']));
+                    $row['start_time']        = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
+                    $row['end_time']          = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
+                    $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
+                    $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
+                    $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
+                    $index                    = count($keys);
 
                     if (in_array($dateKey, $keys)) {
                         $index = array_keys($keys, $dateKey)[0];
@@ -102,10 +106,13 @@ class Viewappointment {
                 $keys   = [];
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-
-                    $formatted = date("l, M d, Y", strtotime($row['visit_date']));
-                    $dateKey   = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
-                    $index     = count($keys);
+                    $row['start_day']         = gmdate('d', strtotime($row['visit_date']));
+                    $row['start_month']       = gmdate('m', strtotime($row['visit_date']));
+                    $row['start_year']        = gmdate('Y', strtotime($row['visit_date']));
+                    $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
+                    $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
+                    $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
+                    $index                    = count($keys);
 
                     if (in_array($dateKey, $keys)) {
                         $index = array_keys($keys, $dateKey)[0];

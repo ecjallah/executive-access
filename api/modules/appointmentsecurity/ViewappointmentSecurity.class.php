@@ -39,15 +39,36 @@ class ViewappointmentSecurity {
 
      //This method liikups an appointment
      public function lookup_appointment($companyId, $lookupVal){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' AND `status` != 'completed'");
         if($query === false){
             return 500;
         }else{
             $count      = $query->num_rows;
             if($count >= 1){
+                $keys   = [];
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $data[] = $row;
+                    $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
+                    $row['start_time']        = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
+                    $row['end_time']          = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
+                    $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
+                    $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
+                    $index                    = count($keys);
+
+                    if (in_array($dateKey, $keys)) {
+                        $index = array_keys($keys, $dateKey)[0];
+                    } else {
+                        $keys[] = $dateKey;
+                    }
+
+                    if (!key_exists($index, $data)) {
+                        $data[$index] = [
+                            'formatted_date' => $formatted,
+                            'appointments'   => [$row]
+                        ];
+                    } else {
+                        $data[$index]['appointments'][] = $row; 
+                    }
                 }
                 return $data;
             }else{
