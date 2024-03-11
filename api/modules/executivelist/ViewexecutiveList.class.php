@@ -77,14 +77,10 @@ class ViewexecutiveList {
         }else{
             $count          = $query->num_rows;
             if($count === 1){
-                $data       = [];
-                $department = new Viewdepartments();
-                $row        = mysqli_fetch_assoc($query);
-                $data[]     = [
-                    'department_info' => $department->get_departments_details($companyId, $row['department_id']),
-                    'staff_info'      => $row
-                ];
-                return $data;
+                $department             = new Viewdepartments();
+                $row                    = mysqli_fetch_assoc($query);
+                $row['department_info'] =  $department->get_departments_details($companyId, $row['department_id']);
+                return $row;
             }else{
                 return 404;
             }

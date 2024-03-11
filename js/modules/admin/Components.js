@@ -1362,6 +1362,7 @@ export const Components = {
         data: {
             userid: '',
             selectedvalue: '',
+            selectedexecutive: '',
             executives: '',
             includeexecutives: false,
             options: [{text: 'Loading...', value: '...'}],
@@ -1387,7 +1388,7 @@ export const Components = {
                 const value      = this.querySelector('select').value;
                 let executives = ''
                 if (value != '') {
-                    executives = /*html*/ `<executive-select departmentid="${value}"></executive-select>`
+                    executives = /*html*/ `<executive-select selectedvalue="${this.parentComponent.selectedexecutive}" departmentid="${value}"></executive-select>`
                 }
 
                 this.parentComponent.setData({
@@ -1411,9 +1412,15 @@ export const Components = {
                                 value: department.id
                             });
                         });
-                        this.setData({
+
+                        let obj = {
                             options: options
-                        });
+                        }
+
+                        if (this.selectedvalue && this.selectedexecutive != '') {
+                            obj.executives = /*html*/ `<executive-select selectedvalue="${this.selectedexecutive}" departmentid="${this.selectedvalue}"></executive-select>`
+                        }
+                        this.setData(obj);
                     } else {
                         this.setData({
                             options: [{text: 'No department has been added', value: "..."}]
@@ -1507,15 +1514,12 @@ export const Components = {
                 let request;
                 if (this.department != '') {
                     request = {
-                        url: '/api/get-department-executives',
-                        method: 'POST',
-                        data: {
-                            department_id: this.departmentid
-                        }
+                        url: `/api/get-department-executives/${this.departmentid}`,
+                        method: 'GET'
                     }
                 } else {
                     request = {
-                        url: '/api/get-departments',
+                        url: '/api/get-executive-members',
                         method: 'GET'
                     }
                 }
@@ -1525,6 +1529,7 @@ export const Components = {
                         const data  = result.response_body;
                         let options = [];
                         data.forEach(executive=>{
+                            console.log(executive.id);
                             options.push({
                                 text: executive.full_name,
                                 value: executive.id
@@ -1797,14 +1802,31 @@ export const Components = {
 
     AppointmentItem: new PageLessComponent("appointment-item", {
         data: {
-            name: "",
-            purpose: "",
-            status: "",
-            starttime: "",
-            endtime: "",
+            id : "",
+            name : "",
+            number : "",
+            purpose : "",
+            departmentid : "",
+            executiveid : "",
+            executive : "",
+            status : "",
+            starttime : "",
+            endtime : "",
+            startday : "",
+            startmonth : "",
+            startyear : "",
+            editable : "",
             // colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
-            colors: {earlyMorning: "bg-primary", lateMorning: 'bg-secondary',  noon: "bg-gold", earlyAfternoon: 'bg-coral', lateAfternoon: "bg-orange", evening: "bg-danger"},
-            bgColor: ''
+            colors: {
+                earlyMorning: "bg-primary", 
+                lateMorning: 'bg-secondary',  
+                noon: "bg-gold", 
+                earlyAfternoon: 'bg-coral', 
+                lateAfternoon: "bg-orange", 
+                evening: "bg-danger"
+            },
+            bgColor: '',
+            editable: true
         },
 
         props: {
@@ -1829,25 +1851,114 @@ export const Components = {
                 this.setData({
                     bgColor: bgColor
                 })
-            }
+            },
+
+            oncontextclick: function(event){
+                event.stopPropagation();
+                let parent = this.parentComponent;
+                PageLess.ContextMenu([
+                    {
+                        text: "Edit",
+                        callback: ()=>{
+                            
+                            Modal.BuildForm({
+                                title: "Update Appointment",
+                                icon: "user-tie",
+                                description: `Please enter the details below`,
+                                inputs: /*html*/ `
+                                    <text-input value="${parent.name}" icon="user" text="Visitor Name" identity="visitor-name" required="required" ></text-input>
+                                    <department-select selectedvalue="${parent.departmentid}" selectedexecutive="${parent.executiveid}" includeexecutives=true ></department-select>
+                                    <long-text-input value="${parent.purpose}" icon="align-justify" text="Purpose" identity="purpose"></long-text-input>
+                                    <number-input value="${parent.number}" icon="phone-alt" text="Visitor Phone Number" identity="number"></number-input>
+                                    <date-input selectedyear="${parent.startyear}" selectedmonth="${parent.startmonth}" selectedday="${parent.startday}" text="Date"></date-input>
+                                    <time-input selectedvalue="${parent.starttime}:00" icon="clock" text="Start Time" identity="start-time" required="required"></time-input>
+                                    <time-input selectedvalue="${parent.endtime}:00" icon="clock" text="End Time" identity="end-time" required="required"></time-input>
+                                `,
+                                submitText: "Update",
+                                closable: false,
+                                autoClose: false,
+                            }, values=>{
+                                console.log(values);
+                                PageLess.Request({
+                                    url: `/api/update-appointment`,
+                                    method: "POST",
+                                    data: {
+                                        appointment_id: parent.id,
+                                        executive_id: values.executive,
+                                        department_id: values.department,
+                                        visitor_name: values['visitor-name'],
+                                        number: values.number,
+                                        purpose: values.purpose,
+                                        visit_date: `${values.year}-${values.month}-${values.day}`,
+                                        start_time: values['start-time'],
+                                        end_time: values['end-time']
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(values.submitBtn, 'Adding');
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(values.submitBtn);
+                                    if (result.status == 200) {
+                                        this.parentComponents('vertical-scroll-view').update();
+                                        PageLess.Toast('success', result.message);
+                                        Modal.Close(values.modal);
+                                    } else {
+                                        PageLess.Toast('danger', result.message);
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    {
+                        text: "Delete",
+                        callback: ()=>{
+                            Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
+                                PageLess.Request({
+                                    url: `/api/delete-appointment`,
+                                    method: "POST",
+                                    data: {
+                                        appointment_id: parent.id
+                                    },
+                                    beforeSend: ()=>{
+                                        PageLess.ChangeButtonState(this, '');
+                                    }
+                                }, true).then(result=>{
+                                    PageLess.RestoreButtonState(this);
+                                    if (result.status == 200) {
+                                        PageLess.Toast('success', result.message);
+                                        parent.remove();
+                                    } else {
+                                        PageLess.Toast('success', result.message, 5000);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                ], this);
+            },
         },
         
         view: function(){
             return /*html*/`
                 <div class="appointment-item">
                     <div class="time-container position-relative">
-                        <div class="small">${this.starttime} - ${this.endtime}</div>
+                        <div class="small d-flex justify-content-center flex-column flex-sm-row align-items-center">
+                            <div>${this.starttime}</div>
+                            <div><span class="d-none d-sm-inline p-1">-</span><span class="d-inline d-sm-none"> to </span></div>
+                            <div>${this.endtime}</div>
+                        </div>
                         <div class="dot"></div>
                     </div>
                     <div class="details-container pl-3 p-2">
                         <div class="details p-2 p-sm-3 text-dark ${this.bgColor}">
                             <div class="properties">
                                 <div class="name h6 font-weight-bold">${this.name}</div>
-                                <div class="property text-muted">${this.purpose}</div>
-                                <div class="property small text-muted">${this.status.toUpperCase()}</div>
+                                <div class="property text-muted">Meeting With: <b>${this.executive}</b></div>
+                                <div class="property w-100 text-muted">Purpose: <b>${this.purpose}</b></div>
+                                <div class="property small text-muted">Status: <b>${this.status.toUpperCase()}</b></div>
                             </div>
                             <div class="action">
-                                <pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>'></pageless-button>
+                                ${this.editable === true || this.editable == 'true' ? /*html*/ `<pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncontextclick}}" />` : ''}
                             </div>
                         </div>
                     </div>
@@ -1868,80 +1979,7 @@ export const Components = {
             date: '',
             items: '',
             appointments: '',
-        },
-        props: {
-            oncontextclick: function(event){
-                event.stopPropagation();
-                let parent = this.parentComponent;
-                PageLess.ContextMenu([
-                    // {
-                    //     text: "Edit",
-                    //     callback: ()=>{
-                            
-                    //         Modal.BuildForm({
-                    //             title: "Update Department",
-                    //             icon: "sitemap",
-                    //             description: ``,
-                    //             inputs: /*html*/ `
-                    //                 <text-input value="${parent.name}" icon="user" text="Department Name" identity="name" required="required"></text-input>
-                    //             `,
-                    //             submitText: "Update",
-                    //             closeText: 'Cancel',
-                    //             closable: false,
-                    //             autoClose: false,
-                    //         }, values=>{
-                    //             PageLess.Request({
-                    //                 url: `/api/update-department`,
-                    //                 method: "POST",
-                    //                 data: {
-                    //                     department_id: parent.id,
-                    //                     title: values.name,
-                    //                 },
-                    //                 beforeSend: ()=>{
-                    //                     PageLess.ChangeButtonState(values.submitBtn);
-                    //                 }
-                    //             }, true).then(result=>{
-                    //                 PageLess.RestoreButtonState(values.submitBtn);
-                    //                 if (result.status == 200) {
-                    //                     PageLess.Toast('success', result.message);
-                    //                     Modal.Close(values.modal);
-                    //                     parent.setData({
-                    //                         name: values.name,
-                    //                     });
-                    //                 } else{
-                    //                     PageLess.Toast('danger', result.message, 5000);
-                    //                 }
-                    //             });
-                    //         });
-                    //     }
-                    // },
-                    // {
-                    //     text: "Delete",
-                    //     callback: ()=>{
-                    //         Modal.Confirmation("Confirm Deletion", "This action cannot be undone! Are you sure you want to continue?").then(()=>{
-                    //             PageLess.Request({
-                    //                 url: `/api/delete-department`,
-                    //                 method: "POST",
-                    //                 data: {
-                    //                     department_id: parent.id
-                    //                 },
-                    //                 beforeSend: ()=>{
-                    //                     PageLess.ChangeButtonState(this, '');
-                    //                 }
-                    //             }, true).then(result=>{
-                    //                 PageLess.RestoreButtonState(this);
-                    //                 if (result.status == 200) {
-                    //                     PageLess.Toast('success', result.message);
-                    //                     parent.remove();
-                    //                 } else {
-                    //                     PageLess.Toast('success', result.message, 5000);
-                    //                 }
-                    //             });
-                    //         });
-                    //     }
-                    // }
-                ], this);
-            },
+            editable: true,
         },
 
         view: function(){
@@ -1964,7 +2002,24 @@ export const Components = {
             this.ready(()=>{
                 let appointments = '';
                 this.items.forEach(item=>{
-                    appointments += /*html*/ `<appointment-item id="${item.id}" name="${item.visitor_name}" number="${item.number}" purpose="${item.purpose}" status="${item.status}" starttime="${item.start_time}" endtime="${item.end_time}"></appointment-item>`
+                    appointments += /*html*/ `
+                        <appointment-item 
+                            id="${item.id}" 
+                            name="${item.visitor_name}" 
+                            number="${item.visitor_number}" 
+                            purpose="${item.purpose}"
+                            departmentid="${item.department_id}"
+                            executiveid="${item.executive_id}"
+                            executive="${item.executive_details.full_name}"
+                            status="${item.status}" 
+                            starttime="${item.start_time}" 
+                            endtime="${item.end_time}" 
+                            startday="${item.start_day}" 
+                            startmonth="${item.start_month}" 
+                            startyear="${item.start_year}" 
+                            editable="${this.editable}"
+                        ></appointment-item>
+                    `
                 });
 
                 this.setData({

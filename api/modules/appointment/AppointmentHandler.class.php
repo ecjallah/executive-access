@@ -230,25 +230,38 @@
                             $visitor_name    = InputCleaner::sanitize($_POST['visitor_name']);
                             $purpose         = InputCleaner::sanitize($_POST['purpose']);
                             $number          = InputCleaner::sanitize($_POST['number']);
+                            $start_time      = InputCleaner::sanitize($_POST['start_time']);
+                            $end_time        = InputCleaner::sanitize($_POST['end_time']);
                             $visit_date      = InputCleaner::sanitize($_POST['visit_date']);
-
-                            $details     = [
-                                "company_id"     => $companyId,
-                                "executive_id"   => $executive_id,
-                                "department_id"  => $department_id,
-                                "visitor_name"   => $visitor_name,
-                                "purpose"        => $purpose,
-                                "visitor_number" => $number,
-                                "visit_date"     => $visit_date,
-                                "added_by"       => $this->userId
-                            ];
-                            $identity         = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointment_id]];
-                            $result           = $editAppointment->update_executive_appointment($details, $identity);
-                            if($result === 500){
-                                $response     = new Response(500, " Error updating appointment. ");
-                                $response->send_response();
-                            }else{
-                                $response     = new Response(200, " Appointment updated successfully. ", $result);
+                            $final_visit_date = "$visit_date $start_time";
+                            $currentDate      = gmdate("Y-m-d H:i:s");
+                            $currentTimestamp = strtotime($currentDate);
+                            $VisitTimestamp   = strtotime($final_visit_date);
+                            if ($currentTimestamp < $VisitTimestamp) {
+                                $details     = [
+                                    "company_id"     => $companyId,
+                                    "executive_id"   => $executive_id,
+                                    "department_id"  => $department_id,
+                                    "visitor_name"   => $visitor_name,
+                                    "purpose"        => $purpose,
+                                    "start_time"     => $start_time,
+                                    "end_time"       => $end_time,
+                                    "visitor_number" => $number,
+                                    "visit_date"     => $visit_date,
+                                    "date_added"     => $currentDate,
+                                    "added_by"       => $this->userId
+                                ];
+                                $identity         = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointment_id]];
+                                $result           = $editAppointment->update_executive_appointment($details, $identity);
+                                if($result === 500){
+                                    $response     = new Response(500, " Error updating appointment. ");
+                                    $response->send_response();
+                                }else{
+                                    $response     = new Response(200, " Appointment updated successfully. ", $result);
+                                    $response->send_response();
+                                }
+                            } else {
+                                $response     = new Response(400, " Appointment date and time cannot be a date or time of the past");
                                 $response->send_response();
                             }
                         }else{
