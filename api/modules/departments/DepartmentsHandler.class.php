@@ -152,12 +152,12 @@
 
         //GET DEPARTMENT EXECUTIVES ENDPOINT
         public function get_department_executives(){
-            if($this->url == "/api/get-department-executives")
+            if(strpos($this->url, "/api/get-department-executives") !== false)
             {
-                if($this->method == "POST"){
+                if($this->method == "GET"){
                     $_POST               = json_decode(file_get_contents("php://input"), true);
-                    $departmentId        = InputCleaner::sanitize($_POST['department_id']);
-                    $pager               = key_exists('pager', $_POST) ? InputCleaner::sanitize($_POST['pager']) : null;
+                    $departmentId        = InputCleaner::sanitize($_GET['department-id']);
+                    $pager               = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
                     $companyId           = Helper::get_business_id($this->userId, $this->account_character);
                     $executive           = new ViewexecutiveList();
                     if($executive->permission === 200){
@@ -185,11 +185,10 @@
 
         //GET DEPARTMENT STAFF ENDPOINT
         public function get_department_staff(){
-            if($this->url == "/api/get-department-staff")
+            if(strpos($this->url, "/api/get-department-staff") !== false)
             {
-                if($this->method == "POST"){
-                    $_POST              = json_decode(file_get_contents("php://input"), true);
-                    $departmentId       = InputCleaner::sanitize($_POST['department_id']);
+                if($this->method == "GET"){
+                    $departmentId       = InputCleaner::sanitize($_GET['department-id']);
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);
                     $departments        = new Viewdepartments();
                     if($departments->permission === 200){
@@ -198,7 +197,7 @@
                             $response   = new Response(500, "Error returing dapartment staff.");
                             $response->send_response();
                         }else if($result === 404){
-                            $response   = new Response(400, "There is no staff assigned to this department.");
+                            $response   = new Response(404, "There is no staff assigned to this department.");
                             $response->send_response();
                         }else{
                             $response   = new Response(200, "Department executives.", $result);

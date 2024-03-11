@@ -44,8 +44,8 @@ RewriteRule ^delete-department/?$ modules/departments/DepartmentsHandler.class.p
 #DEPARTMENT APPOINTMENT
 RewriteRule ^assign-staff-to-department/?$ modules/departments/DepartmentsHandler.class.php
 RewriteRule ^unassign-staff-from-department/?$ modules/departments/DepartmentsHandler.class.php
-RewriteRule ^get-department-executives/?$ modules/departments/DepartmentsHandler.class.php
-RewriteRule ^get-department-staff/?$ modules/departments/DepartmentsHandler.class.php
+RewriteRule ^get-department-executives/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department-id=$1
+RewriteRule ^get-department-staff/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department-id=$1
 
 #EXECUTIVE ENDPOINTS
 RewriteRule ^get-executive-members/?$ modules/executivelist/ExecutiveListHandler.class.php [QSA]

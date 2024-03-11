@@ -94,7 +94,7 @@ class ViewexecutiveList {
     //This method returns all executive members from a department
     public function return_department_executive_list($companyId, $departmentId, $pager = null){
         $pageCond = $pager != null ? "LIMIT 15 OFFSET $pager" : '';
-        $query              = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE `company_id` = $companyId AND `department_id` = $departmentId ORDER BY `id` DESC $pageCond");
+        $query              = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE `company_id` = $companyId AND `department_id` = $departmentId AND `status` != 'remove' ORDER BY `id` DESC $pageCond");
         if($query === false){
             return 500;
         }else{
