@@ -45,6 +45,14 @@ export class Widget extends PageLess{
                 routePattern: /^\/departments-manager\/?$/
             },
             {
+                widget: "DepartmentStaff",
+                routePattern: /^\/departments-manager\/([0-9]+)\/staff\/?$/
+            },
+            {
+                widget: "DepartmentExecutives",
+                routePattern: /^\/departments-manager\/([0-9]+)\/executives\/?$/
+            },
+            {
                 widget: "ExecutivesManager",
                 routePattern: /^\/executives-manager\/?$/
             },
