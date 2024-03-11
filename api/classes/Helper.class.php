@@ -342,4 +342,36 @@ class Helper{
             }
         }
     }
+
+    //This method returns staff department id
+    public static function get_staff_department_id($staffId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE staff_id = $staffId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count = $query->num_rows;
+            if($count === 1){
+                $data =  $query->fetch_assoc();
+                return ['status' => 200, 'data' => $data] ;
+            }else{
+                return ['status' => 404] ;
+            }
+        }
+    }
+
+    //This method returns appointment department id
+    public static function get_appointment_department_id($appointmentId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE department_id = $appointmentId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count = $query->num_rows;
+            if($count === 1){
+                $data =  $query->fetch_assoc();
+                return ['status' => 200, 'data' => $data] ;
+            }else{
+                return ['status' => 404] ;
+            }
+        }
+    }
 }
