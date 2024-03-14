@@ -36,6 +36,7 @@
                 if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
                     $this->get_appointment_dash_info();
+                    $this->appointment_operation_stats();
                 }else{
                     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
                     $response->send_response();
@@ -75,33 +76,35 @@
             }
         }
 
-        // //THIS ENDPOINT RETURNS COUNTY VOTE REPORT
-        // public function get_county_vote_report(){
-        //     if($this->url == "/api/get-county-vote-reports")
-        //     {
-        //         if($this->method == "GET"){
-        //             $viewDashboard   = new Viewdashboard();
-        //             if($viewDashboard->permission === 200){
-        //                 $result           = $viewDashboard->get_voter_report(100, $countyId, $precintId, $pollingCenterId);
-        //                 if($result === 500){
-        //                     $response     = new Response(500, " Error loading candidate report. ");
-        //                     $response->send_response();
-        //                 }else if($result === 404){
-        //                     $response     = new Response(404, " There is no candidate report at this time. ");
-        //                     $response->send_response();
-        //                 }else{
-        //                     $response     = new Response(200, "Candidates report", $result);
-        //                     $response->send_response();
-        //                 }
-        //             }else{
-        //                 $response = new Response(301, "Unauthorized Module: Contact Admin");
-        //                 $response->send_response();
-        //             }
-        //         }else{                
-        //             $response = new Response(300, "This endpoint accepts the POST method");
-        //             $response->send_response();
-        //         } 
-        //     }
-        // }
+        //This endpoint returns all appointments
+        protected function appointment_operation_stats(){
+            if($this->url == '/api/appointment-operation-stats')
+            {
+                if($this->method == 'POST'){
+                    $viewDashboard       = new Viewdashboard();
+                    if($viewDashboard->permission === 200){
+                        $_POST           = json_decode(file_get_contents('php://input'), true);
+                        $companyId       = Helper::get_business_id($this->userId, $this->account_character);
+
+                        //Get healthcare/hospital id
+                        $filter          = InputCleaner::sanitize($_POST['data_key']);
+                        $result          = $viewDashboard->appointment_stats($companyId, $filter);
+                        if($result === 500){
+                            $response    = new Response(500, "Error returning pharmacy order request stats");
+                            $response->send_response();
+                        }else{
+                            $response    = new Response(200, "Appointment stats", $result);
+                            $response->send_response();
+                        }
+                    }else{
+                        $response = new Response(305, 'Unauthorized Module: Contact Admin');
+                        $response->send_response();
+                    }
+                }else{                
+                    $response = new Response(300, "This endpoint accepts the POST method");
+                    $response->send_response();
+                } 
+            }
+        }
     }
 new DashboardHandler();
