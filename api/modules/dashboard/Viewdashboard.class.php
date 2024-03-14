@@ -31,9 +31,9 @@ class Viewdashboard {
 
     function __construct(){
         if(isset($_SESSION["user_id"])){
-            $this->userId              = $_SESSION["user_id"];
-            $this->user_type           = $_SESSION["user_type"];
-            $this->permission          = null;
+            $this->userId      = $_SESSION["user_id"];
+            $this->user_type   = $_SESSION["user_type"];
+            $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
             $auth              = Auth::function_check('SUB_VIEWDASHBOARD', $this->userId, $this->user_type, $this->account_character);
@@ -41,105 +41,59 @@ class Viewdashboard {
         }
     }
 
-    //This method get from give database
-    public function get_voter_report($businessId, $countyId = null, $precintId = null, $pollingCenterId = null){
-        //GET ALL PRESIDENTIAL CANDIDATES
-        $candidateInfo       = new ViewCandidate();
-        $result              = $candidateInfo->get_all_candidate_list(1);
-        if(is_array($result)){
-            $dataResult      = [];
-            $totalVotes      = [];
-            foreach ($result as $value) {
-                $candidateId        = $value['id'];
-                $countyCond         = $countyId != null ? "AND `county_id`=$countyId" : "";
-                $precinctCond       = $precintId != null ? "AND `precint_id`=$precintId" : "";
-                $pollingCenterCond  = $pollingCenterId != null ? "AND `center_id`=$pollingCenterId" : "";
-                $query       = CustomSql::quick_select(" SELECT * FROM `candidate_votes` WHERE `candidate_id` = $candidateId $countyCond $precinctCond $pollingCenterCond");
-                
-                if($query === false){
-                    $dataResult[]    = 500;
-                }else{
-                    $count           = $query->num_rows;
-                    if($count >= 1){
-                        while ($row  = $query->fetch_assoc()) {
-                            $details = [
-                                "candidate_info"  => $value,
-                                "vote_value"      => $row['value']
-                            ];
-                            $totalVotes[] = $row['value'];
-                            $dataResult['candidates'][]  = $details;
-                        }
-                    }else{
-                        $totalVotes[] = 0;
-                        $dataResult['candidates'][]      = [
-                            "candidate_info"  => $value,
-                            "vote_value"      => 0
-                        ];
-                    }
-                }
-            }
-            //Get invaild votes
-            $dataResult['total_vote']    = [
-                "full_name"   => "Total Votes",
-                "vote_value"  => array_sum($totalVotes)
-            ];
-            $totalInvalid = $this->get_invaild_votes_per_county($countyId, $precintId, $pollingCenterId);
-            $dataResult['invaild_vote']  = $totalInvalid;
-            $dataResult['candidates'][]  = [
-                "candidate_info" => [
-                    "full_name" =>"Invalid Votes",
-                    "id"        =>"99",
-                ],
-                "vote_value" => $totalInvalid['vote_value']
-            ];
-            return $dataResult;
-        }else{
-            return $result;
-        }
-        
+
+    //This method return dashboard basis information
+    public function get_overview_info($companyId){
+        $data =  [
+            "total_appointment"             => isset($this->get_appointment_dash_info($companyId)['data'])?$this->get_appointment_dash_info($companyId)['data']:$this->get_appointment_dash_info($companyId),
+            "total_department"              => isset($this->get_department_dash_info($companyId)['data'])?$this->get_department_dash_info($companyId)['data']:$this->get_department_dash_info($companyId),
+            "total_executive"               => isset($this->get_executive_dash_info($companyId)['data'])?$this->get_executive_dash_info($companyId)['data']:$this->get_executive_dash_info($companyId),
+            "total_department_executive"    => isset($this->get_department_staff_dash_info($companyId)['data'])?$this->get_department_staff_dash_info($companyId)['data']:$this->get_department_staff_dash_info($companyId)
+        ];
+        return $data;
     }
-    
-    //This method returns invaild votes per county, precints and centers
-    public function get_invaild_votes_per_county($countyId, $precintId, $pollingCenterId){
-        $countyCond         = $countyId != null ? "AND `county_id`=$countyId" : "";
-        $precinctCond       = $precintId != null ? "AND `precint_id`=$precintId" : "";
-        $pollingCenterCond  = $pollingCenterId != null ? "AND `center_id`=$pollingCenterId" : "";
-        $query              = CustomSql::quick_select("SELECT * FROM `candidate_votes` WHERE `candidate_id` = 99 $countyCond $precinctCond $pollingCenterCond");
+
+    //This method returns appointment info
+    public function get_appointment_dash_info($companyId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId");
         if($query === false){
-            return 500;
+            return ['status' => 500];
         }else{
-            $count = $query->num_rows;
-            if($count >= 1){
-                $data          = [];
-                while ($row    = $query->fetch_assoc()) {
-                    $data = [
-                        "full_name"   => "Invaild Votes",
-                        "vote_value"  => $row['value']
-                    ];
-                }
-                return $data;
-            }else{
-                $data = [
-                    "full_name"   => "Invaild Votes",
-                    "vote_value"  => 0
-                ];
-                return $data;
-            }
+            $data  = $query->num_rows;
+            return ['status' => 200, 'data' => $data];
         }
-        
     }
 
-    //This method returns polling centers report
-    public function get_polling_center_report(){
-        //Get all polling places
-        $pollingCenters    = new ViewpollingManagement();
-        $allPollingCenters = $pollingCenters->return_all_polling_centers();
-        return $allPollingCenters;
+    //This method returns department info
+    public function get_department_dash_info($companyId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `departments` WHERE company_id = $companyId");
+        if($query === false){
+            return ['status' => 500];
+        }else{
+            $data  = $query->num_rows;
+            return ['status' => 200, 'data' => $data];
+        }
     }
 
-    //This method returns county vote report
-    public function get_county_vote_report($businessId){
-        //Get all registred county
-        // $allCounties  = 
+    //This method returns executive info
+    public function get_executive_dash_info($companyId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE company_id = $companyId");
+        if($query === false){
+            return ['status' => 500];
+        }else{
+            $data  = $query->num_rows;
+            return ['status' => 200, 'data' => $data];
+        }
+    }
+
+    //This method returns department staff
+    public function get_department_staff_dash_info($companyId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE company_id = $companyId");
+        if($query === false){
+            return ['status' => 500];
+        }else{
+            $data  = $query->num_rows;
+            return ['status' => 200, 'data' => $data];
+        }
     }
 }

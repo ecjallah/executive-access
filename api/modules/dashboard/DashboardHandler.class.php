@@ -33,12 +33,9 @@
                 $this->method              = $_SERVER["REQUEST_METHOD"];
                 $this->url                 = $_SERVER["REQUEST_URI"];
                 $moduelCheck               = Auth::module_security(DASHBOARD_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
-
                 if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
-                    $this->get_candidate_vote_report();
-                    $this->get_polling_center_report();
-                    // $this->get_county_vote_report();
+                    $this->get_appointment_dash_info();
                 }else{
                     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
                     $response->send_response();
@@ -48,63 +45,29 @@
             }
         }
 
-        //THIS ENDPOINT RETURNS POLLING CENTERS PERCENTAGE
-        public function get_polling_center_report(){
-            if($this->url == "/api/get-candidate-vote-reports")
+        //THIS ENDPOINT RETURNS APPOINTMENT INFORMATION
+        public function get_appointment_dash_info(){
+            if($this->url == "/api/get-overview-reports")
             {
                 if($this->method == "GET"){
-                    $viewDashboard     = new Viewdashboard();
+                    $viewDashboard          = new Viewdashboard();
                     if($viewDashboard->permission === 200){
-                        $result        = $viewDashboard->get_polling_center_report();
-
-                        // if($result === 500){
-                        //     $response     = new Response(500, " Error loading candidate report. ");
-                        //     $response->send_response();
-                        // }else if($result === 404){
-                        //     $response     = new Response(404, " There is no candidate report at this time. ");
-                        //     $response->send_response();
-                        // }else{
-                        //     $response     = new Response(200, "Candidates report", $result);
-                        //     $response->send_response();
-                        // }
-                    }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
-                        $response->send_response();
-                    }
-                }else{                
-                    $response = new Response(300, "This endpoint accepts the POST method");
-                    $response->send_response();
-                }
-            }
-        }
-
-        //THIS ENDPOINT RETURNS CANDIDATE VOTE REPORT
-        public function get_candidate_vote_report(){
-            if($this->url == "/api/get-candidate-vote-reports")
-            {
-                if($this->method == "POST"){
-                    $_POST           = json_decode(file_get_contents("php://input"), true);
-                    $viewDashboard   = new Viewdashboard();
-                    if($viewDashboard->permission === 200){
-                        $countyId         = key_exists('county_id', $_POST) && !empty($_POST['county_id']) ? InputCleaner::sanitize($_POST['county_id']) : null;
-                        $precintId        = key_exists('precint_id', $_POST) && !empty($_POST['precint_id']) ? InputCleaner::sanitize($_POST['precint_id']) : null;
-                        $pollingCenterId  = key_exists('polling_center_id', $_POST) && !empty($_POST['polling_center_id']) ? InputCleaner::sanitize($_POST['polling_center_id']) : null;
-                        $result           = $viewDashboard->get_voter_report(100, $countyId, $precintId, $pollingCenterId);
+                        $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                        $result             = $viewDashboard->get_overview_info($companyId);
                         if($result === 500){
-                            $response     = new Response(500, " Error loading candidate report. ");
+                            $response       = new Response(500, "Error loading candidate report.");
                             $response->send_response();
                         }else if($result === 404){
-                            $response     = new Response(404, " There is no candidate report at this time. ");
+                            $response       = new Response(404, "There is no overview report at this time.");
                             $response->send_response();
                         }else{
-                            $response     = new Response(200, "Candidates report", $result);
+                            $response       = new Response(200, "Overview report.", $result);
                             $response->send_response();
                         }
                     }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response  = new Response(301, "Unauthorized Module: Contact Admin");
                         $response->send_response();
                     }
-                    // }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the POST method");
                     $response->send_response();
