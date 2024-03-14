@@ -67,7 +67,7 @@ RewriteRule ^get-department-appointments/([0-9]+)/?$ modules/appointment/Appoint
 RewriteRule ^lookup-appointment/?$ modules/appointmentsecurity/AppointmentSecurityHandler.class.php
 
 #DEPARTMENT APPOINTMENTS
-RewriteRule ^get-appointments-from-department/([0-9]+)/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php?pager=$1
+RewriteRule ^get-appointments-from-department/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php [QSA]
 RewriteRule ^get-department-appointment-details/([0-9]+)/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php?id=$1
 RewriteRule ^add-new-department-appointment/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php
 RewriteRule ^update-department-appointment/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php

@@ -39,7 +39,7 @@ class ViewappointmentSecurity {
 
      //This method liikups an appointment
      public function lookup_appointment($companyId, $lookupVal){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' AND `status` != 'completed'");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' AND `status` != 'completed'");
         if($query === false){
             return 500;
         }else{

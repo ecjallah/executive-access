@@ -351,7 +351,7 @@ class Helper{
         }else{
             $count = $query->num_rows;
             if($count === 1){
-                $data =  $query->fetch_assoc();
+                $data =  $query->fetch_assoc()['department_id'];
                 return ['status' => 200, 'data' => $data] ;
             }else{
                 return ['status' => 404] ;

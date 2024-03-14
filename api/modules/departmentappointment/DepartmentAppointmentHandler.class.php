@@ -63,15 +63,18 @@
                         $departmentId       = $departmentId['data'];
                         $getAppointment     = new Viewappointment();
                         if($getAppointment->permission === 200){
+                            $response       = ['department_id'=>$departmentId];
                             $result         = $getAppointment->return_department_appointments($companyId, $departmentId, $pager);
                             if($result === 500){
                                 $response   = new Response(500, "Error returning department appointments.");
                                 $response->send_response();
                             }else if($result === 404){
-                                $response   = new Response(404, "There is no department appointment at this time.");
+                                $response['department_appointments'] = $result;
+                                $response   = new Response(404, "There is no department appointment at this time.", $response);
                                 $response->send_response();
                             }else{
-                                $response   = new Response(200, "Department active appointment list.", $result);
+                                $response['department_appointments'] = $result;
+                                $response   = new Response(200, "Department active appointment list.", $response);
                                 $response->send_response();
                             }
                         }else{
@@ -96,7 +99,7 @@
                 if($this->method == "GET"){
                     $companyId              = Helper::get_business_id($this->userId, $this->account_character);
                     $id                     = InputCleaner::sanitize($_GET['id']);
-                    $departmentId           = Helper::get_appointment_department_id($this->userId);
+                    $departmentId           = Helper::get_staff_department_id($this->userId);
                     if($departmentId['status'] === 200){
                         $getAppointment     = new Viewappointment();
                         if($getAppointment->permission === 200){
@@ -139,10 +142,10 @@
                         $companyId                = Helper::get_business_id($this->userId, $this->account_character);
                         $addAppointment           = new Addappointment();
                         if($addAppointment->permission === 200){
-                            $departmentId         = Helper::get_appointment_department_id($this->userId);
+                            $departmentId         = Helper::get_staff_department_id($this->userId);
                             if($departmentId['status'] === 200){
                                 $executive_id     = InputCleaner::sanitize($_POST['executive_id']);
-                                $department_id    = 1;
+                                $department_id    = $departmentId['data'];
                                 $visitor_name     = InputCleaner::sanitize($_POST['visitor_name']);
                                 $purpose          = InputCleaner::sanitize($_POST['purpose']);
                                 $start_time       = InputCleaner::sanitize($_POST['start_time']);
@@ -181,7 +184,7 @@
                                     $response->send_response();
                                 }
                             }else{
-                                $response   = new Response(404, "Sorry, you are not assigned to a department.");
+                                $response   = new Response(404, "Sorry, you are not assigned to a department.", $departmentId);
                                 $response->send_response();
                             }
                         }else{
@@ -209,7 +212,7 @@
                         $companyId           = Helper::get_business_id($this->userId, $this->account_character);
                         $editAppointment     = new Editappointment();
                         if($editAppointment->permission === 200){
-                            $departmentId         = Helper::get_appointment_department_id($this->userId);
+                            $departmentId         = Helper::get_staff_department_id($this->userId);
                             if($departmentId['status'] === 200){
                                 $appointment_id  = InputCleaner::sanitize($_POST['appointment_id']);
                                 $executive_id    = InputCleaner::sanitize($_POST['executive_id']);
@@ -267,7 +270,7 @@
                         $companyId         = Helper::get_business_id($this->userId, $this->account_character);
                         $editAppointment   = new Editappointment();
                         if($editAppointment->permission === 200){
-                            $departmentId         = Helper::get_appointment_department_id($this->userId);
+                            $departmentId         = Helper::get_staff_department_id($this->userId);
                             if($departmentId['status'] === 200){
                                 $appointment_id      = InputCleaner::sanitize($_POST['appointment_id']);
                                 $appointment_status  = InputCleaner::sanitize($_POST['appointment_status']);
@@ -312,7 +315,7 @@
                     $businessId          = Helper::get_business_id($this->userId, $this->account_character);
                     $removeAppointment   = new Deleteappointment();
                     if($removeAppointment->permission === 200){
-                        $departmentId        = Helper::get_appointment_department_id($this->userId);
+                        $departmentId        = Helper::get_staff_department_id($this->userId);
                         if($departmentId['status'] === 200){
                             $details         = ['status' => 'delete'];
                             $identity        = ['column' => ['company_id', 'id'], 'value' => [$businessId, $id]];

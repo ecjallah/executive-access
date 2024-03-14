@@ -90,7 +90,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
             if($vaildRoles !== 200){
                 return $vaildRoles;
             }else{
-                $query       = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE company_id = $businessId AND role_id = $roleId ");
+                $query       = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE company_id = '$businessId' AND role_id = '$roleId' ");
                 if($query === false){
                     return 500;
                 }else{
@@ -120,7 +120,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
                 }
             }
         }else if($accountType == 'staff'){
-            $query       = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE `company_id` = $businessId AND `role_id` = $roleId ");
+            $query       = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE `company_id` = '$businessId' AND `role_id` = '$roleId' ");
             if($query === false){
                 return 500;
             }else{
@@ -155,7 +155,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
 
     //This function retuns all staff created roles
     public function return_all_roles($businessId){
-        $query         = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE `company_id` = $businessId ");
+        $query         = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE `company_id` = '$businessId' ");
         if($query === false){
             return 500;
         }else{
@@ -186,7 +186,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
 
     //This function returns all the assigned modules related to a role
     public function return_all_assign_role_modules($businessId, $roleId){
-        $query    = CustomSql::quick_select(" SELECT r.*, m.* FROM role_modules r JOIN app_modules m ON m.module_id = r.module_id WHERE r.business_id = $businessId AND r.role_id = $roleId ORDER BY m.module_id DESC ");
+        $query    = CustomSql::quick_select(" SELECT r.*, m.* FROM role_modules r JOIN app_modules m ON m.module_id = r.module_id WHERE r.business_id = '$businessId' AND r.role_id = '$roleId' ORDER BY m.module_id DESC ");
         // AND m.type != 'generic' 
         if($query === false){
             return 500;
@@ -210,7 +210,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
 
     //This function checks if the icomming modules are already assign to the same role
     public function check_reassigned_modules($roleId, $moduleId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `role_modules` WHERE module_id = $moduleId AND role_id = $roleId ");
+        $query     = CustomSql::quick_select(" SELECT * FROM `role_modules` WHERE module_id = '$moduleId' AND role_id = $roleId ");
         if($query === false){
             return 500;
         }else{

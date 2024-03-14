@@ -50,6 +50,8 @@ class Auth{
                 }else{
                     return 404;
                 }
+            }else {
+                return 404;
             }
         }
     }

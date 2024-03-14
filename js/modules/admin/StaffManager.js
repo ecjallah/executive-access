@@ -67,12 +67,12 @@ export const widget = new PageLessComponent("staff-management-widget", {
                 this.setChild(data=>{
                     return /*html*/ `
                         <user-card 
-                            firstname=""
-                            lastname=""
-                            address=""
-                            gender=""
-                            email=""
-                            county=""
+                            firstname="${data.first_name}"
+                            lastname="${data.last_name}"
+                            address="${data.address}"
+                            gender="${data.sex}"
+                            email="${data.email}"
+                            county="${data.country}"
                             userid="${data.user_id}"
                             phoneno="${data.number}" 
                             roleid="${data.user_role_id}" 

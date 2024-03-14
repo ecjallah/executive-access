@@ -42,11 +42,12 @@ export const Components = {
                                 title: `${parent.fullname} Details`,
                                 icon: "user",
                                 inputs: /*html*/ `
-                                    <text-input value="${parent.firstname}" text="Full Name" icon="user" identity="fullname" required="required"></text-input>
-                                    <text-input value="${parent.username}" text="Username" icon="signature" identity="username" required="required"></text-input>
-                                    <text-input value="${parent.address}" text="Address" icon="signature" identity="address" required="required"></text-input>
-                                    <number-input value="${parent.phoneno}" text="Phone Number" icon="phone-alt" identity="phone-no" required="required"></number-input>
-                                    <staff-role-select selectedvalues="${parent.roleid}"></staff-role-select>
+                                    <text-input value="${parent.firstname}" text="First Name" icon="user" identity="firstname" required="required"></text-input>
+                                    <text-input value="${parent.lastname}" text="Last Name" icon="user" identity="lastname" required="required"></text-input>
+                                    <text-input value="${parent.adress}" text="Address" icon="map-marked" identity="address" required="required"></text-input>
+                                    <gender-select selectedvalue="${parent.gender}"></gender-select>
+                                    <email-input value="${parent.email}" required="required"></email-input>
+                                    <staff-role-select selectedvalue="${parent.rollid}"></staff-role-select>
                                 `,
                                 submitText: "Update",
                                 closable: false,
@@ -60,11 +61,12 @@ export const Components = {
                                     method: "POST",
                                     data: {
                                         user_id: parent.userid,
-                                        fullname: values.fullname,
-                                        role : values.role,
-                                        username: values.username,
+                                        first_name: values.firstname,
+                                        last_name: values.lastname,
+                                        role_id: values.role,
                                         address : values.address,
-                                        number: values['phone-no']
+                                        sex: values.gender,
+                                        email: values.email
                                     },
                                     beforeSend: ()=>{
                                         PageLess.ChangeButtonState(submitBtn, 'Updating');
@@ -539,53 +541,6 @@ export const Components = {
                         });
                     }
                 });
-            });
-        }
-    }),
-
-    ToolCountyPrecinctSelect : new PageLessComponent("tool-county-precinct-select", {
-        data: {
-            countyid: '',
-            text: "All Precincts",
-            items: [{text: "Loading...", value: ' '}],
-            selectedvalue: ""
-        },
-        props: {
-            onprecinctchange: ()=>{}
-        },
-        view: function(){
-            return /*html*/`
-                <div class="month-section tool d-flex flex-nowrap align-items-center" style="background: rgba(0, 0, 0, 0.05) !important;">
-                    <i class="fa fa-map-marker-alt text-muted"></i>&nbsp;
-                    <native-select onchange="{{this.props.onprecinctchange}}" placeholder="${this.text}" items='${JSON.stringify(this.items)}' selectedvalue="${this.selectedvalue}" classname="form-select types text-muted" style="border-bottom: 0;"></native-select>
-                </div>
-            `;
-        },
-        callback: function(){
-            PageLess.Request({
-                url: `/api/get-precincts-by-county`,
-                method: "GET",
-                data:{
-                    "county-id": this.countyid
-                }
-            }).then(result=>{
-                if(result.status == 200){
-                    const data  = result.response_body;
-                    let options = [];
-                    data.forEach(precinct=>{
-                        options.push({
-                            text: precinct.title,
-                            value: precinct.id
-                        });
-                    });
-                    this.setData({
-                        items: options
-                    });
-                }else {
-                    this.setData({
-                        items: [{text: "No Precinct Available", value: ''}]
-                    });
-                }
             });
         }
     }),
@@ -1816,6 +1771,7 @@ export const Components = {
             startmonth : "",
             startyear : "",
             editable : "",
+            departmentonly: false,
             // colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
             colors: {
                 earlyMorning: "bg-primary", 
@@ -1860,14 +1816,14 @@ export const Components = {
                     {
                         text: "Edit",
                         callback: ()=>{
-                            
+                            console.log(parent.starttime, parent.endtime);
                             Modal.BuildForm({
                                 title: "Update Appointment",
                                 icon: "user-tie",
                                 description: `Please enter the details below`,
                                 inputs: /*html*/ `
                                     <text-input value="${parent.name}" icon="user" text="Visitor Name" identity="visitor-name" required="required" ></text-input>
-                                    <department-select selectedvalue="${parent.departmentid}" selectedexecutive="${parent.executiveid}" includeexecutives=true ></department-select>
+                                    ${parent.departmentonly === false || parent.departmentonly == 'false' ? /*html*/ `<department-select selectedvalue="${parent.departmentid}" selectedexecutive="${parent.executiveid}" includeexecutives=true ></department-select>` : /*html*/ `<executive-select departmentid="${parent.departmentid}" selectedvalue="${parent.executiveid}"></executive-select>`}
                                     <long-text-input value="${parent.purpose}" icon="align-justify" text="Purpose" identity="purpose"></long-text-input>
                                     <number-input value="${parent.number}" icon="phone-alt" text="Visitor Phone Number" identity="number"></number-input>
                                     <date-input selectedyear="${parent.startyear}" selectedmonth="${parent.startmonth}" selectedday="${parent.startday}" text="Date"></date-input>
@@ -1878,21 +1834,27 @@ export const Components = {
                                 closable: false,
                                 autoClose: false,
                             }, values=>{
-                                console.log(values);
+                                let endpoint = `/api/update-appointment`;
+                                let data     = {
+                                    appointment_id: parent.id,
+                                    executive_id: values.executive,
+                                    visitor_name: values['visitor-name'],
+                                    number: values.number,
+                                    purpose: values.purpose,
+                                    visit_date: `${values.year}-${values.month}-${values.day}`,
+                                    start_time: values['start-time'],
+                                    end_time: values['end-time']
+                                }
+
+                                if (parent.departmentonly != false && parent.departmentonly != 'false') {
+                                    endpoint = `/api/update-department-appointment`;
+                                } else {
+                                    data.department_id = values.department;
+                                }
                                 PageLess.Request({
-                                    url: `/api/update-appointment`,
+                                    url: endpoint,
                                     method: "POST",
-                                    data: {
-                                        appointment_id: parent.id,
-                                        executive_id: values.executive,
-                                        department_id: values.department,
-                                        visitor_name: values['visitor-name'],
-                                        number: values.number,
-                                        purpose: values.purpose,
-                                        visit_date: `${values.year}-${values.month}-${values.day}`,
-                                        start_time: values['start-time'],
-                                        end_time: values['end-time']
-                                    },
+                                    data: data,
                                     beforeSend: ()=>{
                                         PageLess.ChangeButtonState(values.submitBtn, 'Adding');
                                     }
@@ -1980,6 +1942,7 @@ export const Components = {
             items: '',
             appointments: '',
             editable: true,
+            departmentonly: false
         },
 
         view: function(){
@@ -2018,6 +1981,7 @@ export const Components = {
                             startmonth="${item.start_month}" 
                             startyear="${item.start_year}" 
                             editable="${this.editable}"
+                            departmentonly="${this.departmentonly}"
                         ></appointment-item>
                     `
                 });
@@ -2029,5 +1993,46 @@ export const Components = {
         }
     }),
     
-
+    GeneralDashboardStats: new PageLessComponent("general-dashboard-stats", {
+        data: {
+            title: "General Dashboard",
+            cards: /*html*/ `
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+            `
+        },
+        view: function(){
+            return /*html*/`
+                <div class="w-100 d-flex flex-wrap">
+                    ${this.cards}
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                PageLess.Request({
+                    url: "/api/get-overview-reports",
+                    method: "GET",
+                }).then(result=>{
+                    const data = result.response_body
+                    if (result.status == 200) {
+                        this.setData({
+                            cards: /*html*/ `
+                                <dashboard-card title="Total Appointments" value="${data.total_appointment}" icon="calendar-alt" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Toatl Departments" value="${data.total_department}" icon="sitemap" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Total Executive" value="${data.total_executive}" icon="user-tie" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Total Department Staff" value="${data.total_department_executive}" icon="sitemap" iconcolor="text-danger"></dashboard-card>
+                            `
+                        });
+                    } else {
+                        this.remove();
+                    }
+                });
+            });
+        }
+    })
 }

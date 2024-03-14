@@ -34,6 +34,7 @@
                 $this->url                  = $_SERVER["REQUEST_URI"];
                 $moduelCheck                = Auth::module_security(DEPARTMENTS_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
                 $this->get_company_department();
+                $this->get_department_executives();
                 if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
                     $this->add_department();
@@ -42,7 +43,6 @@
                     $this->delete_department();
                     $this->assign_staff_to_department();
                     $this->unassign_staff_from_department();
-                    $this->get_department_executives();
                     $this->get_department_staff();
                 }else{
                     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
@@ -160,7 +160,7 @@
                     $pager               = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
                     $companyId           = Helper::get_business_id($this->userId, $this->account_character);
                     $executive           = new ViewexecutiveList();
-                    if($executive->permission === 200){
+                    // if($executive->permission === 200){
                         $result          = $executive->return_department_executive_list($companyId, $departmentId, $pager);
                         if($result === 500){
                             $response         = new Response(500, "Error creating dapartments");
@@ -172,10 +172,10 @@
                             $response         = new Response(200, "Department executives.", $result);
                             $response->send_response();
                         }
-                    }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
-                        $response->send_response();
-                    }
+                    // }else{
+                    //     $response = new Response(301, "Unauthorized Module: Contact Admin");
+                    //     $response->send_response();
+                    // }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the POST method");
                     $response->send_response();

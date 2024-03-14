@@ -52,7 +52,7 @@ class DepartmentAppointment {
         $companyId      = $details['company_id'];
         $departmentId   = $details['department_id'];
         $staffId        = $details['staff_id'];
-        $query          = CustomSql::delete_sql("department_staff", " `company_id` = $companyId AND `department_id` = $departmentId AND `staff_id` = $staffId ");
+        $query          = CustomSql::delete_sql("department_staff", " `company_id` = '$companyId' AND `department_id` = $departmentId AND `staff_id` = $staffId ");
         if($query === false){
             return 500;
         }else{
