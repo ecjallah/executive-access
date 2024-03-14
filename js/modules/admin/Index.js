@@ -61,6 +61,10 @@ export class Widget extends PageLess{
                 routePattern: /^\/appointments\/?$/
             },
             {
+                widget: "DepartmentAppointmentManager",
+                routePattern: /^\/department-appointments\/?$/
+            },
+            {
                 widget: "AppointmentLookup",
                 routePattern: /^\/appointments\/lookup\/?$/
             },

@@ -18,16 +18,17 @@ export const widget = new PageLessComponent("political-party-home-widget", {
                     <div class="main-content-body">
                         <div class="flex-1 w-100 p-0 p-sm-1 p-md-3 p-xl-4 scroll-y d-flex">
                             <div class="w-100 p-1 d-flex flex-wrap list-items-container dashboard-cards-container">
+                                <general-dashboard-stats></general-dashboard-stats>
                                 <results-chart-view></results-chart-view>
                                 <div class="welcome-container p-1 p-sm-1 p-md-2 p-lg-2 p-xl-3">
                                     <div class="col-12 col-sm-8 col-md-6 order-2 order-sm-1">
                                         <div class="welcome-note p-0 p-sm-1 p-md-3 p-lg-4">
                                             <h3>Hi there!</h3>
                                             <span class="text-muted">
-                                                Welcome to your personal Real-time Election Result Management <br> We understand Parties and 
-                                                candidates need a better 
-                                                understanding of the elections results. And That's why we're here. <br><br> 
-                                                Let's get started by setting your staff members and their roles
+                                                Welcome to Executive Access Management Portal <br> 
+                                                We understand your needs and priorities for a centralize appointment tracking system.  
+                                                And That's why we're here. <br><br> 
+                                                Let's get started by setting your staff members for each departments and their roles
                                             </span><br>
                                             <div class="d-flex w-100">
                                                 <pageless-button type="button" classname="btn btn-primary col-6" text='Get Started' onclick="{{this.props.ongetstarted}}"></pageless-button><br>
