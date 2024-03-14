@@ -94,7 +94,7 @@ class ModulesManager{
 
     //This method returns all assigned modules
     public function return_staff_assigned_modules($businessId){
-        $query         = CustomSql::quick_select(" SELECT m.*, r.* FROM `app_modules` m JOIN `role_modules` r ON m.module_id = r.module_id WHERE r. r.business_id = $businessId ORDER BY r.id DESC ");
+        $query         = CustomSql::quick_select(" SELECT m.*, r.* FROM `app_modules` m JOIN `role_modules` r ON m.module_id = r.module_id WHERE r. r.business_id = '$businessId' ORDER BY r.id DESC ");
         if($query === false){
             return 500;
         }else{

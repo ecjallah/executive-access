@@ -42,11 +42,12 @@ export const Components = {
                                 title: `${parent.fullname} Details`,
                                 icon: "user",
                                 inputs: /*html*/ `
-                                    <text-input value="${parent.firstname}" text="Full Name" icon="user" identity="fullname" required="required"></text-input>
-                                    <text-input value="${parent.username}" text="Username" icon="signature" identity="username" required="required"></text-input>
-                                    <text-input value="${parent.address}" text="Address" icon="signature" identity="address" required="required"></text-input>
-                                    <number-input value="${parent.phoneno}" text="Phone Number" icon="phone-alt" identity="phone-no" required="required"></number-input>
-                                    <staff-role-select selectedvalues="${parent.roleid}"></staff-role-select>
+                                    <text-input value="${parent.firstname}" text="First Name" icon="user" identity="firstname" required="required"></text-input>
+                                    <text-input value="${parent.lastname}" text="Last Name" icon="user" identity="lastname" required="required"></text-input>
+                                    <text-input value="${parent.adress}" text="Address" icon="map-marked" identity="address" required="required"></text-input>
+                                    <gender-select selectedvalue="${parent.gender}"></gender-select>
+                                    <email-input value="${parent.email}" required="required"></email-input>
+                                    <staff-role-select selectedvalue="${parent.rollid}"></staff-role-select>
                                 `,
                                 submitText: "Update",
                                 closable: false,
@@ -60,11 +61,12 @@ export const Components = {
                                     method: "POST",
                                     data: {
                                         user_id: parent.userid,
-                                        fullname: values.fullname,
-                                        role : values.role,
-                                        username: values.username,
+                                        first_name: values.firstname,
+                                        last_name: values.lastname,
+                                        role_id: values.role,
                                         address : values.address,
-                                        number: values['phone-no']
+                                        sex: values.gender,
+                                        email: values.email
                                     },
                                     beforeSend: ()=>{
                                         PageLess.ChangeButtonState(submitBtn, 'Updating');

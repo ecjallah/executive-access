@@ -40,7 +40,7 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
 
     //This function gets all the staff of a given healthcare
     public function return_staffs($businessId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = $businessId AND `block` = 0 ORDER BY `id` DESC ");
+        $query     = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = '$businessId' AND `block` = 0 ORDER BY `id` DESC ");
         if($query === false){
             return 500;
         }else{
@@ -70,7 +70,7 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
 
     //This function gets a given staff details
     public function return_staff_details($businessId, $userId){
-        $query         = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = $businessId AND `staff_id` = $userId AND `block` = 0 OR `business_id` = $businessId AND `staff_personal_id` = $userId AND `block` = 0 ");
+        $query         = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = '$businessId' AND `staff_id` = '$userId' AND `block` = 0 OR `business_id` = '$businessId' AND `staff_personal_id` = '$userId' AND `block` = 0 ");
         if($query === false){
             return 500;
         }else{

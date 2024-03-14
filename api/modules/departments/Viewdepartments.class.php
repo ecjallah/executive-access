@@ -47,7 +47,7 @@ class Viewdepartments {
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = $companyId AND `delete` = 0 ORDER BY `date_added` DESC $pageCond");
+        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = '$companyId' AND `delete` = 0 ORDER BY `date_added` DESC $pageCond");
         if($query === false){
             return 500;
         }else{
@@ -66,7 +66,7 @@ class Viewdepartments {
 
     //This method get departments without pagination
     public function get_departments_list($companyId){
-        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = $companyId AND `delete` = 0 ORDER BY `date_added` DESC ");
+        $query              = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = '$companyId' AND `delete` = 0 ORDER BY `date_added` DESC ");
         if($query === false){
             return 500;
         }else{
@@ -86,7 +86,7 @@ class Viewdepartments {
 
     //This method get department details by id
     public function get_departments_details($companyId, $id){
-        $query          = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = $companyId AND `id` = $id AND `delete` = 0 ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `departments` WHERE `company_id` = '$companyId' AND `id` = $id AND `delete` = 0 ");
         if($query === false){
             return 500;
         }else{
@@ -102,7 +102,7 @@ class Viewdepartments {
 
     //This method get department staff
     public function get_department_staff($companyId, $departmentId){
-        $query          = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE `company_id` = $companyId AND `department_id` = $departmentId ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE `company_id` = '$companyId' AND `department_id` = $departmentId ");
         if($query === false){
             return 500;
         }else{

@@ -10,7 +10,7 @@ class Db {
   public function connect(){
     $this->host        = "localhost";
     $this->user        = "root";
-    $this->password    = "";
+    $this->password    = "password@123";
     $this->database    = "executive_access";
 
     $connection = mysqli_connect($this->host, $this->user, $this->password, $this->database);
