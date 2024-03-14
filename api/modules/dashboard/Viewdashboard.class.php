@@ -96,4 +96,47 @@ class Viewdashboard {
             return ['status' => 200, 'data' => $data];
         }
     }
+
+    //This function returns appointment operation stats
+    public function appointment_stats($companyId, $dataFilter){
+        $dataCenter    = new DataCenter();
+        $data          = [];
+        if($dataFilter == 'today'){
+            $data      = $dataCenter->daily("appointments", "visit_date", " `company_id` = $companyId");
+        }else if($dataFilter == 'yesterday'){
+            $data      = $dataCenter->yesterday("appointments", "visit_date", " `company_id` = $companyId");
+        }
+        else if($dataFilter == 'this_week'){
+            $data      = $dataCenter->weekly("appointments", "visit_date", " `company_id` = $companyId");
+        }else if($dataFilter == 'this_month'){
+            $data      = $dataCenter->monthly("appointments", "visit_date", " `company_id` = $companyId");
+        }else if($dataFilter == 'this_year'){
+            $data      = $dataCenter->yearly("appointments", "visit_date", " `company_id` = $companyId");
+        }
+
+        if(is_array($data)){
+            while ($row = mysqli_fetch_assoc($data['data'])) {
+                if($row['status'] == 'active'){
+                    $data['active'][]     = $row['status'];
+                }
+                else if($row['status'] == 'pending'){
+                    $data['pending'][]    = $row['status'];
+                }
+                else if($row['status'] == 'check_out'){
+                    $data['check_out'][]  = $row['status'];
+                }
+                else if($row['status'] == 'expired'){
+                    $data['expired'][]    = $row['status'];
+                }
+            }
+            return [
+                "active"    => isset($data['active'])?array_count_values($data['active'])['active']:0,
+                "pending"   => isset($data['pending'])?array_count_values($data['pending'])['pending']:0,
+                "check_out" => isset($data['check_out'])?array_count_values($data['check_out'])['check_out']:0,
+                "expired"   => isset($data['expired'])?array_count_values($data['expired'])['expired']:0
+            ];
+        }else{
+            return $data;
+        }
+    }
 }

@@ -32,7 +32,7 @@ RewriteRule ^search-polling-centers/?$ modules/staff_management/StaffManagementH
 
 #DASHBOARD ENDPOINTS
 RewriteRule ^get-overview-reports/?$ modules/dashboard/DashboardHandler.class.php
-# RewriteRule ^get-county-vote-reports/?$ modules/dashboard/DashboardHandler.class.php
+RewriteRule ^appointment-operation-stats/?$ modules/dashboard/DashboardHandler.class.php
 
 #DEPARTMENT ENDPOINTS
 RewriteRule ^get-departments/?$ modules/departments/DepartmentsHandler.class.php [QSA]
