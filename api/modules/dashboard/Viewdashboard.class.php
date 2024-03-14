@@ -55,7 +55,7 @@ class Viewdashboard {
 
     //This method returns appointment info
     public function get_appointment_dash_info($companyId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId");
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId'");
         if($query === false){
             return ['status' => 500];
         }else{
@@ -66,7 +66,7 @@ class Viewdashboard {
 
     //This method returns department info
     public function get_department_dash_info($companyId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `departments` WHERE company_id = $companyId");
+        $query     = CustomSql::quick_select(" SELECT * FROM `departments` WHERE company_id = '$companyId'");
         if($query === false){
             return ['status' => 500];
         }else{
@@ -77,7 +77,7 @@ class Viewdashboard {
 
     //This method returns executive info
     public function get_executive_dash_info($companyId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE company_id = $companyId");
+        $query     = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE company_id = '$companyId'");
         if($query === false){
             return ['status' => 500];
         }else{
@@ -88,7 +88,7 @@ class Viewdashboard {
 
     //This method returns department staff
     public function get_department_staff_dash_info($companyId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE company_id = $companyId");
+        $query     = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE company_id = '$companyId'");
         if($query === false){
             return ['status' => 500];
         }else{

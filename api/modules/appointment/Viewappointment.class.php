@@ -46,7 +46,7 @@ class Viewappointment {
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
@@ -97,7 +97,7 @@ class Viewappointment {
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND department_id =$departmentId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
@@ -139,7 +139,7 @@ class Viewappointment {
 
     //This method returns appointment details
     public function get_appointment_details($companyId, $id){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = $companyId AND id = $id AND status != 'delete' ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND id = $id AND status != 'delete' ");
         if($query === false){
             return 500;
         }else{
