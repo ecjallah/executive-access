@@ -674,7 +674,8 @@ export const Components = {
             text: null,
             items: null,
             selectedvalue: '',
-            className: null,
+            classname: '',
+            style: '',
             attributes: null,
             description: '',
             required: null
@@ -683,7 +684,7 @@ export const Components = {
         
         view: function(){
             return /*html*/`
-                <div class="row form-content-row p-2${(this.description != '') ? 'align-items-center' : ''}">
+                <div class="row form-content-row p-2 ${(this.description != '') ? 'align-items-center ${this.classname}' : ''}" style="${this.style}">
                     <div class="input-icon pr-2 text-muted">
                         <span><i class="fa fa-lg fa-${this.icon}"></i></span>
                     </div>

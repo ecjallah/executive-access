@@ -2008,6 +2008,9 @@ export const Components = {
         view: function(){
             return /*html*/`
                 <div class="w-100 d-flex flex-wrap">
+                    <form class="w-100 d-flex justify-content-between align-items-center p-1 p-sm-1 p-md-2 p-lg-2 p-xl-3" style="padding-bottom: 0px !important;">
+                        <div class="title">${this.title}</div>
+                    </form>
                     ${this.cards}
                 </div>
             `;
@@ -2032,6 +2035,86 @@ export const Components = {
                         this.remove();
                     }
                 });
+            });
+        }
+    }),
+
+    AppointmentDashboardStats: new PageLessComponent("appointment-dashboard-stats", {
+        data: {
+            title: "Appointment Dashboard",
+            interval: 'today',
+            intervals: [
+                {text: "Today", value: "today"},
+                {text: "Yesterday", value: "yesterday"},
+                {text: "This Week", value: "this_week"},
+                {text: "This Month", value: "this_month"},
+                {text: "This Year", value: "this_year"},
+            ],
+            cards: /*html*/ `
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+            `
+        },
+        props: {
+            onintervalchange: function(){
+                let value = this.querySelector('select').value.trim();
+                if (value == '') {
+                    value = 'today';
+                }
+
+                this.parentComponent.props.loadData.call(this.parentComponent, value);
+            },
+
+            loadData: function(interval = this.interval){
+                const intervalElem = this.querySelector('.interval-container');
+                PageLess.Request({
+                    url: "/api/appointment-operation-stats",
+                    method: "POST",
+                    data: {
+                        data_key: interval
+                    }, 
+                    beforeSend: function(){
+                        PageLess.ChangeButtonState(intervalElem, 'Updating');
+                    }
+                }, true).then(result=>{
+                    PageLess.RestoreButtonState(intervalElem);
+                    const data = result.response_body
+                    if (result.status == 200) {
+                        this.setData({
+                            interval: interval,
+                            cards: /*html*/ `
+                                <dashboard-card title="Pending Appointments" value="${data.pending}" icon="calendar-day" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Active Appointments" value="${data.active}" icon="user-clock" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Completed Appointments" value="${data.check_out}" icon="calendar-check" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Expired Appointments" value="${data.expired}" icon="calendar-exclamation" iconcolor="text-danger"></dashboard-card>
+                            `
+                        });
+                    } else {
+                        this.remove();
+                    }
+                });
+            }
+        },
+        view: function(){
+            return /*html*/`
+                <div class="w-100 d-flex flex-wrap mt-4">
+                    <form class="w-100 d-flex justify-content-between align-items-center p-1 p-sm-1 p-md-2 p-lg-2 p-xl-3" style="padding-bottom: 0px !important;">
+                        <div class="title">${this.title}</div>
+                        <div class="interval-container">
+                            <custom-select onchange="{{this.props.onintervalchange}}" text="Interval" icon="sort-amount-down" selectedvalue="${this.interval}" items='${JSON.stringify(this.intervals)}' style="background-color: unset !important; margin: 0 !important; "></custom-select>
+                        </div>
+                    </form>
+                    ${this.cards}
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                this.props.loadData.call(this)
             });
         }
     })
