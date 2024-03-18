@@ -216,13 +216,13 @@
             if($this->url == "/api/update-appointment")
             {
                 if($this->method == "POST"){
-                    $_POST                 = json_decode(file_get_contents("php://input"), true);
+                    $_POST                  = json_decode(file_get_contents("php://input"), true);
                     if(empty($_POST['appointment_id']) || empty($_POST['executive_id']) || empty($_POST['department_id']) || empty($_POST['visitor_name']) || empty($_POST['purpose'])|| empty($_POST['number']) || empty($_POST['visit_date'])){
-                        $response          = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, and status");
+                        $response           = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, and status");
                         $response->send_response();
                     }else{
-                        $companyId         = Helper::get_business_id($this->userId, $this->account_character);
-                        $editAppointment   = new Editappointment();
+                        $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                        $editAppointment    = new Editappointment();
                         if($editAppointment->permission === 200){
                             $appointment_id  = InputCleaner::sanitize($_POST['appointment_id']);
                             $executive_id    = InputCleaner::sanitize($_POST['executive_id']);

@@ -139,6 +139,7 @@ class Viewappointment {
 
     //This method returns appointment details
     public function get_appointment_details($companyId, $id){
+        $visitChecks    = new ViewvisitChecks();
         $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND id = $id AND status != 'delete' ");
         if($query === false){
             return 500;
@@ -148,6 +149,7 @@ class Viewappointment {
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
                     $data[] = $row;
+                    $data['registered_items'] = $visitChecks->get_appointment_registered_items($id);
                 }
                 return $data;
             }else{

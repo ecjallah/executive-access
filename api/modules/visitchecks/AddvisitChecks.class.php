@@ -1,17 +1,16 @@
-
 <?php
 //SubModule Identity
-define('MODULE_APPOINTMENT_HANDLER_ID_', '10020240228203211');
-define('SUB_EDITAPPOINTMENT', '10020240228203216');
-define('SUB_NAME_EDITAPPOINTMENT', 'Editappointment');
-Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID);
+define('MODULE_VISITCHECKS_HANDLER_ID', '10020240314211538');
+define('SUB_ADDVISITCHECKS', '10020240314211547');
+define('SUB_NAME_ADDVISITCHECKS', 'Add visit Checks');
+Auth::module_function_registration(SUB_ADDVISITCHECKS, SUB_NAME_ADDVISITCHECKS, MODULE_VISITCHECKS_HANDLER_ID);
 
 /**
  * *********************************************************************************************************
  * @_forProject: Shell Bone
- * @_purpose: This class handles/manages Appointment VIEW/GET operations.
+ * @_purpose: This class handles/manages VisitChecks ADD operations.
  * @_version Release: 1.0
- * @_created Date: 2024-02-28
+ * @_created Date: 2024-03-14
  * @_author(s):Shell Bone Generator
  *   --------------------------------------------------------------------------------------------------
  *   1) Fullname of engineer. (Paul Glaydor)
@@ -20,7 +19,7 @@ Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT
  * *********************************************************************************************************
 */
 
-class Editappointment {
+class AddvisitChecks {
     private $user_type;
     private $userId;
     public $permission;
@@ -33,18 +32,18 @@ class Editappointment {
             $this->permission          = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(SUB_EDITAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);
+            $auth              = Auth::function_check(SUB_ADDVISITCHECKS, $this->userId, $this->user_type, $this->account_character);
             $this->permission  = $auth;
         }
     }
 
-    //This method updates appointments
-    public function update_executive_appointment($details, $identity){
-        $query    = CustomSql::update_array($details, $identity, "appointments");
+    //This adds appointment items
+    public function add_appointment_items($details){
+        $query    = CustomSql::insert_array("appointment_items", $details);
         if($query === false){
             return 500;
         }else{
             return 200;
         }
     }
-}
+}     
