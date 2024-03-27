@@ -16,7 +16,7 @@ export const widget = new PageLessComponent("political-party-home-widget", {
                 <div class="main-content">
                     <main-content-header title="${this.title}" startpage="true"></main-content-header>
                     <div class="main-content-body">
-                        <div class="flex-1 w-100 p-0 p-sm-1 p-md-3 p-xl-4 scroll-y d-flex">
+                        <div class="flex-1 w-100 p-2 p-md-3 p-xl-4 scroll-y d-flex">
                             <div class="w-100 p-1 d-flex flex-wrap list-items-container dashboard-cards-container">
                                 <general-dashboard-stats></general-dashboard-stats>
                                 <appointment-dashboard-stats></appointment-dashboard-stats>
