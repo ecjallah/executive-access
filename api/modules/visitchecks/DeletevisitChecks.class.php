@@ -1,17 +1,17 @@
 
 <?php
 //SubModule Identity
-define('MODULE_APPOINTMENT_HANDLER_ID_', '10020240228203211');
-define('SUB_EDITAPPOINTMENT', '10020240228203216');
-define('SUB_NAME_EDITAPPOINTMENT', 'Editappointment');
-Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID);
+define('MODULE_VISITCHECKS_HANDLER_ID', '10020240314211538');
+define('SUB_DELETEVISITCHECKS', '10020240314211545');
+define('SUB_NAME_DELETEVISITCHECKS', 'DeletevisitChecks');
+Auth::module_function_registration(SUB_DELETEVISITCHECKS, SUB_NAME_DELETEVISITCHECKS, MODULE_VISITCHECKS_HANDLER_ID);
 
 /**
  * *********************************************************************************************************
  * @_forProject: Shell Bone
- * @_purpose: This class handles/manages Appointment VIEW/GET operations.
+ * @_purpose: This class handles/manages VisitChecks operations.
  * @_version Release: 1.0
- * @_created Date: 2024-02-28
+ * @_created Date: 2024-03-14
  * @_author(s):Shell Bone Generator
  *   --------------------------------------------------------------------------------------------------
  *   1) Fullname of engineer. (Paul Glaydor)
@@ -20,7 +20,7 @@ Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT
  * *********************************************************************************************************
 */
 
-class Editappointment {
+class DeletevisitChecks {
     private $user_type;
     private $userId;
     public $permission;
@@ -33,18 +33,23 @@ class Editappointment {
             $this->permission          = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(SUB_EDITAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);
+            $auth              = Auth::function_check(SUB_DELETEVISITCHECKS, $this->userId, $this->user_type, $this->account_character);
             $this->permission  = $auth;
         }
     }
 
-    //This method updates appointments
-    public function update_executive_appointment($details, $identity){
-        $query    = CustomSql::update_array($details, $identity, "appointments");
+    //This method updates/deletes given record by id
+    public function update_record($details, $identity){
+        $query            = CustomSql::update_array($details, $identity, "table");
         if($query === false){
             return 500;
         }else{
-            return 200;
+            if($query === 200){
+                return 200;
+            }else{
+                return 400;
+            }
         }
     }
 }
+            

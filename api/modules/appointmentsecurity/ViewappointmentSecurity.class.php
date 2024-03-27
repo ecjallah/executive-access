@@ -47,10 +47,12 @@ class ViewappointmentSecurity {
             if($count >= 1){
                 $keys   = [];
                 $data   = [];
+                $visitChecks = new ViewvisitChecks();
                 while ($row = mysqli_fetch_assoc($query)) {
                     $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
                     $row['start_time']        = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
                     $row['end_time']          = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
+                    $row['registered_items']  = $visitChecks->get_appointment_registered_items($row['id']);
                     $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
                     $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
                     $index                    = count($keys);

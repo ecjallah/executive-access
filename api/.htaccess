@@ -47,6 +47,11 @@ RewriteRule ^unassign-staff-from-department/?$ modules/departments/DepartmentsHa
 RewriteRule ^get-department-executives/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department-id=$1
 RewriteRule ^get-department-staff/([0-9]+)/?$ modules/departments/DepartmentsHandler.class.php?department-id=$1
 
+#VISIT CHECKS ENDPOINTMENT
+RewriteRule ^lookup-appointment-info/?$ modules/visitchecks/VisitChecksHandler.class.php
+RewriteRule ^apply-visit-operation/?$ modules/visitchecks/VisitChecksHandler.class.php
+RewriteRule ^add-appointment-items/?$ modules/visitchecks/VisitChecksHandler.class.php
+
 #EXECUTIVE ENDPOINTS
 RewriteRule ^get-executive-members/?$ modules/executivelist/ExecutiveListHandler.class.php [QSA]
 RewriteRule ^add-new-executive-member/?$ modules/executivelist/ExecutiveListHandler.class.php

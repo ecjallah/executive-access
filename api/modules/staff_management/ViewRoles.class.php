@@ -39,11 +39,6 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
         }
     }
 
-    //This function returns healthcare roles
-    public function return_users_roles($healthcareId){
-        return Helper::get_all_users_roles($healthcareId);
-    }
-
     //This function returns role details of a role base on roleId
     public function get_role_details($businessId, $roleId, $accountType, $accountTypeId){
         if($accountType == 'ninja'){
