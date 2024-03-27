@@ -38,15 +38,20 @@ class Viewappointment {
     }
 
     //This method returns all appointments
-    public function return_all_appointments($companyId, $pager){
-        $pageCond  = '';
+    public function return_all_appointments($companyId, $pager, $filter = null){
+        $pageCond     = '';
         if ($pager != null) {
             $count    = 15; 
             $pageNum  = intval($pager);
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+
+        $filterCond     = '';
+        if($filter != null){
+            $filterCond = " AND status = '$filter' ";
+        }
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' $filterCond ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
@@ -89,7 +94,7 @@ class Viewappointment {
     }
 
     //This method returns department appointments
-    public function return_department_appointments($companyId, $departmentId, $pager){
+    public function return_department_appointments($companyId, $departmentId, $pager, $filter = null){
         $pageCond  = '';
         if ($pager != null) {
             $count    = 15; 
@@ -97,7 +102,13 @@ class Viewappointment {
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+
+        $filterCond     = '';
+        if($filter != null){
+            $filterCond = " AND status = '$filter' ";
+        }
+
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' $filterCond ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{

@@ -58,9 +58,10 @@
                 if($this->method == "GET"){
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);
                     $pager              = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
+                    $filter             = key_exists('filter', $_GET) ? InputCleaner::sanitize($_GET['filter']) : null;
                     $getAppointment     = new Viewappointment();
                     if($getAppointment->permission === 200){
-                        $result         = $getAppointment->return_all_appointments($companyId, $pager);
+                        $result         = $getAppointment->return_all_appointments($companyId, $pager, $filter);
                         if($result === 500){
                             $response   = new Response(500, "Error returning appointments.");
                             $response->send_response();
