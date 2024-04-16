@@ -122,8 +122,8 @@ class Viewdashboard {
                 else if($row['status'] == 'pending'){
                     $data['pending'][]    = $row['status'];
                 }
-                else if($row['status'] == 'check_out'){
-                    $data['check_out'][]  = $row['status'];
+                else if($row['status'] == 'completed'){
+                    $data['completed'][]  = $row['status'];
                 }
                 else if($row['status'] == 'expired'){
                     $data['expired'][]    = $row['status'];
@@ -132,7 +132,7 @@ class Viewdashboard {
             return [
                 "active"    => isset($data['active'])?array_count_values($data['active'])['active']:0,
                 "pending"   => isset($data['pending'])?array_count_values($data['pending'])['pending']:0,
-                "check_out" => isset($data['check_out'])?array_count_values($data['check_out'])['check_out']:0,
+                "completed" => isset($data['completed'])?array_count_values($data['completed'])['completed']:0,
                 "expired"   => isset($data['expired'])?array_count_values($data['expired'])['expired']:0
             ];
         }else{

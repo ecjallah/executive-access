@@ -4,7 +4,7 @@
 define('MODULE_APPOINTMENT_HANDLER_ID_', '10020240228203211');
 define('SUB_EDITAPPOINTMENT', '10020240228203216');
 define('SUB_NAME_EDITAPPOINTMENT', 'Editappointment');
-Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID);
+Auth::module_function_registration(SUB_EDITAPPOINTMENT, SUB_NAME_EDITAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID_);
 
 /**
  * *********************************************************************************************************

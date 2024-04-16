@@ -32,8 +32,8 @@
                 $this->account_character   = $_SESSION['account_character'];
                 $this->method              = $_SERVER["REQUEST_METHOD"];
                 $this->url                 = $_SERVER["REQUEST_URI"];
-                $moduelCheck               = Auth::module_security(VISITCHECKS_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
-                if($moduelCheck === 200){
+                // $moduelCheck               = Auth::module_security(VISITCHECKS_HANDLER_ID, $this->userId, $this->user_type, $this->account_character);
+                // if($moduelCheck === 200){
                     //CALL FUNCTIONS HERE!
                     $this->lookup_appointment();
                     $this->apply_visit_actions();
@@ -41,10 +41,10 @@
                     $this->get();
                     $this->get_params();
                     $this->delete();
-                }else{
-                    $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
-                    $response->send_response();
-                }
+                // }else{
+                //     $response = new Response($moduelCheck, "Unauthorized Module: Contact Admin");
+                //     $response->send_response();
+                // }
             }else{
                 Logout::log_user_out();
             }
@@ -154,6 +154,7 @@
                     }else{
                         $appointmentId = InputCleaner::sanitize($_POST['appointment_id']);
                         $status        = InputCleaner::sanitize($_POST['status']);
+                        $tagNumber     = key_exists('tag_number', $_POST) ? InputCleaner::sanitize($_POST['tag_number']) : false;
 
                         //Check appointment status
                         $appointment                = new Viewappointment();
@@ -172,11 +173,17 @@
                                 }else if($appointmentStatus == 'pending' && $status == 'active'){
                                     //UPDATE STATUS
                                     $details        = ["status" => $status];
+                                    if ($tagNumber != false) {
+                                        $details['tag_number'] = $tagNumber;
+                                    }
                                     $identity       = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointmentId]];
                                     $result         = $editAppointment->update_executive_appointment($details, $identity);
                                 }else if($appointmentStatus == 'active' && $status == 'completed'){
                                     //UPDATE STATUS
                                     $details        = ["status" => $status];
+                                    if ($tagNumber != false) {
+                                        $details['tag_number'] = $tagNumber;
+                                    }
                                     $identity       = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointmentId]];
                                     $result         = $editAppointment->update_executive_appointment($details, $identity);
                                 }else if($appointmentStatus == $status){

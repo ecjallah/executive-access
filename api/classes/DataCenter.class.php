@@ -93,7 +93,7 @@ class DataCenter{
 
     //This function return records from this weekly
     public function weekly($table, $colum, $condition, $groupBy = null, $condition2 = '', $limit = null){
-        $query    = CustomSql::quick_select(" SELECT * FROM {$table} WHERE ${condition} AND YEARWEEK($colum) = YEARWEEK(NOW()) $groupBy ");
+        $query    = CustomSql::quick_select(" SELECT * FROM {$table} WHERE $condition AND YEARWEEK($colum) = YEARWEEK(NOW()) $groupBy ");
         if($query === false){
             return 500;
         }else{
@@ -115,7 +115,7 @@ class DataCenter{
 
     //This function returns records from this monthly 
     public function monthly($table, $colum, $condition, $groupBy = null, $condition2 = '', $limit = null){
-        $query     = CustomSql::quick_select(" SELECT * FROM {$table} WHERE ${condition} AND MONTH({$colum}) = MONTH(CURRENT_DATE()) AND YEAR({$colum}) = YEAR(CURRENT_DATE()) $groupBy ");
+        $query     = CustomSql::quick_select(" SELECT * FROM {$table} WHERE $condition AND MONTH({$colum}) = MONTH(CURRENT_DATE()) AND YEAR({$colum}) = YEAR(CURRENT_DATE()) $groupBy ");
         if($query === false){
             return 500;
         }else{
@@ -137,7 +137,7 @@ class DataCenter{
 
     //This function returs records from this year
     public function yearly($table, $colum, $condition, $groupBy = null, $condition2 = '', $limit = null){
-        $query     = CustomSql::quick_select(" SELECT * FROM {$table} WHERE ${condition} AND YEAR({$colum}) = YEAR(CURRENT_DATE()) $groupBy ");
+        $query     = CustomSql::quick_select(" SELECT * FROM {$table} WHERE $condition AND YEAR({$colum}) = YEAR(CURRENT_DATE()) $groupBy ");
         if($query === false){
             return 500;
         }else{

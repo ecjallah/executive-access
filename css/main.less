@@ -717,7 +717,7 @@ form {
     }
 
     .form-content-row {
-        padding: 15px 20px !important;
+        // padding: 0 20px !important;
         .borderRadius(10px);
         margin: 0 !important;
         background-color: lighten(@MWSecondary, 7%); 
@@ -728,20 +728,26 @@ form {
     }
 
     .input-icon{
-        width: 35px;
+        width: 50px;
+        display: flex;
+        justify-content: center;
         padding: 0 !important;
         color: @MWPrimary !important;
     }
 
     .form-input-container, .form-textarea-container{
+        height: 50px;
         position: relative;
         padding: 0;
         flex: 1;
+        display: flex; 
+        align-items: center;
     }
 
     .form-input,
     .form-select,
     .form-textarea {
+        height: 100%;
         border: none;
         width: 100%;
         padding: 0;
@@ -885,7 +891,7 @@ form {
 	.noTextSelection();
 
 	&:hover input~.radio {
-		background-color: #ccc;
+		background-color: #aaa;
 	}
 
 	input {
@@ -910,7 +916,7 @@ form {
 		left: 0;
 		height: 20px;
 		width: 20px;
-		background-color: #eee;
+		background-color: #ccc;
 		border-radius: 50%;
 
 		&:after {
@@ -1358,7 +1364,6 @@ form {
                         .dashboard-card {
                             background-color: #fff;
                             .borderRadius(10px);
-                            .containerShadow(0.1);
 
 
                             .stats-container {

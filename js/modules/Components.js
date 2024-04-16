@@ -480,45 +480,40 @@ export const Components = {
         }
     }),
 
-    NativeRadioButton : new PageLessComponent("native-radio-button", {
+    RadioButton : new PageLessComponent("radio-button", {
         data: {
             identity: '',
-            icon: '',
             classname: '',
             description: '',
             text: '',
             value: '',
             checked: '0',
             attributes: null,
-            required: null
+            required: null,
+            name: ''
         },
         props: {
             onchange: function(){}
         },
         view: function(){
             return /*html*/`
-                <div class="row px-2 align-items-center">
-                    <div class="input-icon pr-2 text-muted">
-                        <span><i class="far fa-lg fa-${this.icon}"></i></span>
-                    </div>
-                    
-                    <label class="custom-radio-button-container">${this.text}
-                        <input type="radio"
-                            name="${this.identity}" 
-                            class="${this.identity} ${this.classname}"
-                            value="${this.value}"
-                            ${(this.attributes != null)? this.attributes : ''}
-                            ${(this.required != null)? `required=${this.required}` : ''}
-                            ${(this.checked != '0')? `checked=${this.checked}` : ''}
-                        >
-                        <span class="radio"></span>
-                    </label>         
-                </div>
+                <label class="custom-radio-button-container">${this.text}
+                    <input type="radio"
+                        id="${this.identity}"
+                        name="${this.name}" 
+                        class="${this.classname}"
+                        value="${this.value}"
+                        ${(this.attributes != null)? this.attributes : ''}
+                        ${(this.required != null)? `required=${this.required}` : ''}
+                        ${(this.checked != '0')? `checked=${this.checked}` : ''}
+                    >
+                    <span class="radio"></span>
+                </label>
             `;
         }
     }),
 
-    RadioButton : new PageLessComponent("radio-button", {
+    RadioButtonGroup : new PageLessComponent("radio-button-group", {
         data: {
             identity: '',
             icon: '',
@@ -528,29 +523,29 @@ export const Components = {
             value: '',
             checked: '0',
             attributes: null,
-            required: null
+            required: null,
+            items: [],
+            name: ''
         },
         props: {
             onchange: function(){}
         },
         view: function(){
+            let opts = ``;
+            if(this.items != null && typeof this.items == 'object')
+            {
+                this.items.forEach((option) =>{
+                    let selected = (option.value == this.value) ? 'checked' : '';
+                    opts += /*html*/`<radio-button name="${this.name}" identity="${this.identity}" value="${option.value}" ${selected} text="${option.text}" ${(this.required != null)? `required=${this.required}` : ''}></radio-button>`; 
+                });
+            }
             return /*html*/`
-                <div class="row px-2 align-items-center">
-                    <div class="input-icon pr-2 text-muted">
-                        <span><i class="far fa-lg fa-${this.icon}"></i></span>
-                    </div>
-                    
-                    <label class="custom-radio-button-container">${this.text}
-                        <input type="radio"
-                            name="${this.identity}" 
-                            class="${this.identity} ${this.classname}"
-                            value="${this.value}"
-                            ${(this.attributes != null)? this.attributes : ''}
-                            ${(this.required != null)? `required=${this.required}` : ''}
-                            ${(this.checked != '0')? `checked=${this.checked}` : ''}
-                        >
-                        <span class="radio"></span>
-                    </label>         
+                <div class="row p-2 form-content-row align-items-center py-3">
+                    ${this.icon != '' ? /*html*/ `<div class="input-icon pr-2 text-muted"><span><i class="far fa-lg fa-${this.icon}"></i></span></div>` : ''}
+                    <div class="flex-1">${this.text}</div>
+                    <div class="w-100 d-flex flex-column pt-3 px-3">
+                        ${opts}
+                    </div>        
                 </div>
             `;
         }
@@ -674,7 +669,8 @@ export const Components = {
             text: null,
             items: null,
             selectedvalue: '',
-            className: null,
+            classname: '',
+            style: '',
             attributes: null,
             description: '',
             required: null
@@ -683,7 +679,7 @@ export const Components = {
         
         view: function(){
             return /*html*/`
-                <div class="row form-content-row p-2${(this.description != '') ? 'align-items-center' : ''}">
+                <div class="row form-content-row p-2 ${(this.description != '') ? 'align-items-center ${this.classname}' : ''}" style="${this.style}">
                     <div class="input-icon pr-2 text-muted">
                         <span><i class="fa fa-lg fa-${this.icon}"></i></span>
                     </div>
@@ -762,8 +758,8 @@ export const Components = {
                     <div class="input-icon pr-2 text-muted">
                         <span><i class="fa fa-lg fa-${this.icon}"></i></span>
                     </div>
-                    <div class="form-input-container" style="width: auto !important; flex: unset;">
-                        <span class="form-input country-name">${this.prefix}${this.text}</span>
+                    <div class="form-input-container d-flex align-items-center" style="width: auto !important; flex: unset;">
+                        <div>${this.prefix}${this.text}</div>
                     </div>
                     <div class="form-input-container flex-2" style="width: auto !important;">
                         <native-select

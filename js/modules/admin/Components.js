@@ -1755,6 +1755,56 @@ export const Components = {
         }
     }),
 
+    DeviceInput : new PageLessComponent('device-input', {
+        data: {
+            identity: '',
+            initcount: 1,
+            icon: 'phone-laptop',
+            text: '',
+            className: null,
+            attributes: null,
+            localvalue: '',
+            usdvalue: '',
+            removable: false
+        },
+        props: {
+            addinput: function(){
+                let newInput = PageLessComponent.Render(/*html*/ `<device-input identity="${this.parentComponent.identity}" removable="true" initcount="${parseInt(this.parentComponent.initcount)+1}"></device-input>`);
+                this.closest('.form-content-row').parentElement.append(newInput);
+                this.classList.add('d-none');
+                this.closest('.form-content-row').initcount++;
+            },
+
+            removeinput: function(){
+                let parent      = this.closest('.form-content-row');
+                let container   = parent.parentElement;
+                parent.remove();
+                container.lastElementChild.querySelector('.add-input-btn').classList.remove('d-none');
+                parent.initcount--;
+            }
+        },
+        view: function(){
+            let identity = `${this.identity}-${this.initcount}`;
+            return /*html*/`
+                <div class="row p-2 form-content-row device-input h-80px">
+                    <div class="input-icon pr-2 text-muted">
+                        <span><i class="far fa-lg fa-${this.icon}"></i></span>
+                    </div>
+                    <div class="form-input-container" style="width: auto !important; flex: 1;">
+                        <input type="text" placeholder="Device Name" value='${this.text}'  class="form-input device-name" id="device-name" name="device-name" required="required">
+                    </div>
+                    <div class="form-input-container" style="width: auto !important; flex: 1; border-left: 1px solid #ccc; padding-left: 10px;">
+                        <input type="text" placeholder="Serial Number (optional)" value='${this.text}'  class="form-input serial-number" id="serial-number" name="serial-number">
+                    </div>
+                    <div class="action-container d-flex align-items-bottom w-80px justify-content-end">
+                        ${this.removable !== false ? /*html*/ `&nbsp;<pageless-button type="button" class="btn btn-light" text='<i class="fad text-danger fa-trash"></i>' onclick="{{this.props.removeinput}}"></pageless-button>` : '' }
+                        &nbsp;<pageless-button type="button" class="btn btn-light add-input-btn" text='<i class="fa fa-plus"></i>' onclick="{{this.props.addinput}}"></pageless-button>
+                    </div>                 
+                </div> 
+            `;
+        }
+    }),
+
     AppointmentItem: new PageLessComponent("appointment-item", {
         data: {
             id : "",
@@ -1771,6 +1821,7 @@ export const Components = {
             startmonth : "",
             startyear : "",
             editable : "",
+            checkin: false,
             departmentonly: false,
             // colors: ["bg-secondary", "bg-primary", "bg-danger", "bg-success", "bg-light-blue", "bg-gold", "bg-brown", "bg-coral", "bg-orange"]
             colors: {
@@ -1781,8 +1832,9 @@ export const Components = {
                 lateAfternoon: "bg-orange", 
                 evening: "bg-danger"
             },
+            
             bgColor: '',
-            editable: true
+            editable: true,
         },
 
         props: {
@@ -1898,9 +1950,185 @@ export const Components = {
                     }
                 ], this);
             },
+
+            oncheckoptionclick: function(event){
+                event.stopPropagation();
+                let parent = this.parentComponent;
+                let options = [];
+
+                if (parent.status == 'pending') {
+                    options.push({
+                        text: "Check-In",
+                        callback: ()=>{
+                            parent.props.checkin.call(this);
+                        }
+                    })
+                }
+
+                if (parent.status == 'active') {
+                    options.push({
+                        text: "Check-Out",
+                        callback: ()=>{
+                            parent.props.checkout.call(this);
+                        }
+                    })
+                }
+                PageLess.ContextMenu(options, this);
+            },
+
+            checkin: function(){
+                const parent = this.parentComponent;
+                Modal.BuildForm({
+                    title: "Visitor Check-In",
+                    icon: "user-check",
+                    description: `Please enter the visitor's tag number in the field below and log any device with they may have with them.`,
+                    inputs: /*html*/ `
+                        <text-input icon="id-badge" text="Enter Visitor Tag Number" identity="tag-number" required="required"></text-input>
+                        <radio-button-group icon="phone-laptop" name="has-device" identity="has-device" text="Is the visitor carrying any electronic device (Laptop, Tablet, etc)?" items='${JSON.stringify([{text: "No", value: "no"}, {text: "Yes", value: "yes"}])}' required="required"></radio-button-group>
+                    `,
+                    submitText: "Continue",
+                    closable: false,
+                    autoClose: false,
+                }, values=>{
+                    const tagNumber = values['tag-number'];
+                    const hasDevice = values['has-device'];
+                    if (hasDevice != null) {
+                        let devices = [];
+
+                        if (hasDevice == 'yes') {
+                            Modal.BuildForm({
+                                title: "Visitor Check-In",
+                                icon: "user-check",
+                                description: `Please enter the visitor's tag number in the field below and log any device with they may have with them.`,
+                                inputs: /*html*/ `
+                                    <device-input></device-input>
+                                `,
+                                submitText: "Continue",
+                                closable: false,
+                                autoClose: false,
+                            }, devicesValues=>{
+                                const deviceInputs = devicesValues.modal.querySelectorAll('.device-input');
+                                deviceInputs.forEach(inputs=>{
+                                    const deviceName   = inputs.querySelector('.device-name').value.trim();
+                                    const serialNumber = inputs.querySelector('.serial-number').value.trim();
+                                    const device = {
+                                        item_name: deviceName, 
+                                        serial_number: serialNumber
+                                    }
+
+                                    devices.push(device);
+                                });
+
+                                parent.props.completeCheckIn.call(parent, tagNumber, devices, devicesValues.submitBtn).then(()=>{
+                                    Modal.Close(devicesValues.modal);
+                                    Modal.Close(values.modal);
+                                });
+                            });
+                        } else {
+                            parent.props.completeCheckIn.call(parent, tagNumber, devices, values.submitBtn).then(()=>{
+                                Modal.Close(values.modal);
+                            });
+                        }
+                    } else {
+                        PageLess.Toast('danger', 'Please specify whether or not the visitor has a device', 5000);
+                    }
+                });
+            },
+
+            checkout: function(){
+                Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                    PageLess.Request({
+                        url: "/api/apply-visit-operation",
+                        method: "POST",
+                        data: {
+                            appointment_id: this.parentComponent.id,
+                            status: "completed"
+                        },
+                        beforeSend: ()=>{
+                            PageLess.ChangeButtonState(this)
+                        }
+                    }, true).then(result=>{
+                        PageLess.RestoreButtonState(this);
+                        if (result.status == 200) {
+                            Modal.Success("Checkin Completed", "Visitor has been successfully checked-out");
+                            this.parentComponent.setData({
+                                status: "completed"
+                            });
+                        } else {
+                            PageLess.Toast('danger', result.message, 5000);
+                        }
+                    });
+                });
+            },
+
+            completeCheckIn: function(tagNumber, devices, submitBtn){
+                return new Promise(resolve=>{
+                    Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                        PageLess.Request({
+                            url: "/api/apply-visit-operation",
+                            method: "POST",
+                            data: {
+                                appointment_id: this.id,
+                                tag_number: tagNumber,
+                                status: "active"
+                            },
+                            beforeSend: ()=>{
+                                PageLess.ChangeButtonState(submitBtn, 'Checking In')
+                            }
+                        }, true).then(result=>{
+                            PageLess.RestoreButtonState(submitBtn);
+                            if (result.status == 200) {
+                                if (devices.length > 0) {
+                                    this.props.logDevices.call(this, devices, submitBtn).then(()=>{
+                                        resolve(result);
+                                    });
+                                } else {
+                                    Modal.Success("Checkin Completed", "Visitor has been successfully checked-in");
+                                    this.setData({
+                                        status: "active",
+                                    });
+                                    
+                                    resolve(result);
+                                }
+                            } else {
+                                PageLess.Toast('danger', result.message, 5000);
+                            }
+                        });
+                    });
+                });
+            }, 
+
+            logDevices: function(devices, submitBtn){
+                return new Promise(resolve=>{
+                    PageLess.Request({
+                        url: "/api/add-appointment-items",
+                        method: "POST",
+                        data: {
+                            appointment_id: this.id,
+                            items: devices
+                        },
+                        beforeSend: ()=>{
+                            PageLess.ChangeButtonState(submitBtn, 'Logging Devices')
+                        }
+                    }, true).then(result=>{
+                        PageLess.RestoreButtonState(submitBtn);
+                        if (result.status == 200) {
+                            Modal.Success("Checkin Completed", "Visitor check-in and device(s) registration have been successfully completed. ");
+                            this.setData({
+                                status: "active"
+                            });
+
+                            resolve(result);
+                        } else {
+                            PageLess.Toast('danger', `Check-in was successful. However, ${result.message}`, 5000);
+                        }
+                    });
+                })
+            }
         },
         
         view: function(){
+            // console.log(this.checkin);
             return /*html*/`
                 <div class="appointment-item">
                     <div class="time-container position-relative">
@@ -1921,6 +2149,7 @@ export const Components = {
                             </div>
                             <div class="action">
                                 ${this.editable === true || this.editable == 'true' ? /*html*/ `<pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncontextclick}}" />` : ''}
+                                ${this.checkin !== false ? /*html*/ `<pageless-button class="btn-circle" text='<i class="fa text-muted fa-lg fa-ellipsis-v"></i>' onclick="{{this.props.oncheckoptionclick}}" />` : ''}
                             </div>
                         </div>
                     </div>
@@ -1942,7 +2171,8 @@ export const Components = {
             items: '',
             appointments: '',
             editable: true,
-            departmentonly: false
+            departmentonly: false,
+            checkin: false
         },
 
         view: function(){
@@ -1982,6 +2212,7 @@ export const Components = {
                             startyear="${item.start_year}" 
                             editable="${this.editable}"
                             departmentonly="${this.departmentonly}"
+                            checkin="${this.checkin}"
                         ></appointment-item>
                     `
                 });
@@ -2008,6 +2239,9 @@ export const Components = {
         view: function(){
             return /*html*/`
                 <div class="w-100 d-flex flex-wrap">
+                    <form class="w-100 d-flex justify-content-between align-items-center p-1 p-sm-1 p-md-2 p-lg-2 p-xl-3" style="padding-bottom: 0px !important;">
+                        <div class="title">${this.title}</div>
+                    </form>
                     ${this.cards}
                 </div>
             `;
@@ -2023,7 +2257,7 @@ export const Components = {
                         this.setData({
                             cards: /*html*/ `
                                 <dashboard-card title="Total Appointments" value="${data.total_appointment}" icon="calendar-alt" iconcolor="text-danger"></dashboard-card>
-                                <dashboard-card title="Toatl Departments" value="${data.total_department}" icon="sitemap" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Total Departments" value="${data.total_department}" icon="sitemap" iconcolor="text-danger"></dashboard-card>
                                 <dashboard-card title="Total Executive" value="${data.total_executive}" icon="user-tie" iconcolor="text-danger"></dashboard-card>
                                 <dashboard-card title="Total Department Staff" value="${data.total_department_executive}" icon="sitemap" iconcolor="text-danger"></dashboard-card>
                             `
@@ -2032,6 +2266,86 @@ export const Components = {
                         this.remove();
                     }
                 });
+            });
+        }
+    }),
+
+    AppointmentDashboardStats: new PageLessComponent("appointment-dashboard-stats", {
+        data: {
+            title: "Appointment Dashboard",
+            interval: 'today',
+            intervals: [
+                {text: "Today", value: "today"},
+                {text: "Yesterday", value: "yesterday"},
+                {text: "This Week", value: "this_week"},
+                {text: "This Month", value: "this_month"},
+                {text: "This Year", value: "this_year"},
+            ],
+            cards: /*html*/ `
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+                <image-card-preloader></image-card-preloader>
+            `
+        },
+        props: {
+            onintervalchange: function(){
+                let value = this.querySelector('select').value.trim();
+                if (value == '') {
+                    value = 'today';
+                }
+
+                this.parentComponent.props.loadData.call(this.parentComponent, value);
+            },
+
+            loadData: function(interval = this.interval){
+                const intervalElem = this.querySelector('.interval-container');
+                PageLess.Request({
+                    url: "/api/appointment-operation-stats",
+                    method: "POST",
+                    data: {
+                        data_key: interval
+                    }, 
+                    beforeSend: function(){
+                        PageLess.ChangeButtonState(intervalElem, 'Updating');
+                    }
+                }, true).then(result=>{
+                    PageLess.RestoreButtonState(intervalElem);
+                    const data = result.response_body
+                    if (result.status == 200) {
+                        this.setData({
+                            interval: interval,
+                            cards: /*html*/ `
+                                <dashboard-card title="Pending Appointments" value="${data.pending}" icon="calendar-day" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Active Appointments" value="${data.active}" icon="user-clock" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Completed Appointments" value="${data.completed}" icon="calendar-check" iconcolor="text-danger"></dashboard-card>
+                                <dashboard-card title="Expired Appointments" value="${data.expired}" icon="calendar-exclamation" iconcolor="text-danger"></dashboard-card>
+                            `
+                        });
+                    } else {
+                        this.remove();
+                    }
+                });
+            }
+        },
+        view: function(){
+            return /*html*/`
+                <div class="w-100 d-flex flex-wrap mt-4">
+                    <form class="w-100 d-flex justify-content-between align-items-center p-1 p-sm-1 p-md-2 p-lg-2 p-xl-3" style="padding-bottom: 0px !important;">
+                        <div class="title">${this.title}</div>
+                        <div class="interval-container">
+                            <custom-select onchange="{{this.props.onintervalchange}}" text="Interval" icon="sort-amount-down" selectedvalue="${this.interval}" items='${JSON.stringify(this.intervals)}' style="background-color: unset !important; margin: 0 !important; "></custom-select>
+                        </div>
+                    </form>
+                    ${this.cards}
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                this.props.loadData.call(this)
             });
         }
     })

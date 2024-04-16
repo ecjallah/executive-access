@@ -371,7 +371,7 @@ export class PageLessModal
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row no-gutters ${this.noClose !== false || this.noSubmit !== false ? 'justify-content-center' : 'justify-content-end'} pt-3 pb-2">
+                                <div class="row no-gutters ${this.noClose !== false || this.noSubmit !== false ? 'justify-content-center' : 'justify-content-end'} pt-3 pb-3">
                                     ${this.noClose === false ? `<button type="button" class="btn btn-muted col-5 col-sm-3 col-md-3 switch-mode animated fadeIn faster close-modal">${this.closeText}</button>&emsp;` : ''}
                                     ${this.noSubmit === false ? `<progress-button type="submit" classname="btn btn-primary col-5 col-sm-3 col-md-3 animated fadeIn faster" progresstype="warning" text="${this.submitText}"></progress-button>` : ''}
 
