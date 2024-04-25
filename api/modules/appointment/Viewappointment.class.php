@@ -2,7 +2,7 @@
 //SubModule Identity
 define('MODULE_APPOINTMENT_HANDLER_ID', '10020240228203211');
 define('SUB_VIEWAPPOINTMENT', '10020240228203214');
-define('SUB_NAME_VIEWAPPOINTMENT', 'Viewappointment');
+define('SUB_NAME_VIEWAPPOINTMENT', 'View appointment');
 Auth::module_function_registration(SUB_VIEWAPPOINTMENT, SUB_NAME_VIEWAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID);
 
 /**
@@ -38,15 +38,25 @@ class Viewappointment {
     }
 
     //This method returns all appointments
-    public function return_all_appointments($companyId, $pager){
-        $pageCond  = '';
+    public function return_all_appointments($companyId, $pager, $filter = null, $type = null, $approval_status = 'pending'){
+        $typeCondition = '';
+        if($type != null){
+            $typeCondition = " AND appointment_type = 'online' AND approval_status = $approval_status ";
+        }
+
+        $pageCond     = '';
         if ($pager != null) {
             $count    = 15; 
             $pageNum  = intval($pager);
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+
+        $filterCond     = '';
+        if($filter != null){
+            $filterCond = " AND status = '$filter' ";
+        }
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' $filterCond $typeCondition ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{
@@ -89,15 +99,21 @@ class Viewappointment {
     }
 
     //This method returns department appointments
-    public function return_department_appointments($companyId, $departmentId, $pager){
-        $pageCond  = '';
+    public function return_department_appointments($companyId, $departmentId, $pager, $filter = null){
+        $pageCond     = '';
         if ($pager != null) {
             $count    = 15; 
             $pageNum  = intval($pager);
             $offset   = $pageNum * $count;
             $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
-        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' ORDER BY `visit_date` ASC $pageCond");
+
+        $filterCond     = '';
+        if($filter != null){
+            $filterCond = " AND status = '$filter' ";
+        }
+
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' $filterCond ORDER BY `visit_date` ASC $pageCond");
         if($query === false){
             return 500;
         }else{

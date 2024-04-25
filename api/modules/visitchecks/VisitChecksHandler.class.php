@@ -3,7 +3,7 @@
     
     //Module Identity
     define('VISITCHECKS_HANDLER_ID', 10020240314211538);
-    define('VISITCHECKS_HANDLER', 'VisitChecks');
+    define('VISITCHECKS_HANDLER', 'Visit Checks');
     Auth::module_registration(VISITCHECKS_HANDLER_ID, VISITCHECKS_HANDLER);
     /**
         * *********************************************************************************************************
@@ -148,17 +148,30 @@
                 if($this->method == "POST"){
                     $_POST             = json_decode(file_get_contents("php://input"), true);
                     $companyId         = Helper::get_business_id($this->userId, $this->account_character);
-                    if(empty($_POST['appointment_id']) || empty($_POST['status'])){
-                        $response      = new Response(400, "Please provide the following: appointment_id and status");
+                    if(empty($_POST['appointment_id']) || empty($_POST['status']) || empty($_POST['verification_code'])){
+                        $response      = new Response(400, "Please provide the following: appointment_id, status and verification_code");
                         $response->send_response();
                     }else{
-                        $appointmentId = InputCleaner::sanitize($_POST['appointment_id']);
-                        $status        = InputCleaner::sanitize($_POST['status']);
-                        $tagNumber     = key_exists('tag_number', $_POST) ? InputCleaner::sanitize($_POST['tag_number']) : false;
+                        $viewAppointment        = new Viewappointment;
+                        $appointmentId          = InputCleaner::sanitize($_POST['appointment_id']);
+                        $status                 = InputCleaner::sanitize($_POST['status']);
+                        $onlineAppointmentCode  = InputCleaner::sanitize($_POST['verification_code']);
+                        $tagNumber              = key_exists('tag_number', $_POST) ? InputCleaner::sanitize($_POST['tag_number']) : false;
 
+                        //CHECK APPOINTMENT TYPE
+                        $appointmentType        = $viewAppointment->get_appointment_details($companyId, $appointmentId);
+                        if(is_array($appointmentType) && $appointmentType[0]['appointment_type'] == 'online'){
+                            if($onlineAppointmentCode === $appointmentType[0]['token'] && $appointmentType[0]['approval_status'] == 'approved'){
+                                //
+                            }else{
+                                $response = new Response(400, "Sorry, invaild appointment token/code.");
+                                $response->send_response();
+                            }
+                        }
+                        // else{
                         //Check appointment status
-                        $appointment                = new Viewappointment();
-                        $editAppointment            = new Editappointment();
+                        $appointment       = new Viewappointment();
+                        $editAppointment   = new Editappointment();
                         if($appointment->permission === 200){
                             $appointmentStatusCheck = $appointment->get_appointment_details($companyId, $appointmentId);
                             if(is_array($appointmentStatusCheck)){
@@ -202,9 +215,10 @@
                                 $response->send_response();
                             }
                         }else{
-                            $response = new Response(301, "Unauthorized Module: Contact Admin");
+                            $response      = new Response(301, "Unauthorized Module: Contact Admin");
                             $response->send_response();
                         }
+                        // }
                     }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the POST method");

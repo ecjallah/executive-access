@@ -17,6 +17,11 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/api/classes/Autoloader.class.php';
  */
 
 class UpdateUserProfile{
+    private $user_type;
+    private $userId;
+    private $account_character;
+    private $method;
+    private $url;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId            = $_SESSION['user_id'];

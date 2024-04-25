@@ -374,4 +374,33 @@ class Helper{
             }
         }
     }
+
+    //This method generates appointment verification code
+    public function generate_appointment_verification_code($companyId, $appointmentId, $number){
+        $code             = mt_rand();
+        $str              = (string) $code;
+        $str              = "$code";   
+        $newCode          = substr($str, 0, 7);
+
+        // ALLOW TO SEND SMS
+        $sendSms          = new MessageCenter();
+        $result           = $sendSms->send_sms($newCode, $number);
+        if($result === 200){
+            //Appointment Information
+            $details      = [
+                'token'            => $newCode,
+                'approval_status'  => 'approved',
+                'date_updated'     => gmdate('Y-m-d : H:s:i')
+            ];
+            $identity     = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointmentId]];
+            $query        = CustomSql::update_array($details, $identity, 'appointments');
+            if($query === false){
+                return 500;
+            }else{
+                return 200;
+            }
+        }else if($result === 500){
+            return 500;
+        }
+    }
 }

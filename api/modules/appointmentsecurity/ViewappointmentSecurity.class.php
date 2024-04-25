@@ -2,7 +2,7 @@
 //SubModule Identity
 define('MODULE_APPOINTMENTSECURITY_HANDLER_ID', '10020240301194745');
 define('SUB_VIEWAPPOINTMENTSECURITY', '10020240301194748');
-define('SUB_NAME_VIEWAPPOINTMENTSECURITY', 'ViewappointmentSecurity');
+define('SUB_NAME_VIEWAPPOINTMENTSECURITY', 'View Appointment Security');
 Auth::module_function_registration(SUB_VIEWAPPOINTMENTSECURITY, SUB_NAME_VIEWAPPOINTMENTSECURITY, MODULE_APPOINTMENTSECURITY_HANDLER_ID);
 
 /**
@@ -39,20 +39,22 @@ class ViewappointmentSecurity {
 
      //This method liikups an appointment
      public function lookup_appointment($companyId, $lookupVal){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' AND `status` != 'completed'");
+        $query               = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND visitor_name LIKE '%{$lookupVal}%' AND status != 'delete' AND `status` != 'completed'");
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
+            $count           = $query->num_rows;
             if($count >= 1){
-                $keys   = [];
-                $data   = [];
+                $keys        = [];
+                $data        = [];
                 $visitChecks = new ViewvisitChecks();
-                while ($row = mysqli_fetch_assoc($query)) {
+                $onlieStatus = 0;
+                while ($row  = mysqli_fetch_assoc($query)) {
                     $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
                     $row['start_time']        = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
                     $row['end_time']          = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
                     $row['registered_items']  = $visitChecks->get_appointment_registered_items($row['id']);
+                    // $row['appointment_type']  = $visitChecks->get_appointment_registered_items($row['id']);
                     $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
                     $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
                     $index                    = count($keys);

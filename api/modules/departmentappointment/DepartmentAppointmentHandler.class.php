@@ -56,7 +56,8 @@
             {
                 if($this->method == "GET"){
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);
-                    $pager              = InputCleaner::sanitize($_GET['pager']);
+                    $pager              = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
+                    $filter             = key_exists('filter', $_GET) ? InputCleaner::sanitize($_GET['filter']) : null;
                     $staffId            = $this->userId;
                     $departmentId       = Helper::get_staff_department_id($staffId);
                     if($departmentId['status'] === 200){
@@ -64,7 +65,7 @@
                         $getAppointment     = new Viewappointment();
                         if($getAppointment->permission === 200){
                             $response       = ['department_id'=>$departmentId];
-                            $result         = $getAppointment->return_department_appointments($companyId, $departmentId, $pager);
+                            $result         = $getAppointment->return_department_appointments($companyId, $departmentId, $pager, $filter);
                             if($result === 500){
                                 $response   = new Response(500, "Error returning department appointments.");
                                 $response->send_response();

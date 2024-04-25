@@ -78,12 +78,21 @@ RewriteRule ^add-new-department-appointment/?$ modules/departmentappointment/Dep
 RewriteRule ^update-department-appointment/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php
 RewriteRule ^update-department-appointment-status/?$ modules/departmentappointment/DepartmentAppointmentHandler.class.php
 
-# #GENERIC USER ENDPOINTS
-# RewriteRule ^epad-get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php
-# RewriteRule ^epad-get-user-security-details/?$ modules/generic_users_module/GenericUserHandler.class.php
+#APPOINTMENT SETTINGS
+RewriteRule ^get-appointment-settings/?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php
+RewriteRule ^update-appointment-settings/?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php
+RewriteRule ^get-online-appointments?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php [QSA]
+RewriteRule ^apply-online-appointment-action/?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php
+
+
+#OUTSIDE ONLINE APPOINTMENT
+RewriteRule ^set-outside-appointment/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php
+RewriteRule ^get-all-ministries/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php
+RewriteRule ^get-ministry-departments/([0-9]+)/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php?ministry_id=$1
+RewriteRule ^get-department-executives/([0-9]+)/([0-9]+)/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php?ministry_id=$1&department_id=$2
 
 #GENERIC USER ENDPOINTS
-RewriteRule ^get-user-profile-details/?$ modules/generic_users_module/GenericUserHandler.class.php
-RewriteRule ^update-user-basic-info/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^get-user-personal-details/?$ modules/generic_users_module/GenericUserHandler.class.php
 RewriteRule ^get-user-security-details/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^update-user-basic-info/?$ modules/generic_users_module/GenericUserHandler.class.php
 RewriteRule ^update-user-security-info/?$ modules/generic_users_module/GenericUserHandler.class.php
