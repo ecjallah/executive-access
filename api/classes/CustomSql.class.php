@@ -33,7 +33,7 @@ include_once dirname(__FILE__).'/Autoloader.class.php';
     
     $sql      = "INSERT INTO `$table` ($columns) VALUES ($values)";
     $query    = self::$conn->query($sql);
-          if ($query == true) {
+    if ($query == true) {
       return true;
     } else {
       return self::$conn->error;

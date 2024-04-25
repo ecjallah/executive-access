@@ -1,16 +1,17 @@
 <?php
+
 //SubModule Identity
-define('MODULE_APPOINTMENT_HANDLER_ID', '10020240228203211');
-define('SUB_ADDAPPOINTMENT', '10020240228203220');
-define('SUB_NAME_ADDAPPOINTMENT', 'Add Appointment');
-Auth::module_function_registration(SUB_ADDAPPOINTMENT, SUB_NAME_ADDAPPOINTMENT, MODULE_APPOINTMENT_HANDLER_ID);
+define('MODULE_ONLINE_APPOINTMENTS_HANDLER_ID', '10020240416123315');
+define('SUB_ADDONLINEAPPOINTMENTS', '10020240416123324');
+define('SUB_NAME_ADDONLINEAPPOINTMENTS', 'Add online Appointments');
+Auth::module_function_registration(SUB_ADDONLINEAPPOINTMENTS, SUB_NAME_ADDONLINEAPPOINTMENTS, MODULE_ONLINE_APPOINTMENTS_HANDLER_ID);
 
 /**
  * *********************************************************************************************************
  * @_forProject: Shell Bone
- * @_purpose: This class handles/manages Appointment ADD operations.
+ * @_purpose: This class handles/manages OnlineAppointments ADD operations.
  * @_version Release: 1.0
- * @_created Date: 2024-02-28
+ * @_created Date: 2024-04-16
  * @_author(s):Shell Bone Generator
  *   --------------------------------------------------------------------------------------------------
  *   1) Fullname of engineer. (Paul Glaydor)
@@ -19,7 +20,7 @@ Auth::module_function_registration(SUB_ADDAPPOINTMENT, SUB_NAME_ADDAPPOINTMENT, 
  * *********************************************************************************************************
 */
 
-class Addappointment {
+class AddonlineAppointments {
     private $user_type;
     private $userId;
     public $permission;
@@ -32,14 +33,22 @@ class Addappointment {
             $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(SUB_ADDAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);
+            $auth              = Auth::function_check(SUB_ADDONLINEAPPOINTMENTS, $this->userId, $this->user_type, $this->account_character);
             $this->permission  = $auth;
         }
     }
 
-    //This method adds new executive appointments
-    public function add_new_appointments($details){
-        $query    = CustomSql::insert_array("appointments", $details);
+    //This method sets default appointment settings
+    public function set_default_appointment_settings($companyId){
+        $todayDate = Helper::get_current_date();
+        $details  = [
+            "ministry_id"   => $companyId,
+            "start_time"    => "00:00:00",
+            "end_time"      => "00:00:00",
+            "added_by"      => $this->userId,
+            "added_date"    => $todayDate
+        ];
+        $query    = CustomSql::insert_array("appointment_settings", $details);
         if($query === false){
             return 500;
         }else{
@@ -47,3 +56,4 @@ class Addappointment {
         }
     }
 }
+            

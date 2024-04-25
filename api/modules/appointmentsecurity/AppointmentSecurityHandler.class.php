@@ -141,7 +141,6 @@
             }
         }
 
-
         //UPDATE ENDPOINT
         public function update(){
             if($this->url == "/api/")

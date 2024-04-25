@@ -21,6 +21,11 @@ Auth::module_registration(USERHANDLER_MODULE_ID, USERHANDLER_MODULE_NAME);
 */
 
 class GenericUserHandler{
+    private $user_type;
+    private $userId;
+    private $account_character;
+    private $method;
+    private $url;
     function __construct(){
         if(isset($_SESSION['user_id'])){
             $this->userId      = $_SESSION['user_id'];
@@ -30,8 +35,6 @@ class GenericUserHandler{
             $this->url         = $_SERVER['REQUEST_URI'];
             $this->get_login_user_details();
             $this->get_user_security();
-            $this->update_health_care_basic_info();
-            $this->update_healthcare_security_info();
             $this->return_all_user_accounts();
             $this->switch_login_user_accounts();
         }else{
@@ -41,7 +44,7 @@ class GenericUserHandler{
 
     //This endpoint returns regualr Information reating to the login user
     protected function get_login_user_details(){
-        if($this->url == '/api/epad-get-user-personal-details')
+        if($this->url == '/api/get-user-personal-details')
         {
             if($this->method == 'GET'){    
                 $userInfo  = new ViewUserProfile();
@@ -70,7 +73,7 @@ class GenericUserHandler{
 
     //This endpoint returns user security information
     protected function get_user_security(){
-        if($this->url == '/api/epad-get-user-security-details')
+        if($this->url == '/api/get-user-security-details')
         {
             if($this->method == "POST"){
                 $_GET      = json_decode(file_get_contents('php://input'), true);
@@ -94,96 +97,6 @@ class GenericUserHandler{
                     $response->send_response();
                 }
             } else{
-                $response = new Response(300, "This endpoint accepts the POST method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint updates healthcare basic information
-    protected function update_health_care_basic_info(){
-        if($this->url == '/api/update-health-care-basic-info')
-        {
-            if($this->method == 'POST'){
-                $_POST        = json_decode(file_get_contents('php://input'), true);
-
-                $healthCareName     = InputCleaner::sanitize($_POST['health_care_name']);
-                $address            = InputCleaner::sanitize($_POST['address']);
-                $date_founded       = InputCleaner::sanitize($_POST['date_founded']);
-                $email              = InputCleaner::sanitize($_POST['email']);
-                $logo               = InputCleaner::sanitize($_POST['logo']);
-                $image              = InputCleaner::sanitize($_POST['image']);
-                $country            = InputCleaner::sanitize($_POST['country']);
-                $county             = InputCleaner::sanitize($_POST['county']);
-                $last_updated       = gmdate('Y-m-d H:i:s');
-
-
-                $details = [
-                    'health_care_name'   => $healthCareName,
-                    'address'            => $address,
-                    'date_founded'       => $date_founded,
-                    'email'              => $email,
-                    'logo'               => $logo,
-                    'image'              => $image,
-                    'country'            => $country,
-                    'county'             => $county,
-                    'last_updated'       => $last_updated
-                ];
-
-                $update_user_info   = new UpdateUserProfile();
-		        $identity    = ['column' => 'user_id', 'value' => $this->userId];
-                $result      = $update_user_info->update_health_care_basic_info($details, $identity);
-    
-                if($result == 500){
-                    $response = new Response(500, "Contact Admin(Update health care healthcare basic Profile)");
-                    $response->send_response();
-
-                }else{
-                    $response = new Response(200, "Health care basic information updated successfully");
-                    $response->send_response();
-                }
-
-            } else{
-                $response = new Response(300, "This endpoint accepts the POST method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint updates healthcare security information
-    protected function update_healthcare_security_info(){
-        if($this->url == '/api/update-health-care-security-info')
-        {
-            if($this->method == 'POST'){
-                $_POST             = json_decode(file_get_contents('php://input'), true);
-
-                $number            = InputCleaner::sanitize($_POST['number']);
-                $username          = InputCleaner::sanitize($_POST['username']);
-                $password          = InputCleaner::sanitize($_POST['password']);
-                $last_updated      = gmdate('Y-m-d H:i:s');
-                $newPassword       = password_hash($password, PASSWORD_DEFAULT);
-                
-                $details = [
-                    'contact'        => $number,
-                    'username'       => $username,
-                    'password'       => $newPassword,
-                    'last_updated'   => $last_updated
-                ];
-                
-                $identity                     = ['column' => 'user_id', 'value' => $this->userId];
-                $update_healthcare_security   = new UpdateUserProfile();
-                $result                       = $update_healthcare_security->update_health_care_security_profile($details, $identity);
-
-                if($result == 500){
-                    $response = new Response(500, "Contact Admin(Update health care healthcare security Profile)");
-                    $response->send_response();
-
-                }else{
-                    $response = new Response(200, "Health care security information updated successfully");
-                    $response->send_response();
-                }
-
-            }else{
                 $response = new Response(300, "This endpoint accepts the POST method");
                 $response->send_response();
             } 

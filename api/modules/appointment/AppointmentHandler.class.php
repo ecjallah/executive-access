@@ -217,29 +217,29 @@
             if($this->url == "/api/update-appointment")
             {
                 if($this->method == "POST"){
-                    $_POST                  = json_decode(file_get_contents("php://input"), true);
+                    $_POST                    = json_decode(file_get_contents("php://input"), true);
                     if(empty($_POST['appointment_id']) || empty($_POST['executive_id']) || empty($_POST['department_id']) || empty($_POST['visitor_name']) || empty($_POST['purpose'])|| empty($_POST['number']) || empty($_POST['visit_date'])){
-                        $response           = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, and status");
+                        $response             = new Response(400, "Please provide the following: executive_id, department_id, visitor_name, purpose, number, visit_date, and status");
                         $response->send_response();
                     }else{
-                        $companyId          = Helper::get_business_id($this->userId, $this->account_character);
-                        $editAppointment    = new Editappointment();
+                        $companyId            = Helper::get_business_id($this->userId, $this->account_character);
+                        $editAppointment      = new Editappointment();
                         if($editAppointment->permission === 200){
-                            $appointment_id  = InputCleaner::sanitize($_POST['appointment_id']);
-                            $executive_id    = InputCleaner::sanitize($_POST['executive_id']);
-                            $department_id   = InputCleaner::sanitize($_POST['department_id']);
-                            $visitor_name    = InputCleaner::sanitize($_POST['visitor_name']);
-                            $purpose         = InputCleaner::sanitize($_POST['purpose']);
-                            $number          = InputCleaner::sanitize($_POST['number']);
-                            $start_time      = InputCleaner::sanitize($_POST['start_time']);
-                            $end_time        = InputCleaner::sanitize($_POST['end_time']);
-                            $visit_date      = InputCleaner::sanitize($_POST['visit_date']);
+                            $appointment_id   = InputCleaner::sanitize($_POST['appointment_id']);
+                            $executive_id     = InputCleaner::sanitize($_POST['executive_id']);
+                            $department_id    = InputCleaner::sanitize($_POST['department_id']);
+                            $visitor_name     = InputCleaner::sanitize($_POST['visitor_name']);
+                            $purpose          = InputCleaner::sanitize($_POST['purpose']);
+                            $number           = InputCleaner::sanitize($_POST['number']);
+                            $start_time       = InputCleaner::sanitize($_POST['start_time']);
+                            $end_time         = InputCleaner::sanitize($_POST['end_time']);
+                            $visit_date       = InputCleaner::sanitize($_POST['visit_date']);
                             $final_visit_date = "$visit_date $start_time";
                             $currentDate      = gmdate("Y-m-d H:i:s");
                             $currentTimestamp = strtotime($currentDate);
                             $VisitTimestamp   = strtotime($final_visit_date);
                             if ($currentTimestamp < $VisitTimestamp) {
-                                $details     = [
+                                $details      = [
                                     "company_id"     => $companyId,
                                     "executive_id"   => $executive_id,
                                     "department_id"  => $department_id,
@@ -282,24 +282,24 @@
             if($this->url == "/api/update-appointment-status")
             {
                 if($this->method == "POST"){
-                    $_POST                 = json_decode(file_get_contents("php://input"), true);
+                    $_POST                       = json_decode(file_get_contents("php://input"), true);
                     if(empty($_POST['appointment_id']) || empty($_POST['appointment_status'])){
                         $response          = new Response(400, "Please provide the following: appointment_id, appointment_status");
                         $response->send_response();
                     }else{
-                        $companyId         = Helper::get_business_id($this->userId, $this->account_character);
-                        $editAppointment   = new Editappointment();
+                        $companyId               = Helper::get_business_id($this->userId, $this->account_character);
+                        $editAppointment         = new Editappointment();
                         if($editAppointment->permission === 200){
                             $appointment_id      = InputCleaner::sanitize($_POST['appointment_id']);
                             $appointment_status  = InputCleaner::sanitize($_POST['appointment_status']);
                             $updated_date        = Helper::get_current_date();
 
-                            $details        = [
+                            $details             = [
                                 "status"        => $appointment_status,
                                 "date_updated"  => $updated_date
                             ];
-                            $identity         = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointment_id]];
-                            $result           = $editAppointment->update_executive_appointment($details, $identity);
+                            $identity            = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointment_id]];
+                            $result              = $editAppointment->update_executive_appointment($details, $identity);
                             if($result === 500){
                                 $response     = new Response(500, "Error updating appointment.");
                                 $response->send_response();

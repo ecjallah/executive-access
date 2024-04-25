@@ -1,9 +1,8 @@
-
 <?php
 //SubModule Identity
 define('MODULE_EXECUTIVELIST_HANDLER_ID', '10020240227182744');
 define('SUB_VIEWEXECUTIVELIST', '10020240227182747');
-define('SUB_NAME_VIEWEXECUTIVELIST', 'ViewexecutiveList');
+define('SUB_NAME_VIEWEXECUTIVELIST', 'View executive List');
 Auth::module_function_registration(SUB_VIEWEXECUTIVELIST, SUB_NAME_VIEWEXECUTIVELIST, MODULE_EXECUTIVELIST_HANDLER_ID);
 
 /**
@@ -28,9 +27,9 @@ class ViewexecutiveList {
 
     function __construct(){
         if(isset($_SESSION["user_id"])){
-            $this->userId              = $_SESSION["user_id"];
-            $this->user_type           = $_SESSION["user_type"];
-            $this->permission          = null;
+            $this->userId      = $_SESSION["user_id"];
+            $this->user_type   = $_SESSION["user_type"];
+            $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
             $auth              = Auth::function_check(SUB_VIEWEXECUTIVELIST, $this->userId, $this->user_type, $this->account_character);
@@ -106,5 +105,23 @@ class ViewexecutiveList {
             }
         }
     }
-}
-            
+
+    //This method returns all executive members from a department WITHOUT PAGENATION
+    public function return_department_executives_($companyId, $departmentId){
+        $query              = CustomSql::quick_select(" SELECT * FROM `executive_members` WHERE `company_id` = '$companyId' AND `department_id` = $departmentId AND `status` != 'remove' ORDER BY `id` DESC ");
+        if($query === false){
+            return 500;
+        }else{
+            $count          = $query->num_rows;
+            if($count >= 1){
+                $data       = [];
+                while ($row = mysqli_fetch_assoc($query)) {
+                    $data[] = $row;
+                }
+                return $data;
+            }else{
+                return 404;
+            }
+        }
+    }
+}           
