@@ -50,7 +50,6 @@ class ViewonlineAppointments {
                 while ($row = mysqli_fetch_assoc($query)) {
                     //Get executive info
                     $executiveInfo = $executives->return_executive_member_details($businessId, $row['executive_id']);
-
                     $data[] = $executiveInfo;
 
                     // print_r($executiveInfo);

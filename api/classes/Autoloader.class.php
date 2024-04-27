@@ -54,6 +54,9 @@ class Autoloader{
             else if(file_exists(__ROOT__. '/api/modules/outsideappointment/' . $className. ".class.php")){
                 include_once __ROOT__.'/api/modules/outsideappointment/' . $className. ".class.php";
             }
+            else if(file_exists(__ROOT__. '/api/modules/appointmentpurpose/' . $className. ".class.php")){
+                include_once __ROOT__.'/api/modules/appointmentpurpose/' . $className. ".class.php";
+            }
             else{
                 echo "Can't find the requested class anywhere on this Api";
             }

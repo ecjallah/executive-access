@@ -84,6 +84,13 @@ RewriteRule ^update-appointment-settings/?$ modules/onlineappointments/OnlineApp
 RewriteRule ^get-online-appointments?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php [QSA]
 RewriteRule ^apply-online-appointment-action/?$ modules/onlineappointments/OnlineAppointmentsHandler.class.php
 
+#APPOINTMENT PURPOSE
+RewriteRule ^get-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
+RewriteRule ^get-appointment-purpose-details/([0-9]+)/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php?id=$1
+RewriteRule ^add-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
+RewriteRule ^update-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
+RewriteRule ^delete-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
+
 
 #OUTSIDE ONLINE APPOINTMENT
 RewriteRule ^set-outside-appointment/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php
