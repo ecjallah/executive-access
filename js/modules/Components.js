@@ -1688,4 +1688,212 @@ export const Components = {
             `;
         }
     }),
+
+    MinistrySelect : new PageLessComponent("ministry-select", {
+        data: {
+            userid: '',
+            selectedvalue: '',
+            selectedepartment: '',
+            departments: '',
+            includedepartments: false,
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="ministry"
+                        icon="building"
+                        text="Choose Government Entity"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                        onchange="{{this.props.onchange}}"
+                    ></custom-select>
+                    ${this.includedepartments !== false ? this.departments : ''}
+                </div>
+            `;
+        },
+        props: {
+            onchange: function(){
+                const value      = this.querySelector('select').value;
+                let departments = ''
+                if (value != '') {
+                    departments = /*html*/ `<department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></department-select>`
+                }
+
+                this.parentComponent.setData({
+                    selectedvalue: value, 
+                    departments: departments
+                });
+            }
+        },
+        callback: function(){
+            this.ready(()=>{
+                PageLess.Request({
+                    url: `/api/get-all-ministries`,
+                    method: "GET",
+                }).then(result=>{
+                    if(result.status == 200){
+                        let data    = result.response_body;
+                        let options = [];
+                        data.forEach(ministry=>{
+                            options.push({
+                                text: ministry.full_name,
+                                value: ministry.user_id
+                            });
+                        });
+
+                        let obj = {
+                            options: options
+                        }
+
+                        if (this.selectedvalue && this.selectedepartment != '') {
+                            obj.departments = /*html*/ `<department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></department-select>`
+                        }
+                        this.setData(obj);
+                    } else {
+                        this.setData({
+                            options: [{text: 'No ministry has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    DepartmentSelect : new PageLessComponent("department-select", {
+        data: {
+            userid: '',
+            ministryid: '',
+            selectedvalue: '',
+            selectedexecutive: '',
+            executives: '',
+            includeexecutives: false,
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="department"
+                        icon="sitemap"
+                        text="Department"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                        onchange="{{this.props.onchange}}"
+                    ></custom-select>
+                    ${this.includeexecutives !== false ? this.executives : ''}
+                </div>
+            `;
+        },
+        props: {
+            onchange: function(){
+                const value      = this.querySelector('select').value;
+                let executives = ''
+                if (value != '') {
+                    executives = /*html*/ `<executive-select selectedvalue="${this.parentComponent.selectedexecutive}" departmentid="${value}" ministryid="${this.parentComponent.ministryid}"></executive-select>`
+                }
+
+                this.parentComponent.setData({
+                    selectedvalue: value, 
+                    executives: executives
+                });
+            }
+        },
+        callback: function(){
+            this.ready(()=>{
+                PageLess.Request({
+                    url: `/api/get-ministry-departments/${this.ministryid}`,
+                    method: "GET",
+                }).then(result=>{
+                    if(result.status == 200){
+                        let data    = result.response_body;
+                        let options = [];
+                        data.forEach(department=>{
+                            options.push({
+                                text: department.title,
+                                value: department.id
+                            });
+                        });
+
+                        let obj = {
+                            options: options
+                        }
+
+                        if (this.selectedvalue && this.selectedexecutive != '') {
+                            obj.executives = /*html*/ `<executive-select selectedvalue="${this.selectedexecutive}" departmentid="${this.selectedvalue}" ministryid="${this.parentComponent.ministryid}"></executive-select>`
+                        }
+                        this.setData(obj);
+                    } else {
+                        this.setData({
+                            options: [{text: 'No department has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
+    ExecutiveSelect : new PageLessComponent("executive-select", {
+        data: {
+            departmentid: '',
+            ministryid: '',
+            selectedvalue: '',
+            options: [{text: 'Loading...', value: '...'}],
+        },
+        view: function(){
+            return /*html*/`
+                <div>
+                    <custom-select
+                        identity="executive"
+                        icon="user-tie"
+                        text="Meeting With"
+                        items='${JSON.stringify(this.options)}'
+                        required="required"
+                        selectedvalue="${this.selectedvalue}"
+                    ></custom-select>
+                </div>
+            `;
+        },
+        callback: function(){
+            this.ready(()=>{
+                let request;
+                if (this.departmentid != '') {
+                    request = {
+                        url: `/api/get-department-executives/${this.ministryid}/${this.departmentid}`,
+                        method: 'GET'
+                    }
+                } else {
+                    request = {
+                        url: '/api/get-executive-members',
+                        method: 'GET'
+                    }
+                }
+
+                PageLess.Request(request, true).then(result=>{
+                    if(result.status == 200){
+                        const data  = result.response_body;
+                        let options = [];
+                        data.forEach(executive=>{
+                            console.log(executive.id);
+                            options.push({
+                                text: executive.full_name,
+                                value: executive.id
+                            });
+                        });
+                        this.setData({
+                            options: options
+                        });
+                    } else {
+                        this.setData({
+                            options: [{text: 'No executive has been added', value: "..."}]
+                        });
+                    }
+                });
+            });
+        }
+    }),
+
 }

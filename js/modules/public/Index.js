@@ -19,8 +19,20 @@ export class Widget extends PageLess{
         this.modulesLocation      = "/js/modules/public";
         this.routes.push(
             {
-                widget: "Login",
+                widget: "Home",
                 routePattern: /^\/$/
+            },
+            {
+                widget: "GetStarted",
+                routePattern: /^\/get-started\/?$/
+            },
+            {
+                widget: "Login",
+                routePattern: /^\/login\/?$/
+            },
+            {
+                widget: "BookingCompleted",
+                routePattern: /^\/completed\/?$/
             }
         );
     }

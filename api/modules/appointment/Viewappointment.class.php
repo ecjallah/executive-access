@@ -41,7 +41,7 @@ class Viewappointment {
     public function return_all_appointments($companyId, $pager, $filter = null, $type = null, $approval_status = 'pending'){
         $typeCondition = '';
         if($type != null){
-            $typeCondition = " AND appointment_type = 'online' AND approval_status = $approval_status ";
+            $typeCondition = " AND appointment_type = 'online' AND approval_status = '$approval_status' ";
         }
 
         $pageCond     = '';
