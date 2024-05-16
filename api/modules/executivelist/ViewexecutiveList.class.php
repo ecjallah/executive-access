@@ -116,11 +116,44 @@ class ViewexecutiveList {
             if($count >= 1){
                 $data       = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $data[] = $row;
+                    $dailyAppointmentLimit =  $this->check_executive_active_solt($companyId, $departmentId, $row['id']);
+                    if($dailyAppointmentLimit === 200){
+                        $data[] = $row;
+                    }
                 }
                 return $data;
             }else{
                 return 404;
+            }
+        }
+    }
+
+    //This method checks if an executive has an active/open appointment solt
+    public function check_executive_active_solt($companyId, $departmentId, $executiveId){
+        //Get executive settings
+        $onlineAppointment = new ViewonlineAppointments();
+        $executiveSettings = $onlineAppointment->get_executive_appointment_settings($companyId, $departmentId, $executiveId);
+        if(is_array($executiveSettings)){
+            $date                     = gmdate('Y-m-d');
+            $today                    = strtolower(date('l', strtotime($date)));
+            $todayAppointmentStatus   = 0;
+            $todayAppointmentLimit    = $executiveSettings['open_solt'];
+
+            //Get executive daily appointment
+            foreach ($executiveSettings as $key => $value) {
+                if($key === $today){
+                    $todayAppointmentStatus = $value;
+                }
+            }
+
+            if($todayAppointmentStatus === '1'){
+                //Get all daily appointments
+                $allDailyAppointments = $onlineAppointment->get_executive_online_appointment_daily_count($companyId, $departmentId, $executiveId, $date);
+                if(is_array($allDailyAppointments)){
+                    if($allDailyAppointments['total'] < $todayAppointmentLimit){
+                        return 200;
+                    }
+                }
             }
         }
     }

@@ -28,9 +28,9 @@ class ViewdepartmentAppointment {
 
     function __construct(){
         if(isset($_SESSION["user_id"])){
-            $this->userId              = $_SESSION["user_id"];
-            $this->user_type           = $_SESSION["user_type"];
-            $this->permission          = null;
+            $this->userId      = $_SESSION["user_id"];
+            $this->user_type   = $_SESSION["user_type"];
+            $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
             $auth              = Auth::function_check(SUB_VIEWDEPARTMENTAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);

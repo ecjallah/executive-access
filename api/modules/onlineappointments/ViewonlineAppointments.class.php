@@ -37,8 +37,8 @@ class ViewonlineAppointments {
         }
     }
 
-    //This method returns appointment settings
-    public function get_ministry_appointment_settings($businessId, $departmentId){
+    //This method returns all department executive appointment settings
+    public function get_ministry_executives_appointment_settings($businessId, $departmentId){
         $query          = CustomSql::quick_select(" SELECT * FROM `appointment_settings` WHERE ministry_id = $businessId AND department_id = $departmentId ");
         if($query === false){
             return 500;
@@ -48,26 +48,40 @@ class ViewonlineAppointments {
             if($count >= 1){
                 $data   = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    //Get executive info
-                    $executiveInfo = $executives->return_executive_member_details($businessId, $row['executive_id']);
-                    $data[] = $executiveInfo;
-
-                    // print_r($executiveInfo);
-                    // exit;
-
-                    // $data[] = [
-                    //     "" =>
-                    //     "" =>
-                    //     "" =>
-                    //     "" =>
-                    // ];
+                    //Get executive info from settings
+                    $executiveInfo                               = $executives->return_executive_member_details($businessId, $row['executive_id']);
+                    if(is_array($executiveInfo)){
+                        $executiveInfo['online_settings']        = $row;
+                        $data['executives'][]                    = $executiveInfo;
+                    }
                 }
-                $row    = mysqli_fetch_assoc($query);
-                return $row;
+                return $data;
             }else{
                 return 404;
             }
         }
     }
+
+
+    //This method returns an executive appointment settings
+    public function get_executive_appointment_settings($businessId, $departmentId, $executiveId){
+        $query      = CustomSql::quick_select(" SELECT * FROM `appointment_settings` WHERE ministry_id = $businessId AND department_id = $departmentId AND executive_id = $executiveId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count  = $query->num_rows;
+            if($count === 1){
+                return $query->fetch_assoc();
+            }else{
+                return 404;
+            }
+        }
+    }
+
+    //This method returns executive online appointment daily counts
+    public function get_executive_online_appointment_daily_count($companyId, $departmentId, $executiveId, $date){
+        $dataCenter = new DataCenter();
+        $query      = $dataCenter->raw_sql_daily("SELECT * FROM `appointments` WHERE company_id = $companyId AND department_id = $departmentId AND executive_id = $executiveId AND appointment_type = 'online' ", 'date_added');
+        return $query;
+    }
 }
-            

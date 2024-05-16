@@ -38,15 +38,48 @@ class AddonlineAppointments {
         }
     }
 
-    //This method sets default appointment settings
-    public function set_default_appointment_settings($companyId){
-        $todayDate = Helper::get_current_date();
-        $details  = [
-            "ministry_id"   => $companyId,
-            "start_time"    => "00:00:00",
-            "end_time"      => "00:00:00",
-            "added_by"      => $this->userId,
-            "added_date"    => $todayDate
+    //This method sets default appointment settings for all executive members
+    public function set_default_appointment_settings($companyId, $departmentId){
+        $todayDate            = Helper::get_current_date();
+        $queryResult          = [];
+        //Get all department executives
+        $departmentExecutives = new ViewexecutiveList();
+        $executiveList        = $departmentExecutives->return_department_executives_($companyId, $departmentId);
+        foreach ($executiveList as $exective) {
+            $details    = [
+                "ministry_id"     => $companyId,
+                "department_id"   => $departmentId,
+                "executive_id"    => $exective['id'],
+                "start_time"      => "00:00:00",
+                "end_time"        => "00:00:00",
+                "open_solt"       => "0",
+                "added_by"        => $this->userId,
+                "added_date"      => $todayDate
+            ];
+            $queryResult[]    = CustomSql::insert_array("appointment_settings", $details);
+        }
+
+        if(in_array(false, $queryResult)){
+            CustomSql::rollback();
+            return 500;
+        }else{
+            CustomSql::save();
+            return 200;
+        }
+    }
+
+    //This method sets default appointment settings for an executive member
+    public function set_default_executive_appointment_settings($companyId, $departmentId, $executiveId){
+        $todayDate            = Helper::get_current_date();
+        $details              = [
+            "ministry_id"     => $companyId,
+            "department_id"   => $departmentId,
+            "executive_id"    => $executiveId,
+            "start_time"      => "00:00:00",
+            "end_time"        => "00:00:00",
+            "open_solt"       => "0",
+            "added_by"        => $this->userId,
+            "added_date"      => $todayDate
         ];
         $query    = CustomSql::insert_array("appointment_settings", $details);
         if($query === false){
@@ -56,4 +89,3 @@ class AddonlineAppointments {
         }
     }
 }
-            

@@ -43,7 +43,7 @@ class EditonlineAppointments {
         if($query === false){
             return 500;
         }else{
-            if($query === 200){
+            if($query === 1){
                 return 200;
             }else{
                 return 400;
@@ -69,4 +69,3 @@ class EditonlineAppointments {
         return $appointmentCode;
     }
 }
-            
