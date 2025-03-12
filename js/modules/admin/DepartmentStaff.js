@@ -7,7 +7,8 @@ export const widget = function(){
     return new PageLessComponent("staff-management-widget", {
         data: {
             title: "Department Staff",
-            departmentid: PageLess.GetURLData()[1]
+            departmentid: PageLess.GetURLData()[1],
+            staff: ""
         },
         props: {
             assignstaff: function(){
@@ -86,7 +87,7 @@ export const widget = function(){
             }).then(result=>{
                 if (result.status == 200) {
                     this.setData({
-                        staff: /*html*/ `<vertical-scroll-view nodataicon="fa-users" preloader="card" onload="{{this.props.onload}}"></vertical-scroll-view>`,
+                        staff: /*html*/ `<vertical-scroll-view nodataicon="fa-users" preloader="list" onload="{{this.props.onload}}"></vertical-scroll-view>`,
                         title: result.response_body.title + " Staff"
                     })
                 } else {

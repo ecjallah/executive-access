@@ -1719,7 +1719,7 @@ export const Components = {
                 const value      = this.querySelector('select').value;
                 let departments = ''
                 if (value != '') {
-                    departments = /*html*/ `<department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></department-select>`
+                    departments = /*html*/ `<ministry-department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></ministry-department-select>`
                 }
 
                 this.parentComponent.setData({
@@ -1749,7 +1749,7 @@ export const Components = {
                         }
 
                         if (this.selectedvalue && this.selectedepartment != '') {
-                            obj.departments = /*html*/ `<department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></department-select>`
+                            obj.departments = /*html*/ `<ministry-department-select selectedvalue="${this.parentComponent.selectedepartment}" ministryid="${value}" includeexecutives="true"></ministry-department-select>`
                         }
                         this.setData(obj);
                     } else {
@@ -1762,7 +1762,7 @@ export const Components = {
         }
     }),
 
-    DepartmentSelect : new PageLessComponent("department-select", {
+    DepartmentSelect : new PageLessComponent("ministry-department-select", {
         data: {
             userid: '',
             ministryid: '',
@@ -1793,7 +1793,7 @@ export const Components = {
                 const value      = this.querySelector('select').value;
                 let executives = ''
                 if (value != '') {
-                    executives = /*html*/ `<executive-select selectedvalue="${this.parentComponent.selectedexecutive}" departmentid="${value}" ministryid="${this.parentComponent.ministryid}"></executive-select>`
+                    executives = /*html*/ `<ministry-executive-select selectedvalue="${this.parentComponent.selectedexecutive}" departmentid="${value}" ministryid="${this.parentComponent.ministryid}"></ministry-executive-select>`
                 }
 
                 this.parentComponent.setData({
@@ -1823,7 +1823,7 @@ export const Components = {
                         }
 
                         if (this.selectedvalue && this.selectedexecutive != '') {
-                            obj.executives = /*html*/ `<executive-select selectedvalue="${this.selectedexecutive}" departmentid="${this.selectedvalue}" ministryid="${this.parentComponent.ministryid}"></executive-select>`
+                            obj.executives = /*html*/ `<ministry-executive-select selectedvalue="${this.selectedexecutive}" departmentid="${this.selectedvalue}" ministryid="${this.parentComponent.ministryid}"></ministry-executive-select>`
                         }
                         this.setData(obj);
                     } else {
@@ -1836,7 +1836,7 @@ export const Components = {
         }
     }),
 
-    ExecutiveSelect : new PageLessComponent("executive-select", {
+    ExecutiveSelect : new PageLessComponent("ministry-executive-select", {
         data: {
             departmentid: '',
             ministryid: '',

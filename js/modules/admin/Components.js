@@ -1811,6 +1811,8 @@ export const Components = {
         data: {
             id : "",
             name : "",
+            type: "",
+            token: "",
             number : "",
             purpose : "",
             departmentid : "",
@@ -2038,12 +2040,13 @@ export const Components = {
             },
 
             checkout: function(){
-                Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                Modal.Confirmation("Confirm Action", "You are about to check this user out. This cannot be undone. Are you sure you want to continue?").then(()=>{
                     PageLess.Request({
                         url: "/api/apply-visit-operation",
                         method: "POST",
                         data: {
                             appointment_id: this.parentComponent.id,
+                            verification_code: this.parentComponent.token,
                             status: "completed"
                         },
                         beforeSend: ()=>{
@@ -2065,38 +2068,87 @@ export const Components = {
 
             completeCheckIn: function(tagNumber, devices, submitBtn){
                 return new Promise(resolve=>{
-                    Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
-                        PageLess.Request({
-                            url: "/api/apply-visit-operation",
-                            method: "POST",
-                            data: {
-                                appointment_id: this.id,
-                                tag_number: tagNumber,
-                                status: "active"
-                            },
-                            beforeSend: ()=>{
-                                PageLess.ChangeButtonState(submitBtn, 'Checking In')
-                            }
-                        }, true).then(result=>{
-                            PageLess.RestoreButtonState(submitBtn);
-                            if (result.status == 200) {
-                                if (devices.length > 0) {
-                                    this.props.logDevices.call(this, devices, submitBtn).then(()=>{
-                                        resolve(result);
-                                    });
-                                } else {
-                                    Modal.Success("Checkin Completed", "Visitor has been successfully checked-in");
-                                    this.setData({
-                                        status: "active",
-                                    });
-                                    
-                                    resolve(result);
+                    if (this.type == 'online') {
+                        Modal.BuildForm({
+                            title: "Complete Check-in",
+                            icon: "user-check",
+                            inputs: /*html*/ `
+                                <p>You are about to check this user in. This cannot be undone. Enter the token that was sent to the vistor to complete check-in.</p>
+                                <number-input icon="key" text="Enter Appointment Token" identity="token" required="required"></number-input>
+                            `,
+                            submitText: "Proceed",
+                            closable: false,
+                            autoClose: false,
+                        }, values=>{
+                            PageLess.Request({
+                                url: "/api/apply-visit-operation",
+                                method: "POST",
+                                data: {
+                                    appointment_id: this.id,
+                                    tag_number: tagNumber,
+                                    verification_code: values.token,
+                                    status: "active"
+                                },
+                                beforeSend: ()=>{
+                                    Modal.Close(values.modal);
+                                    PageLess.ChangeButtonState(submitBtn, 'Checking In');
                                 }
-                            } else {
-                                PageLess.Toast('danger', result.message, 5000);
-                            }
+                            }, true).then(result=>{
+                                PageLess.RestoreButtonState(submitBtn);
+                                if (result.status == 200) {
+                                    if (devices.length > 0) {
+                                        this.props.logDevices.call(this, devices, submitBtn).then(()=>{
+                                            resolve(result);
+                                        });
+                                    } else {
+                                        Modal.Success("Checkin Completed", "Visitor has been successfully checked-in");
+                                        this.setData({
+                                            status: "active",
+                                            token: values.token
+                                        });
+                                        
+                                        resolve(result);
+                                    }
+                                } else {
+                                    PageLess.Toast('danger', result.message, 5000);
+                                }
+                            });
                         });
-                    });
+                    } else {
+                        Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                            PageLess.Request({
+                                url: "/api/apply-visit-operation",
+                                method: "POST",
+                                data: {
+                                    appointment_id: this.id,
+                                    tag_number: tagNumber,
+                                    verification_code: "unset",
+                                    status: "active"
+                                },
+                                beforeSend: ()=>{
+                                    PageLess.ChangeButtonState(submitBtn, 'Checking In')
+                                }
+                            }, true).then(result=>{
+                                PageLess.RestoreButtonState(submitBtn);
+                                if (result.status == 200) {
+                                    if (devices.length > 0) {
+                                        this.props.logDevices.call(this, devices, submitBtn).then(()=>{
+                                            resolve(result);
+                                        });
+                                    } else {
+                                        Modal.Success("Checkin Completed", "Visitor has been successfully checked-in");
+                                        this.setData({
+                                            status: "active",
+                                        });
+                                        
+                                        resolve(result);
+                                    }
+                                } else {
+                                    PageLess.Toast('danger', result.message, 5000);
+                                }
+                            });
+                        });
+                    }
                 });
             }, 
 
@@ -2200,6 +2252,8 @@ export const Components = {
                     appointments += /*html*/ `
                         <appointment-item 
                             id="${item.id}" 
+                            type="${item.appointment_type}"
+                            token="${item.token}"
                             name="${item.visitor_name}" 
                             number="${item.visitor_number}" 
                             purpose="${item.purpose}"
@@ -2432,7 +2486,7 @@ export const Components = {
                                         PageLess.Toast('success', result.message);
                                         parent.remove();
                                     } else {
-                                        PageLess.Toast('success', result.message, 5000);
+                                        PageLess.Toast('danger', result.message, 5000);
                                     }
                                 });
                             });
@@ -2458,7 +2512,7 @@ export const Components = {
                                         PageLess.Toast('success', result.message);
                                         parent.remove();
                                     } else {
-                                        PageLess.Toast('success', result.message, 5000);
+                                        PageLess.Toast('danger', result.message, 5000);
                                     }
                                 });
                             });
@@ -2552,7 +2606,7 @@ export const Components = {
             },
 
             checkout: function(){
-                Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                Modal.Confirmation("Confirm Action", "You are about to check this user out. This cannot be undone. Are you sure you want to continue?").then(()=>{
                     PageLess.Request({
                         url: "/api/apply-visit-operation",
                         method: "POST",
@@ -2579,17 +2633,29 @@ export const Components = {
 
             completeCheckIn: function(tagNumber, devices, submitBtn){
                 return new Promise(resolve=>{
-                    Modal.Confirmation("Confirm Action", "You are about to check this user in. This cannot be undone. Are you sure you want to continue?").then(()=>{
+                    Modal.BuildForm({
+                        title: "Complete Check-in",
+                        icon: "user-check",
+                        inputs: /*html*/ `
+                            <p>You are about to check this user in. This cannot be undone. Enter the token that was sent to the vistor to complete check-in.</p>
+                            <number-input icon="key" text="Enter Appointment Token" identity="token" required="required"></number-input>
+                        `,
+                        submitText: "Proceed",
+                        closable: false,
+                        autoClose: false,
+                    }, values=>{
                         PageLess.Request({
                             url: "/api/apply-visit-operation",
                             method: "POST",
                             data: {
                                 appointment_id: this.id,
                                 tag_number: tagNumber,
+                                verification_code: values.token,
                                 status: "active"
                             },
                             beforeSend: ()=>{
-                                PageLess.ChangeButtonState(submitBtn, 'Checking In')
+                                Modal.Close(values.modal);
+                                PageLess.ChangeButtonState(submitBtn, 'Checking In');
                             }
                         }, true).then(result=>{
                             PageLess.RestoreButtonState(submitBtn);

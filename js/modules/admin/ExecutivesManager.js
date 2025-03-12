@@ -18,7 +18,6 @@ export const widget = new PageLessComponent("executives-manager-widget", {
                     <text-input icon="user" text="Middle Name" identity="middlename"></text-input>
                     <text-input icon="user" text="Last Name" identity="lastname" required="required"></text-input>
                     <number-input icon="user" text="Phone Number" identity="number" required="required"></number-input>
-                    <date-input text="Date"></date-input>
                     <department-select></department-select>
                 `,
                 submitText: "Add",
