@@ -144,7 +144,7 @@ class MessageCenter{
     public function send_sms($messageDetails, $userNumber, $codeType = 'verification'){
         $message                = $messageDetails;
         if($codeType == 'verification'){
-            $message            = 'Your verification code is:'.' '.$messageDetails;
+            $message            = 'Your appointment verification code is:'.' '.$messageDetails;
         }
         $parentClass            = new MessageCenter();
         $formatedNo             = $parentClass->format_phone_number($userNumber);

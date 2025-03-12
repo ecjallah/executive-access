@@ -41,11 +41,21 @@ class AddexecutiveList {
 
     //This method add given record
     public function create_executive_member($details){
-        $query    = CustomSql::insert_array("executive_members", $details);
+        CustomSql::commit_off();
+        $query              = CustomSql::insert_array_with_returns("executive_members", $details);
         if($query === false){
             return 500;
         }else{
-            return 200;
+            //Add executive settings
+            $settings       = new AddonlineAppointments();
+            $addSettings    = $settings->set_default_executive_appointment_settings($details['company_id'], $details['department_id'], $query);
+            if($addSettings === 500){
+                CustomSql::rollback();
+                return 500;
+            }else{
+                CustomSql::save();
+                return 200;
+            }
         }
     }
 }

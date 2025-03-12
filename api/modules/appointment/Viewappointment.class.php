@@ -39,31 +39,33 @@ class Viewappointment {
 
     //This method returns all appointments
     public function return_all_appointments($companyId, $pager, $filter = null, $type = null, $approval_status = 'pending'){
-        $typeCondition = '';
-        if($type != null){
-            $typeCondition = " AND appointment_type = 'online' AND approval_status = '$approval_status' ";
+        $typeCondition  = '';
+        if($type == 'online'){
+            $typeCondition = " AND appointment_type = 'online' AND approval_status = $approval_status ";
+
         }
 
-        $pageCond     = '';
+        $pageCond       = '';
         if ($pager != null) {
-            $count    = 15; 
-            $pageNum  = intval($pager);
-            $offset   = $pageNum * $count;
-            $pageCond = $pager != null ? " LIMIT $count OFFSET $offset" : '';
+            $count      = 15; 
+            $pageNum    = intval($pager);
+            $offset     = $pageNum * $count;
+            $pageCond   = $pager != null ? " LIMIT $count OFFSET $offset" : '';
         }
 
         $filterCond     = '';
         if($filter != null){
             $filterCond = " AND status = '$filter' ";
         }
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' $filterCond $typeCondition ORDER BY `visit_date` ASC $pageCond");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' $filterCond $typeCondition ORDER BY `visit_date` ASC $pageCond ");
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
+            $count          = $query->num_rows;
             if($count >= 1){
-                $keys   = [];
-                $data   = [];
+                $keys       = [];
+                $data       = [];
+                $purpose    = new ViewappointmentPurpose();
                 while ($row = mysqli_fetch_assoc($query)) {
                     $row['start_day']         = gmdate('d', strtotime($row['visit_date']));
                     $row['start_month']       = gmdate('m', strtotime($row['visit_date']));
@@ -71,10 +73,13 @@ class Viewappointment {
                     $row['start_time']        = substr($row['start_time'], 0, strrpos($row['start_time'], ':'));
                     $row['end_time']          = substr($row['end_time'], 0, strrpos($row['end_time'], ':'));
                     $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
+                    $row['purpose']           = $purpose->get_appointment_purpose_by_id($companyId, $row['purpose']);
+                    unset($row['purpose']['ministry_id']);
+                    unset($row['purpose']['status']);
+                    unset($row['purpose']['date']);
                     $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
                     $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
                     $index                    = count($keys);
-
                     if (in_array($dateKey, $keys)) {
                         $index = array_keys($keys, $dateKey)[0];
                     } else {
@@ -90,7 +95,6 @@ class Viewappointment {
                         $data[$index]['appointments'][] = $row; 
                     }
                 }
-
                 return $data;
             }else{
                 return 404;
@@ -99,8 +103,13 @@ class Viewappointment {
     }
 
     //This method returns department appointments
-    public function return_department_appointments($companyId, $departmentId, $pager, $filter = null){
-        $pageCond     = '';
+    public function return_department_appointments($companyId, $departmentId, $pager, $filter = null, $type = null){
+        $typeCondition     = '';
+        if($type == 'online'){
+            $typeCondition = " AND appointment_type = 'online' ";
+        }
+
+        $pageCond          = '';
         if ($pager != null) {
             $count    = 15; 
             $pageNum  = intval($pager);
@@ -113,23 +122,27 @@ class Viewappointment {
             $filterCond = " AND status = '$filter' ";
         }
 
-        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id =$departmentId AND status != 'delete' $filterCond ORDER BY `visit_date` ASC $pageCond");
+        $query     = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id = $departmentId AND $typeCondition status != 'delete' $filterCond ORDER BY `visit_date` ASC $pageCond ");
         if($query === false){
             return 500;
         }else{
             $count = $query->num_rows;
             if($count >= 1){
-                $keys   = [];
-                $data   = [];
+                $keys       = [];
+                $data       = [];
+                $purpose    = new ViewappointmentPurpose();
                 while ($row = mysqli_fetch_assoc($query)) {
                     $row['start_day']         = gmdate('d', strtotime($row['visit_date']));
                     $row['start_month']       = gmdate('m', strtotime($row['visit_date']));
                     $row['start_year']        = gmdate('Y', strtotime($row['visit_date']));
+                    $row['purpose']           = $purpose->get_appointment_purpose_by_id($companyId, $row['purpose']);
+                    unset($row['purpose']['ministry_id']);
+                    unset($row['purpose']['status']);
+                    unset($row['purpose']['date']);
                     $formatted                = date("l, M d, Y", strtotime($row['visit_date']));
                     $row['executive_details'] = (new ViewexecutiveList())->return_executive_member_details($row['company_id'], $row['executive_id']);
                     $dateKey                  = strtotime(date('Y-m-d', strtotime($row['visit_date'])));
                     $index                    = count($keys);
-
                     if (in_array($dateKey, $keys)) {
                         $index = array_keys($keys, $dateKey)[0];
                     } else {
@@ -155,17 +168,22 @@ class Viewappointment {
 
     //This method returns appointment details
     public function get_appointment_details($companyId, $id){
-        $visitChecks    = new ViewvisitChecks();
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND id = $id AND status != 'delete' ");
+        $visitChecks        = new ViewvisitChecks();
+        $query              = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND id = $id AND status != 'delete' ");
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
+            $count          = $query->num_rows;
             if($count === 1){
-                $data   = [];
+                $data       = [];
+                $purpose    = new ViewappointmentPurpose();
                 while ($row = mysqli_fetch_assoc($query)) {
                     $data[] = $row;
                     $data['registered_items'] = $visitChecks->get_appointment_registered_items($id);
+                    $data['purpose']           = $purpose->get_appointment_purpose_by_id($companyId, $row['purpose']);
+                    unset($row['purpose']['ministry_id']);
+                    unset($row['purpose']['status']);
+                    unset($row['purpose']['date']);
                 }
                 return $data;
             }else{

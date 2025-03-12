@@ -1,17 +1,16 @@
-
 <?php
 //SubModule Identity
-define('MODULE_DEPARTMENTAPPOINTMENT_HANDLER_ID', '10020240311162847');
-define('SUB_VIEWDEPARTMENTAPPOINTMENT', '10020240311162850');
-define('SUB_NAME_VIEWDEPARTMENTAPPOINTMENT', 'ViewdepartmentAppointment');
-Auth::module_function_registration(SUB_VIEWDEPARTMENTAPPOINTMENT, SUB_NAME_VIEWDEPARTMENTAPPOINTMENT, MODULE_DEPARTMENTAPPOINTMENT_HANDLER_ID);
+define('MODULE_APPOINTMENTPURPOSE_HANDLER_ID', '10020240427213726');
+define('SUB_EDITAPPOINTMENTPURPOSE', '10020240427213731');
+define('SUB_NAME_EDITAPPOINTMENTPURPOSE', 'Edit appointment Purpose');
+Auth::module_function_registration(SUB_EDITAPPOINTMENTPURPOSE, SUB_NAME_EDITAPPOINTMENTPURPOSE, MODULE_APPOINTMENTPURPOSE_HANDLER_ID);
 
 /**
  * *********************************************************************************************************
  * @_forProject: Shell Bone
- * @_purpose: This class handles/manages DepartmentAppointment VIEW/GET operations.
+ * @_purpose: This class handles/manages AppointmentPurpose VIEW/GET operations.
  * @_version Release: 1.0
- * @_created Date: 2024-03-11
+ * @_created Date: 2024-04-27
  * @_author(s):Shell Bone Generator
  *   --------------------------------------------------------------------------------------------------
  *   1) Fullname of engineer. (Paul Glaydor)
@@ -20,7 +19,7 @@ Auth::module_function_registration(SUB_VIEWDEPARTMENTAPPOINTMENT, SUB_NAME_VIEWD
  * *********************************************************************************************************
 */
 
-class ViewdepartmentAppointment {
+class EditappointmentPurpose {
     private $user_type;
     private $userId;
     public $permission;
@@ -33,23 +32,21 @@ class ViewdepartmentAppointment {
             $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(SUB_VIEWDEPARTMENTAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);
+            $auth              = Auth::function_check(SUB_EDITAPPOINTMENTPURPOSE, $this->userId, $this->user_type, $this->account_character);
             $this->permission  = $auth;
         }
     }
 
-    //This method get from give database
-    public function get_data_from_database(){
-        $query          = CustomSql::quick_select(" SELECT * FROM `` WHERE ");
+    //This method updates appointment purpose by id
+    public function update_appointment_purpose($details, $identity){
+        $query            = CustomSql::update_array($details, $identity, "appointment_purpose");
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
-            if($count === 1){
-                $row    = mysqli_fetch_assoc($query);
-                return $row;
+            if($query === 200){
+                return 200;
             }else{
-                return 404;
+                return 400;
             }
         }
     }

@@ -1,17 +1,17 @@
-
 <?php
+
 //SubModule Identity
-define('MODULE_DEPARTMENTAPPOINTMENT_HANDLER_ID', '10020240311162847');
-define('SUB_VIEWDEPARTMENTAPPOINTMENT', '10020240311162850');
-define('SUB_NAME_VIEWDEPARTMENTAPPOINTMENT', 'ViewdepartmentAppointment');
-Auth::module_function_registration(SUB_VIEWDEPARTMENTAPPOINTMENT, SUB_NAME_VIEWDEPARTMENTAPPOINTMENT, MODULE_DEPARTMENTAPPOINTMENT_HANDLER_ID);
+define('MODULE_APPOINTMENTPURPOSE_HANDLER_ID', '10020240427213726');
+define('SUB_ADDAPPOINTMENTPURPOSE', '10020240427213735');
+define('SUB_NAME_ADDAPPOINTMENTPURPOSE', 'Add appointment Purpose');
+Auth::module_function_registration(SUB_ADDAPPOINTMENTPURPOSE, SUB_NAME_ADDAPPOINTMENTPURPOSE, MODULE_APPOINTMENTPURPOSE_HANDLER_ID);
 
 /**
  * *********************************************************************************************************
  * @_forProject: Shell Bone
- * @_purpose: This class handles/manages DepartmentAppointment VIEW/GET operations.
+ * @_purpose: This class handles/manages AppointmentPurpose ADD operations.
  * @_version Release: 1.0
- * @_created Date: 2024-03-11
+ * @_created Date: 2024-04-27
  * @_author(s):Shell Bone Generator
  *   --------------------------------------------------------------------------------------------------
  *   1) Fullname of engineer. (Paul Glaydor)
@@ -20,7 +20,7 @@ Auth::module_function_registration(SUB_VIEWDEPARTMENTAPPOINTMENT, SUB_NAME_VIEWD
  * *********************************************************************************************************
 */
 
-class ViewdepartmentAppointment {
+class AddappointmentPurpose {
     private $user_type;
     private $userId;
     public $permission;
@@ -33,24 +33,18 @@ class ViewdepartmentAppointment {
             $this->permission  = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(SUB_VIEWDEPARTMENTAPPOINTMENT, $this->userId, $this->user_type, $this->account_character);
+            $auth              = Auth::function_check(SUB_ADDAPPOINTMENTPURPOSE, $this->userId, $this->user_type, $this->account_character);
             $this->permission  = $auth;
         }
     }
 
-    //This method get from give database
-    public function get_data_from_database(){
-        $query          = CustomSql::quick_select(" SELECT * FROM `` WHERE ");
+    //This method created new appointment purpose
+    public function create_appointment_purpose($details){
+        $query    = CustomSql::insert_array("appointment_purpose", $details);
         if($query === false){
             return 500;
         }else{
-            $count      = $query->num_rows;
-            if($count === 1){
-                $row    = mysqli_fetch_assoc($query);
-                return $row;
-            }else{
-                return 404;
-            }
+            return 200;
         }
     }
 }

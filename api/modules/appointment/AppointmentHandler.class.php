@@ -3,7 +3,7 @@
     
     //Module Identity
     define('APPOINTMENT_HANDLER_ID', 10020240228203211);
-    define('APPOINTMENT_HANDLER', 'Appointment');
+    define('APPOINTMENT_HANDLER', 'Appointments');
     Auth::module_registration(APPOINTMENT_HANDLER_ID, APPOINTMENT_HANDLER);
     /**
         * *********************************************************************************************************
@@ -63,21 +63,21 @@
                     if($getAppointment->permission === 200){
                         $result         = $getAppointment->return_all_appointments($companyId, $pager, $filter);
                         if($result === 500){
-                            $response   = new Response(500, "Error returning appointments.");
+                            $response   = new Response(500, " Error returning appointments.");
                             $response->send_response();
                         }else if($result === 404){
-                            $response   = new Response(404, "There is no appointment at this time.");
+                            $response   = new Response(404, " There is no appointment at this time.");
                             $response->send_response();
                         }else{
-                            $response   = new Response(200, "Active appointment list. $pager", $result);
+                            $response   = new Response(200, " Active appointment list. $pager", $result);
                             $response->send_response();
                         }
                     }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response = new Response(301, " Unauthorized Module: Contact Admin ");
                         $response->send_response();
                     }
-                }else{                
-                    $response = new Response(300, "This endpoint accepts the GET method");
+                }else{
+                    $response = new Response(300, " This endpoint accepts the GET method ");
                     $response->send_response();
                 }
             }

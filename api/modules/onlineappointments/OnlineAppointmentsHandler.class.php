@@ -58,25 +58,23 @@
                     $appointmentSettings      = new ViewonlineAppointments();
                     if($appointmentSettings->permission === 200){
                         $departmentId         = Helper::get_staff_department_id($this->userId);
-
-                        // if($departmentId['status'] === 404){
-                        //     $response             = new Response(400, "Sorry, you are not in a department. Only staff(s) that are assigned to a given department is allowed to performn this action.");
-                        //     $response->send_response();
-                        // }else{
-                            $result               = $appointmentSettings->get_ministry_appointment_settings($companyId, 1);
-                            // $result               = $appointmentSettings->get_ministry_appointment_settings($companyId, $departmentId['data']);
+                        if($departmentId['status'] === 404){
+                            $response               = new Response(400, "Sorry, you are not in a department. Only staff(s) that are assigned to a given department is allowed to performn this action.");
+                            $response->send_response();
+                        }else{
+                            $result                 = $appointmentSettings->get_ministry_executives_appointment_settings($companyId, $departmentId['data']);
                             if($result === 500){
-                                $response         = new Response(500, "Error returing appointment settings.");
+                                $response           = new Response(500, "Error returing appointment settings.");
                                 $response->send_response();
                             }else if($result === 404){
                                 //SET DEFAULT APPOINTMENT
                                 $defaultAppointment = new AddonlineAppointments();
-                                $defaultResult      = $defaultAppointment->set_default_appointment_settings($companyId);
+                                $defaultResult      = $defaultAppointment->set_default_appointment_settings($companyId, $departmentId['data']);
                                 if($defaultResult === 500){
                                     $response       = new Response(500, "Error setting default appointment settings.");
                                     $response->send_response();
                                 }else{
-                                    $result         = $appointmentSettings->get_ministry_appointment_settings($companyId, $departmentId);
+                                    $result         = $appointmentSettings->get_ministry_executives_appointment_settings($companyId, $departmentId['data']);
                                     $response       = new Response(200, "Ministry appointment settings.", $result);
                                     $response->send_response();
                                 }
@@ -84,8 +82,7 @@
                                 $response           = new Response(200, "Ministry appointment settings.", $result);
                                 $response->send_response();
                             }
-
-                        // }
+                        }
                     }else{
                         $response = new Response(301, "Unauthorized Module: Contact Admin");
                         $response->send_response();
@@ -133,16 +130,18 @@
             {
                 if($this->method == "POST"){
                     $_POST                  = json_decode(file_get_contents("php://input"), true);
-                    if(empty($_POST['department_id']) || empty($_POST['executive_id']) || empty($_POST['start_time']) || empty($_POST['end_time']) || empty($_POST['monday']) || empty($_POST['tuesday']) || empty($_POST['wednesday']) || empty($_POST['thursday']) || empty($_POST['friday'])|| empty($_POST['saturday']) || empty($_POST['open_solt'])){
-                        $response           = new Response(400, " Please provide the following: department_id, executive_id, start_time, end_time, monday, tuesday, wednesday, thursday, friday, saturday and open_solt ");
+                    if(!isset($_POST['executive_id']) || !isset($_POST['start_time']) || !isset($_POST['end_time']) || !isset($_POST['monday']) || !isset($_POST['tuesday']) || !isset($_POST['wednesday']) || !isset($_POST['thursday']) || !isset($_POST['friday'])|| !isset($_POST['saturday']) || !isset($_POST['open_solt'])){
+                        $response           = new Response(400, " Please provide the following: executive_id, start_time, end_time, monday, tuesday, wednesday, thursday, friday, saturday and open_solt ");
                         $response->send_response();
                     }else{
                         $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                        $departmentId       = Helper::get_staff_department_id($this->userId)['data'];
                         $todayDate          = Helper::get_current_date();
+                        $executiveId        = InputCleaner::sanitize($_POST['executive_id']);
                         $details            = [
                             "ministry_id"   => $companyId,
-                            "department_id" => InputCleaner::sanitize($_POST['department_id']),
-                            "executive_id"  => InputCleaner::sanitize($_POST['executive_id']),
+                            "department_id" => $departmentId,
+                            "executive_id"  => $executiveId,
                             "start_time"    => InputCleaner::sanitize($_POST['start_time']),
                             "end_time"      => InputCleaner::sanitize($_POST['end_time']),
                             "monday"        => InputCleaner::sanitize($_POST['monday']),
@@ -155,7 +154,8 @@
                             "added_by"      => $this->userId,
                             "added_date"    => $todayDate
                         ];
-                        $identity                 = ['column' => ['ministry_id'], 'value' => [$companyId]];
+
+                        $identity                 = ['column' => ['ministry_id', 'department_id', 'executive_id'], 'value' => [$companyId, $departmentId, $executiveId]];
                         $appointmentSetting       = new EditonlineAppointments();
                         if($appointmentSetting->permission === 200){
                             $result               = $appointmentSetting->update_appointment_settings($details, $identity);
@@ -163,7 +163,7 @@
                                 $response         = new Response(500, "Error updating appointment settings.");
                                 $response->send_response();
                             }else{
-                                $response         = new Response(200, "Appointment settings updated successfully.", $result);
+                                $response         = new Response(200, "Appointment settings updated successfully.");
                                 $response->send_response();
                             }
                         }else{
@@ -186,12 +186,14 @@
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);
                     $pager              = key_exists('pager', $_GET) ? InputCleaner::sanitize($_GET['pager']) : null;
                     $filter             = key_exists('filter', $_GET) ? InputCleaner::sanitize($_GET['filter']) : null;
-
                     $appointment_type   = key_exists('appointment_type', $_GET) ? InputCleaner::sanitize($_GET['appointment_type']) : null;
                     $approval_status    = key_exists('approval_status', $_GET) ? InputCleaner::sanitize($_GET['approval_status']) : null;
                     $getAppointment     = new Viewappointment();
+
+                    //Get staff department
+                    $departmentId       = Helper::get_staff_department_id($this->userId);
                     if($getAppointment->permission === 200){
-                        $result         = $getAppointment->return_all_appointments($companyId, $pager, $filter, $appointment_type, $approval_status);
+                        $result         = $getAppointment->return_department_appointments($companyId, $departmentId['data'], $pager, $filter, $appointment_type);
                         if($result === 500){
                             $response   = new Response(500, "Error returning online appointments.");
                             $response->send_response();
@@ -206,7 +208,7 @@
                         $response = new Response(301, "Unauthorized Module: Contact Admin");
                         $response->send_response();
                     }
-                }else{                
+                }else{
                     $response = new Response(300, "This endpoint accepts the GET method");
                     $response->send_response();
                 }
@@ -233,7 +235,6 @@
                         $editAppointment   = new EditonlineAppointments();
                         if($appointment->permission === 200){
                             $appointmentStatusCheck = $appointment->get_appointment_details($companyId, $appointmentId);
-
                             if(is_array($appointmentStatusCheck) && $appointmentStatusCheck[0]['appointment_type'] == 'online'){
                                 $result             = null;
                                 $appointmentStatus  = $appointmentStatusCheck[0]['approval_status'];
@@ -251,15 +252,13 @@
                                     $identity       = ['column' => ['company_id', 'id'], 'value' => [$companyId, $appointmentId]];
                                     $result         = $editAppointment->update_direct_online_appointments($details, $identity);
                                 }
-
                                 if($result == 200){
                                     $response       = new Response(200, "Appointment status has been updated successfully.");
                                     $response->send_response();
                                 }else if($result == 500){
                                     $response       = new Response(400, "Error sending sms to client.");
                                     $response->send_response();
-                                }
-                                else{
+                                }else{
                                     $response       = new Response(400, "Sorry, this appointment is already `{$appointmentStatus}`.");
                                     $response->send_response();
                                 }

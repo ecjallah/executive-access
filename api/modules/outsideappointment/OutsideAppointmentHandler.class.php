@@ -100,16 +100,16 @@
                     $departmentId       = InputCleaner::sanitize($_GET['department_id']);
                     $ministries         = new ViewexecutiveList();
                     $result             = $ministries->return_department_executives_($ministryId, $departmentId);
-                        if($result === 500){
-                            $response   = new Response(500, "Error returning ministry department executives..");
-                            $response->send_response();
-                        }else if($result === 404){
-                            $response   = new Response(404, "There is no executive from this department in this ministry currently.");
-                            $response->send_response();
-                        }else{
-                            $response   = new Response(200, "Ministry department executives.", $result);
-                            $response->send_response();
-                        }
+                    if($result === 500){
+                        $response   = new Response(500, "Error returning ministry department executives..");
+                        $response->send_response();
+                    }else if($result === 404){
+                        $response   = new Response(404, "There is no executive from this department in this ministry currently.");
+                        $response->send_response();
+                    }else{
+                        $response   = new Response(200, "Ministry department executives.", $result);
+                        $response->send_response();
+                    }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the GET method");
                     $response->send_response();
@@ -142,8 +142,8 @@
                             $currentDate      = gmdate("Y-m-d H:i:s");
                             $currentTimestamp = strtotime($currentDate);
                             $VisitTimestamp   = strtotime($final_visit_date);
-                            if ($currentTimestamp < $VisitTimestamp) {
-                                $details     = [
+                            if($currentTimestamp < $VisitTimestamp) {
+                                $details      = [
                                     "company_id"        => $companyId,
                                     "executive_id"      => $executive_id,
                                     "department_id"     => $department_id,
@@ -159,17 +159,23 @@
                                     "date_added"        => $currentDate,
                                     "added_by"          => 1000
                                 ];
-
-                                $result           = $addAppointment->add_new_appointments($details);
-                                if($result === 500){
-                                    $response     = new Response(500, "Error submitting online appointment.");
-                                    $response->send_response();
+                                $appointmentCheck      =  new ViewexecutiveList();
+                                $dailyAppointmentLimit =  $appointmentCheck->check_executive_active_solt($companyId, $department_id, $executive_id);
+                                if($dailyAppointmentLimit === 200){
+                                    $result           = $addAppointment->add_new_appointments($details);
+                                    if($result === 500){
+                                        $response     = new Response(500, "Error submitting online appointment.");
+                                        $response->send_response();
+                                    }else{
+                                        $response     = new Response(200, "Online appointment sent successfully. A sms will be sent as soon as your appointment is approved.", $result);
+                                        $response->send_response();
+                                    }
                                 }else{
-                                    $response     = new Response(200, "Online appointment sent successfully. A sms will be sent as soon as your appointment is approved.", $result);
+                                    $response         = new Response(400, "Sorry, this executive has reached his/her online appointment limit.");
                                     $response->send_response();
                                 }
-                            } else {
-                                $response     = new Response(400, "Appointment date and time cannot be a date or time of the past.");
+                            }else{
+                                $response         = new Response(400, "Appointment date and time cannot be a date or time of the past.");
                                 $response->send_response();
                             }
                         // }else{

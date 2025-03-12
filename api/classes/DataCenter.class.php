@@ -61,7 +61,7 @@ class DataCenter{
             return 500;
         }else{
             $count = $query->num_rows;
-            return ["total" => $count, "data" => $query];
+            return ["total" => $count, "data" => $query->fetch_assoc()];
         }
     }
 
