@@ -87,6 +87,10 @@ export const widget = new PageLessComponent("appointment-manager-widget", {
                 resolve();
             });
         },
+
+        onlineappointmentclick: function(){
+            (new PageLess(`/department-appointments/online`)).route();
+        }
     },
     view: function(){
         return /*html*/`
@@ -94,6 +98,7 @@ export const widget = new PageLessComponent("appointment-manager-widget", {
                 <main-content-header title="${this.title}"></main-content-header>
                 <div class="tool-bar">
                     <pageless-button class="tool" text="Create New" onclick="{{this.props.addnew}}"></pageless-button>
+                    <pageless-button class="tool" text="Online Appointments" onclick="{{this.props.onlineappointmentclick}}"></pageless-button>
                 </div>
                 <div class="main-content-body">
                     <vertical-scroll-view nodataicon="fa-calendar-check" preloader="list" onload="{{this.props.onload}}"></vertical-scroll-view>

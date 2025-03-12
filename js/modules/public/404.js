@@ -19,7 +19,7 @@ export const widget = new PageLessComponent("not-found-widget", {
                             <div class="flex-1 w-100 p-0 p-sm-1 p-md-3 p-xl-4 scroll-y ">
                                 <div class="w-100 h-100 d-flex flex-column align-content-center justify-content-center align-items-center">
                                     <div class="row justify-content-center">
-                                        <img class="w-250px" style="height: auto;" alt="waste-art" src="/media/images/voteclipart.png">
+                                        <img class="w-250px" style="height: auto;" alt="404 image" src="/media/images/seal.png">
                                         <div class="w-100 text-center h5 mt-3">404! Not Found</div>
                                         <div class="col-10 col-sm-9 col-md-6 text-center mt-2">
                                             Sorry we could find what you're looking for.

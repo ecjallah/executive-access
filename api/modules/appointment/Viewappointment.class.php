@@ -42,6 +42,7 @@ class Viewappointment {
         $typeCondition  = '';
         if($type == 'online'){
             $typeCondition = " AND appointment_type = 'online' AND approval_status = $approval_status ";
+
         }
 
         $pageCond       = '';

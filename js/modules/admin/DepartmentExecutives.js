@@ -7,7 +7,15 @@ export const widget = function(){
     return new PageLessComponent("executive-management-widget", {
         data: {
             title: "Department Executive",
-            departmentid: PageLess.GetURLData()[1]
+            departmentid: PageLess.GetURLData()[1],
+            staff: /*html*/ `
+                <list-view-preloader></list-view-preloader>
+                <list-view-preloader></list-view-preloader>
+                <list-view-preloader></list-view-preloader>
+                <list-view-preloader></list-view-preloader>
+                <list-view-preloader></list-view-preloader>
+                <list-view-preloader></list-view-preloader>
+            `
         },
         props: {
             onload: function(){
@@ -43,7 +51,7 @@ export const widget = function(){
             }).then(result=>{
                 if (result.status == 200) {
                     this.setData({
-                        staff: /*html*/ `<vertical-scroll-view nodataicon="fa-user-tie" preloader="card" onload="{{this.props.onload}}"></vertical-scroll-view>`,
+                        staff: /*html*/ `<vertical-scroll-view nodataicon="fa-user-tie" preloader="list" onload="{{this.props.onload}}"></vertical-scroll-view>`,
                         title: result.response_body.title + " Executives"
                     })
                 } else {

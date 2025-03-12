@@ -90,6 +90,10 @@ export const widget = new PageLessComponent("login-widget", {
             
             createaccount : function(){
                 (new PageLess('/political-party/create-account')).route();
+            },
+
+            ongoback : function(){
+                PageLess.GoBack();
             }
         },
         view: function(){
@@ -100,7 +104,7 @@ export const widget = new PageLessComponent("login-widget", {
                             <div class="login-form" id="login-form">
                                 <div class="flex-1 w-100 p-1 p-sm-2 scroll-y">
                                     <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-start align-content-center">
-                                        <img class="w-100px mt-4" style="height: auto;" alt="waste-art" src="/media/images/seal.png">
+                                        <img class="w-100px mt-4" style="height: auto;" alt="liberian-seal" src="/media/images/seal.png">
                                         <div class="description text-left py-4">
                                             ${this.title}
                                         </div>
@@ -110,6 +114,9 @@ export const widget = new PageLessComponent("login-widget", {
                                         </div>
                                         <div class="w-100 d-flex justify-content-center mt-3">
                                             <pageless-button type="submit" classname="btn btn-primary col-11 col-lg-10 col-xl-9" text="Login"></pageless-button>
+                                        </div>
+                                        <div class="w-100 d-flex justify-content-center mt-3">
+                                            <pageless-button type="button" classname="btn btn-clean col-11 col-lg-10 col-xl-9" text="Go Back" onclick="{{this.props.ongoback}}"></pageless-button>
                                         </div>
                                     </div>
                                 </div>

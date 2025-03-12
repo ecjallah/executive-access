@@ -39,7 +39,7 @@ class ViewoutsideAppointment {
 
     //This method returns all ministries
     public function get_all_ministries(){
-        $query          = CustomSql::quick_select(" SELECT * FROM `user_accounts` WHERE user_type != 1 AND approval_status = 'approved' ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `user_accounts` WHERE user_type = 8 AND approval_status = 'approved' ");
         if($query === false){
             return 500;
         }else{

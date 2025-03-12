@@ -26,20 +26,20 @@
         private $method;
         private $url;
         function __construct(){
-            if(isset($_SESSION["user_id"])){
-                $this->user_type           = $_SESSION["user_type"];
-                $this->userId              = $_SESSION["user_id"];
+            // if(isset($_SESSION["user_id"])){
+            //     $this->user_type           = $_SESSION["user_type"];
+            //     $this->userId              = $_SESSION["user_id"];
                 $this->method              = $_SERVER["REQUEST_METHOD"];
                 $this->url                 = $_SERVER["REQUEST_URI"];
-                $this->account_character   = $_SESSION["account_character"];
+            //     $this->account_character   = $_SESSION["account_character"];
              
                 $this->submit_outside_appointment();
                 $this->get_all_departments_from_ministry();
                 $this->get_all_ministries();
                 $this->get_all_departments_executives_from_ministry();
-            }else{
-                Logout::log_user_out();
-            }
+            // }else{
+            //     Logout::log_user_out();
+            // }
         }
 
         //GET ALL MINISTRIES ENDPOINT
@@ -128,7 +128,7 @@
                         $response->send_response();
                     }else{
                         $addAppointment       = new Addappointment();
-                        if($addAppointment->permission === 200){
+                        // if($addAppointment->permission === 200){
                             $companyId        = InputCleaner::sanitize($_POST['ministry_id']);
                             $executive_id     = InputCleaner::sanitize($_POST['executive_id']);
                             $department_id    = InputCleaner::sanitize($_POST['department_id']);
@@ -157,7 +157,7 @@
                                     "status"            => 'pending',
                                     "visit_date"        => $final_visit_date,
                                     "date_added"        => $currentDate,
-                                    "added_by"          => $this->userId
+                                    "added_by"          => 1000
                                 ];
                                 $appointmentCheck      =  new ViewexecutiveList();
                                 $dailyAppointmentLimit =  $appointmentCheck->check_executive_active_solt($companyId, $department_id, $executive_id);
@@ -178,10 +178,10 @@
                                 $response         = new Response(400, "Appointment date and time cannot be a date or time of the past.");
                                 $response->send_response();
                             }
-                        }else{
-                            $response = new Response(301, "Unauthorized Module: Contact Admin");
-                            $response->send_response();
-                        }
+                        // }else{
+                        //     $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        //     $response->send_response();
+                        // }
                     }
                 }else{                
                     $response = new Response(300, "This endpoint accepts the POST method");
