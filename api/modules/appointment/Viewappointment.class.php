@@ -56,7 +56,7 @@ class Viewappointment {
         if($filter != null){
             $filterCond = " AND status = '$filter' ";
         }
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND status != 'delete' $filterCond $typeCondition AND (appointment_type != 'online' OR approval_status = 'approved') ORDER BY `visit_date` ASC $pageCond ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND (appointment_type != 'online' OR approval_status = 'approved') AND status != 'delete' $filterCond $typeCondition ORDER BY `visit_date` ASC $pageCond ");
         if($query === false){
             return 500;
         }else{
@@ -128,7 +128,7 @@ class Viewappointment {
             $filterCond = " AND status = '$filter' ";
         }
 
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id = $departmentId AND status != 'delete' $filterCond $typeCondition AND (appointment_type != 'online' OR approval_status = 'approved') ORDER BY `visit_date` ASC $pageCond ");
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointments` WHERE company_id = '$companyId' AND department_id = '$departmentId' AND status != 'delete' AND (appointment_type != 'online' OR approval_status = 'approved') $filterCond $typeCondition ORDER BY `visit_date` ASC $pageCond ");
         if($query === false){
             return 500;
         }else{

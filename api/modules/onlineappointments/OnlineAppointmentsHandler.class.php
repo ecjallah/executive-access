@@ -205,7 +205,7 @@
                             $response->send_response();
                         }
                     }else{
-                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response       = new Response(301, "Unauthorized Module: Contact Admin");
                         $response->send_response();
                     }
                 }else{
