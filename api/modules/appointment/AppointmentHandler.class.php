@@ -61,7 +61,7 @@
                     $filter             = key_exists('filter', $_GET) ? InputCleaner::sanitize($_GET['filter']) : null;
                     $getAppointment     = new Viewappointment();
                     if($getAppointment->permission === 200){
-                        $result         = $getAppointment->return_all_appointments($companyId, $pager, $filter);
+                        $result         = $getAppointment->return_all_appointments($companyId, $pager, $filter, null, 'pending');
                         if($result === 500){
                             $response   = new Response(500, " Error returning appointments.");
                             $response->send_response();
@@ -86,6 +86,39 @@
         //GET DEPARTMENT APPOINTMENT ENDPOINT
         public function get_department_appointment(){
             if(strpos($this->url, "/api/get-department-appointments") !== false)
+            {
+                if($this->method == "GET"){
+                    $companyId          = Helper::get_business_id($this->userId, $this->account_character);
+                    $pager              = InputCleaner::sanitize($_GET['pager']);
+                    $departmentId       = InputCleaner::sanitize($_GET['department']);
+                    $getAppointment     = new Viewappointment();
+                    if($getAppointment->permission === 200){
+                        $result         = $getAppointment->return_department_appointments($companyId, $departmentId, $pager);
+                        if($result === 500){
+                            $response   = new Response(500, "Error returning appointments.");
+                            $response->send_response();
+                        }else if($result === 404){
+                            $response   = new Response(404, "There is no appointment at this time.");
+                            $response->send_response();
+                        }else{
+                            $response   = new Response(200, "Active appointment list.", $result);
+                            $response->send_response();
+                        }
+                    }else{
+                        $response = new Response(301, "Unauthorized Module: Contact Admin");
+                        $response->send_response();
+                    }
+                }else{                
+                    $response = new Response(300, "This endpoint accepts the GET method");
+                    $response->send_response();
+                }
+            }
+        }
+
+
+        //GET DEPARTMENT ONLINE APPOINTMENT ENDPOINT
+        public function get_department_online_appointment(){
+            if(strpos($this->url, "/api/get-department-online-appointments") !== false)
             {
                 if($this->method == "GET"){
                     $companyId          = Helper::get_business_id($this->userId, $this->account_character);

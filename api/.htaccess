@@ -11,10 +11,26 @@ RewriteRule ^app-registration/?$ classes/Registration.class.php
 RewriteRule ^get-registration-types/?$ classes/Registration.class.php
 
 #USER ACCOUNT GROUPS ENDPOINTS
+#USER ACCOUNT GROUPS ENDPOINTS
 RewriteRule ^create-user-account-group/?$ modules/user_management/UserHandler.class.php
 RewriteRule ^view-all-account-groups/?$ modules/user_management/UserHandler.class.php
 RewriteRule ^view-user-account-group-modules/([0-9]+)/?$ modules/user_management/UserHandler.class.php?id=$1
 RewriteRule ^assign-modules-to-account-group/?$ modules/user_management/UserHandler.class.php
+RewriteRule ^unassign-modules-from-account-group/?$ modules/user_management/UserHandler.class.php
+
+#STAFF MANAGEMENT
+# RewriteRule ^add-staff-role/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^assign-module-rights-to-role/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^create-new-staff/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^view-staffs/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^view-staff-details/([0-9]+)/?$ modules/staff_management/StaffManagementHandler.class.php?user_id=$1
+# RewriteRule ^view-staff-roles/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^view-role-details/([0-9]+)/?$ modules/staff_management/StaffManagementHandler.class.php?role_id=$1
+# RewriteRule ^edit-staff-details/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^assign-watcher-to-center/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^unassign-watcher-from-center/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^search-precincts/?$ modules/staff_management/StaffManagementHandler.class.php
+# RewriteRule ^search-polling-centers/?$ modules/staff_management/StaffManagementHandler.class.php
 
 #STAFF MANAGEMENT
 RewriteRule ^add-staff-role/?$ modules/staff_management/StaffManagementHandler.class.php
@@ -25,10 +41,6 @@ RewriteRule ^view-staff-details/([0-9]+)/?$ modules/staff_management/StaffManage
 RewriteRule ^view-staff-roles/?$ modules/staff_management/StaffManagementHandler.class.php
 RewriteRule ^view-role-details/([0-9]+)/?$ modules/staff_management/StaffManagementHandler.class.php?role_id=$1
 RewriteRule ^edit-staff-details/?$ modules/staff_management/StaffManagementHandler.class.php
-RewriteRule ^assign-watcher-to-center/?$ modules/staff_management/StaffManagementHandler.class.php
-RewriteRule ^unassign-watcher-from-center/?$ modules/staff_management/StaffManagementHandler.class.php
-RewriteRule ^search-precincts/?$ modules/staff_management/StaffManagementHandler.class.php
-RewriteRule ^search-polling-centers/?$ modules/staff_management/StaffManagementHandler.class.php
 
 #DASHBOARD ENDPOINTS
 RewriteRule ^get-overview-reports/?$ modules/dashboard/DashboardHandler.class.php
@@ -64,7 +76,7 @@ RewriteRule ^delete-executive_member/?$ modules/executivelist/ExecutiveListHandl
 RewriteRule ^add-new-appointment/?$ modules/appointment/AppointmentHandler.class.php
 RewriteRule ^update-appointment/?$ modules/appointment/AppointmentHandler.class.php
 RewriteRule ^delete-appointment/?$ modules/appointment/AppointmentHandler.class.php
-RewriteRule ^get-all-appointments?$ modules/appointment/AppointmentHandler.class.php [QSA]
+RewriteRule ^get-all-appointments/?$ modules/appointment/AppointmentHandler.class.php [QSA]
 RewriteRule ^get-appointment-details/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?id=$1
 RewriteRule ^get-department-appointments/([0-9]+)/?$ modules/appointment/AppointmentHandler.class.php?&department=$1 [QSA]
 
@@ -91,7 +103,6 @@ RewriteRule ^add-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPu
 RewriteRule ^update-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
 RewriteRule ^delete-appointment-purpose/?$ modules/appointmentpurpose/AppointmentPurposeHandler.class.php
 
-
 #OUTSIDE ONLINE APPOINTMENT
 RewriteRule ^set-outside-appointment/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php
 RewriteRule ^get-all-ministries/?$ modules/outsideappointment/OutsideAppointmentHandler.class.php
@@ -103,3 +114,8 @@ RewriteRule ^get-user-personal-details/?$ modules/generic_users_module/GenericUs
 RewriteRule ^get-user-security-details/?$ modules/generic_users_module/GenericUserHandler.class.php
 RewriteRule ^update-user-basic-info/?$ modules/generic_users_module/GenericUserHandler.class.php
 RewriteRule ^update-user-security-info/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^update-user-profile-image/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^get-notifications/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^change-user-password/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^update-account-location/?$ modules/generic_users_module/GenericUserHandler.class.php
+RewriteRule ^delete-user-account/?$ modules/generic_users_module/GenericUserHandler.class.php

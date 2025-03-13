@@ -41,8 +41,8 @@ Auth::module_function_registration(VIEW_USER_GROUP_FUNCTION_ID, VIEW_USER_GROUP_
     }
 
     //This method returns all user group on the app
-    public function return_all_user_account_group(){
-        $query         = CustomSql::quick_select(" SELECT * FROM `user_account_type` WHERE `status` = 0 AND `id` != 5 ");
+    public function return_all_user_registration_group(){
+        $query         = CustomSql::quick_select(" SELECT * FROM `user_account_type` WHERE `status` = 0 ");
         if($query === false){
             return 500;
         }else{
@@ -50,15 +50,40 @@ Auth::module_function_registration(VIEW_USER_GROUP_FUNCTION_ID, VIEW_USER_GROUP_
             if($count >= 1){
                 $data  = [];
                 while ($row = mysqli_fetch_assoc($query)) {
-                    $createdUser  = Helper::user_details($row['created_by']);
                     $data[] = [
                         "id"            => $row['id'],
                         "account_type"  => $row['account_type'],
                         "title"         => $row['title'],
                         "icon"          => $row['icon'],
                         "color"         => $row['color'],
-                        "date_created"  => Helper::get_current_date($row['date_created']),
-                        "created_by"    => $createdUser[0]['full_name']
+                        // "date_created"  => Helper::get_current_date($row['date_created'])
+                    ];
+                }
+                return $data;
+            }else{
+                return 404;
+            }
+        }
+    }
+
+
+    //This method returns all user group on the app
+    public function return_all_user_account_group(){
+        $query         = CustomSql::quick_select(" SELECT * FROM `user_account_type` WHERE status != 1 ");
+        if($query === false){
+            return 500;
+        }else{
+            $count     = $query->num_rows;
+            if($count >= 1){
+                $data  = [];
+                while ($row = mysqli_fetch_assoc($query)) {
+                    $data[] = [
+                        "id"            => $row['id'],
+                        "account_type"  => $row['account_type'],
+                        "title"         => $row['title'],
+                        "icon"          => $row['icon'],
+                        "color"         => $row['color'],
+                        "date_created"  => Helper::get_current_date($row['date_created'])
                     ];
                 }
                 return $data;
@@ -80,14 +105,13 @@ Auth::module_function_registration(VIEW_USER_GROUP_FUNCTION_ID, VIEW_USER_GROUP_
                 $data  = [];
                 while ($row = mysqli_fetch_assoc($query)) {
                     $createdUser  = Helper::user_details($row['created_by']);
-                    $data = [
+                    $data         = [
                         "id"            => $row['id'],
                         "account_type"  => $row['account_type'],
                         "title"         => $row['title'],
                         "icon"          => $row['icon'],
                         "color"         => $row['color'],
-                        "date_created"  => Helper::get_current_date($row['date_created']),
-                        // "created_by"    => $createdUser[0]['full_name']
+                        "date_created"  => Helper::get_current_date($row['date_created'])
                     ];
                 }
                 return $data;
@@ -130,5 +154,4 @@ Auth::module_function_registration(VIEW_USER_GROUP_FUNCTION_ID, VIEW_USER_GROUP_
             }
         }
     }
-   
 }

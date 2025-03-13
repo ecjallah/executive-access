@@ -23,8 +23,6 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
     public $userId;
     public $user_type; 
     public $account_character;
-    public $method;             
-    public $url; 
     public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
@@ -149,7 +147,7 @@ Auth::module_function_registration(VIEW_USER_ROLE_FUNCTION_ID, VIEW_USER_ROLE_FU
     }
 
     //This function retuns all staff created roles
-    public function return_all_roles($businessId){
+    public function return_all_roles($businessId, $accountCharacter = null){
         $query         = CustomSql::quick_select(" SELECT * FROM `staff_role` WHERE `company_id` = '$businessId' ");
         if($query === false){
             return 500;

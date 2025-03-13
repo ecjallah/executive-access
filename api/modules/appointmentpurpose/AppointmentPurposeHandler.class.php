@@ -55,9 +55,10 @@
             {
                 if($this->method == "GET"){
                     $companyId                = Helper::get_business_id($this->userId, $this->account_character);
+                    $departmentId             = Helper::get_department_id_from_staff_id($this->userId);
                     $appointmentPurpose       = new ViewappointmentPurpose();
                     if($appointmentPurpose->permission === 200){
-                        $result               = $appointmentPurpose->get_appointment_purpose($companyId);
+                        $result               = $appointmentPurpose->get_appointment_purpose($companyId, $departmentId);
                         if($result === 500){
                             $response         = new Response(500, " Error returning appointment purpose(s). ");
                             $response->send_response();
@@ -88,7 +89,14 @@
                     $purposeId            = InputCleaner::sanitize($_GET["id"]);
                     $getPurpose           = new ViewappointmentPurpose();
                     if($getPurpose->permission === 200){
-                        $result           = $getPurpose->get_appointment_purpose_by_id($companyId, $purposeId);
+                        if(is_int($purposeId)){
+                            $result       = $getPurpose->get_appointment_purpose_by_id($companyId, $purposeId);
+                            unset($row['purpose']['ministry_id']);
+                            unset($row['purpose']['status']);
+                            unset($row['purpose']['date']);
+                        }
+
+                        $result           = $purposeId;
                         if($result === 500){
                             $response     = new Response(500, " Error returning appointment purpose details. ");
                             $response->send_response();
@@ -118,11 +126,13 @@
                         $response->send_response();
                     }else{
                         $companyId                = Helper::get_business_id($this->userId, $this->account_character);
+                        $departmentId             = Helper::get_department_id_from_staff_id($this->userId);
                         $newAppointmentPurpose    = InputCleaner::sanitize($_POST['appointment_purpose']);
                         $appointmentPurpose       = new AddappointmentPurpose();
                         if($appointmentPurpose->permission === 200){
                             $details              = [
                                 "ministry_id"     => $companyId,
+                                "department_id"   => $departmentId,
                                 "purpose"         => $newAppointmentPurpose
                             ];
                             $result               = $appointmentPurpose->create_appointment_purpose($details);
@@ -158,10 +168,12 @@
                         $companyId                = Helper::get_business_id($this->userId, $this->account_character);
                         $id                       = InputCleaner::sanitize($_POST['appointment_purpose_id']);
                         $newAppointmentPurpose    = InputCleaner::sanitize($_POST['appointment_purpose']);
+                        $departmentId             = Helper::get_department_id_from_staff_id($this->userId);
+
                         $appointmentPurpose       = new EditappointmentPurpose();
                         if($appointmentPurpose->permission === 200){
                             $details              = ["purpose" => $newAppointmentPurpose];
-                            $identity             = ['column' => ['ministry_id', 'id'], 'value' => [$companyId, $id]];
+                            $identity             = ['column' => ['ministry_id', 'id', 'department_id'], 'value' => [$companyId, $id, $departmentId]];
                             $result               = $appointmentPurpose->update_appointment_purpose($details, $identity);
                             if($result === 500){
                                 $response         = new Response(500, " Error editing new appointment purpose. ");
@@ -194,10 +206,11 @@
                     }else{
                         $companyId                = Helper::get_business_id($this->userId, $this->account_character);
                         $id                       = InputCleaner::sanitize($_POST['appointment_purpose_id']);
+                        $departmentId             = Helper::get_department_id_from_staff_id($this->userId);
                         $appointmentPurpose       = new DeleteappointmentPurpose();
                         if($appointmentPurpose->permission === 200){
                             $details              = ["status" => 1];
-                            $identity             = ['column' => ['ministry_id', 'id'], 'value' => [$companyId, $id]];
+                            $identity             = ['column' => ['ministry_id', 'id', 'department_id'], 'value' => [$companyId, $id, $departmentId]];
                             $result               = $appointmentPurpose->delete_appointment_purpose($details, $identity);
                             if($result === 500){
                                 $response         = new Response(500, " Error deleting new appointment purpose. ");
@@ -218,4 +231,4 @@
             }
         }
     }
-new AppointmentPurposeHandler();    
+new AppointmentPurposeHandler();

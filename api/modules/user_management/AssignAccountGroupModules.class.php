@@ -33,8 +33,8 @@ Auth::module_function_registration(ASSIGN_USER_GROUP_MODULES_FUNCTION_ID, ASSIGN
             $this->account_character   = $_SESSION['account_character'];
             $this->permission          = null;
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(ASSIGN_USER_GROUP_MODULES_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
-            $this->permission  =  $auth;
+            $auth                      = Auth::function_check(ASSIGN_USER_GROUP_MODULES_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
+            $this->permission          =  $auth;
         }
     }
 
@@ -47,6 +47,14 @@ Auth::module_function_registration(ASSIGN_USER_GROUP_MODULES_FUNCTION_ID, ASSIGN
            return 200;
         }
     }
+
+    //This function unassigns/removes modules from account group
+    public function unassign_modules_to_account_group($accountGorupId, $moduleId){
+        $query    = CustomSql::delete_sql('account_group_module', "	account_group_id = $accountGorupId AND  module_id = $moduleId ");
+        if($query === false){
+            return 500;
+        }else{
+           return 200;
+        }
+    }
 }
-
-

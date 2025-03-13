@@ -34,14 +34,9 @@ Auth::module_function_registration(VIEW_USER_GROUP_MODULES_FUNCTION_ID, VIEW_USE
             $this->permission          = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(VIEW_USER_GROUP_MODULES_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
-            $this->permission  =  $auth;
+            $auth                      = Auth::function_check(VIEW_USER_GROUP_MODULES_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
+            $this->permission          =  $auth;
         }
-    }
-
-    //This function returns healthcare roles
-    public function return_users_roles($healthcareId){
-        return Helper::get_all_users_roles($healthcareId);
     }
 
     //This function returns role details of a role base on roleId
@@ -117,6 +112,19 @@ Auth::module_function_registration(VIEW_USER_GROUP_MODULES_FUNCTION_ID, VIEW_USE
             }
         }
     }
+
+    //This function checks if the icomming modules are already assign to the same user group
+    public function check_user_group_unassigned_modules($accountGroupId, $moduleId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `account_group_module` WHERE module_id = $moduleId AND account_group_id = $accountGroupId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count = $query->num_rows;
+            if($count >= 1){
+                return $moduleId;
+            }else if($count == 0){
+                return 301;
+            }
+        }
+    }
 }
-
-

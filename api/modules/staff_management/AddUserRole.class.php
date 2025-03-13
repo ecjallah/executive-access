@@ -23,8 +23,6 @@ Auth::module_function_registration(ADD_USER_ROLE_FUNCTION_ID, ADD_USER_ROLE_FUNC
     public $userId;
     public $user_type; 
     public $account_character;
-    public $method;             
-    public $url; 
     public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){ 
@@ -34,8 +32,8 @@ Auth::module_function_registration(ADD_USER_ROLE_FUNCTION_ID, ADD_USER_ROLE_FUNC
             $this->permission          = null;
 
             //Check if user has right to access this class(this module function)
-            $auth              = Auth::function_check(ADD_USER_ROLE_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
-            $this->permission  =  $auth;
+            $auth                      = Auth::function_check(ADD_USER_ROLE_FUNCTION_ID, $this->userId, $this->user_type, $this->account_character);
+            $this->permission          =  $auth;
         }        
     }
 

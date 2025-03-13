@@ -23,8 +23,6 @@ class AddStaff{
     public $userId;
     public $user_type; 
     public $account_character;
-    public $method;             
-    public $url; 
     public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
@@ -55,7 +53,7 @@ class AddStaff{
             'country'           => "Liberia"
         ];
 
-        //REGULAR USER SECURITY INFO'
+        //REGULAR USER SECURITY INFOK
         $regularSecurity = [
             'user_id'        => $basic_details['user_id'],
             'number'         => $details['number'],

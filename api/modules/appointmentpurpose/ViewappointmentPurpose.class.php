@@ -38,8 +38,8 @@ class ViewappointmentPurpose {
     }
 
     //This method returns appointment purpose
-    public function get_appointment_purpose($companyId){
-        $query          = CustomSql::quick_select(" SELECT * FROM `appointment_purpose` WHERE ministry_id = $companyId AND status = 0 ");
+    public function get_appointment_purpose($companyId, $departmentId){
+        $query          = CustomSql::quick_select(" SELECT * FROM `appointment_purpose` WHERE ministry_id = $companyId AND department_id = $departmentId AND status = 0 ");
         if($query === false){
             return 500;
         }else{

@@ -18,12 +18,10 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
  *      @contact Mail: conteeglaydor@gmail.com
  * *********************************************************************************************************
  */
- class ViewStaffs{
+class ViewStaffs{
     public $userId;
     public $user_type; 
     public $account_character;
-    public $method;             
-    public $url; 
     public $permission;
     function __construct(){
         if(isset($_SESSION['user_id'])){
@@ -40,11 +38,11 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
 
     //This function gets all the staff of a given healthcare
     public function return_staffs($businessId){
-        $query     = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = '$businessId' AND `block` = 0 ORDER BY `id` DESC ");
+        $query         = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE `business_id` = '$businessId' AND `block` = 0 ORDER BY `id` DESC ");
         if($query === false){
             return 500;
         }else{
-            $count = $query->num_rows;
+            $count     = $query->num_rows;
             if($count >= 1){
                 $data  = [];
                 while ($row  = mysqli_fetch_assoc($query)) {
@@ -52,9 +50,15 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
                     $roleTitle      = Helper::get_user_role_title($row['role_id'])['role_title'];
                     $details        = [
                         "user_id"             => $userDetails['user_id'],
+                        "address"             => $userDetails['address'],
                         "full_name"           => $userDetails['full_name'],
+                        "first_name"          => $userDetails['first_name'],
+                        "middle_name"         => $userDetails['middle_name'],
+                        "last_name"           => $userDetails['last_name'],
                         "image"               => $userDetails['image'],
+                        "email"               => $userDetails['email'],
                         "number"              => $userDetails['number'],
+                        "gender"              => $userDetails['gender'],
                         "username"            => $userDetails['username'],
                         "user_role_id"        => $row['role_id'],
                         "user_role_title"     => $roleTitle
@@ -87,10 +91,14 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
                     $details        = [
                         "user_id"             => $userDetails['user_id'],
                         "full_name"           => $userDetails['full_name'],
+                        "first_name"          => $userDetails['first_name'],
+                        "middle_name"         => $userDetails['middle_name'],
+                        "last_name"           => $userDetails['last_name'],
                         "image"               => $userDetails['image'],
                         "number"              => $userDetails['number'],
                         "username"            => $userDetails['username'],
                         "email"               => $userDetails['email'],
+                        "address"             => $userDetails['address'],
                         "gender"              => $userDetails['gender'],
                         "user_role_id"        => $row['role_id'],
                         "user_role_title"     => $roleTitle
@@ -103,5 +111,4 @@ Auth::module_function_registration(VIEW_STAFFS_FUNCTION_ID, VIEW_STAFFS_FUNCTION
             }
         }
     }
-
 }

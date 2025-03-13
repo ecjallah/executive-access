@@ -41,6 +41,7 @@ class UserHandler{
                 $this->get_user_account_groups();
                 $this->get_user_account_group_details();
                 $this->assign_module_to_account_group();
+                $this->unassign_module_from_account_group();
             }else{
                 $response = new Response($moduelCheck, 'Unauthorized Module: Contact Admin');
                 $response->send_response();
@@ -133,20 +134,20 @@ class UserHandler{
         {
             if($this->method == 'POST'){
                 //Get data and clean them if possible
-                $_POST                 = json_decode(file_get_contents('php://input'), true);
-                $newUserRole           = new ViewAccountGroupModules();
-                $assignModuleToGroup   = new AssignAccountGroupModules();
+                $_POST                      = json_decode(file_get_contents('php://input'), true);
+                $newUserRole                = new ViewAccountGroupModules();
+                $assignModuleToGroup        = new AssignAccountGroupModules();
                 //permission 
                 if($newUserRole->permission === 200){
-                    $accountGroupId    = InputCleaner::sanitize($_POST['account_group_id']);
-                    $modules           = InputCleaner::sanitize($_POST['module_list']);
-                    if(empty($accountGroupId) || empty($modules)){
-                        $response = new Response(404, "Please send required data(account_group_id, modules_array)");
+                    if(empty($_POST['account_group_id']) || empty($_POST['module_list'])){
+                        $response          = new Response(404, "Please send required data(account_group_id, modules_array)");
                         $response->send_response();
                     }else{
+                        $accountGroupId    = InputCleaner::sanitize($_POST['account_group_id']);
+                        $modules           = InputCleaner::sanitize($_POST['module_list']);
                         //Check if the modules already exist
-                        $unassignedModules    = [];
-                        $assignedModules      = [];
+                        $unassignedModules = [];
+                        $assignedModules   = [];
                         foreach ($modules as $moduleId) {
                             $moduleTest    = $newUserRole->check_user_group_reassigned_modules($accountGroupId, $moduleId);
                             if($moduleTest !== 301){
@@ -167,12 +168,67 @@ class UserHandler{
                                     'date'               => gmdate('Y-m-d H:i:s'),
                                     'last_updated'       => $this->userId
                                 ];
-                                $result         = $assignModuleToGroup->assign_modules_to_account_group($details);
+                                $result       = $assignModuleToGroup->assign_modules_to_account_group($details);
                                 if($result === 500){
                                     $response = new Response(500, "Error Adding User Role", $result);
                                     $response->send_response();
                                 }else{
                                     $response = new Response(200, "Modules have been added successfully!", $result);
+                                    $response->send_response();
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    $response = new Response(301, 'Unauthorized Module: Contact Admin');
+                    $response->send_response();
+                }
+            }else{
+                $response = new Response(300, "This endpoint accepts the POST method");
+                $response->send_response();
+            } 
+        }
+    }
+
+    //This endpoint UNASSIGNED modules rights to USER ACCOUNT GROUP
+    public function unassign_module_from_account_group(){
+        if($this->url == '/api/unassign-modules-from-account-group')
+        {
+            if($this->method == 'POST'){
+                //Get data and clean them if possible
+                $_POST                 = json_decode(file_get_contents('php://input'), true);
+                $newUserRole           = new ViewAccountGroupModules();
+                $assignModuleToGroup   = new AssignAccountGroupModules();
+                //permission 
+                if($newUserRole->permission === 200){
+                    $accountGroupId    = InputCleaner::sanitize($_POST['account_group_id']);
+                    $modules           = InputCleaner::sanitize($_POST['module_list']);
+                    if(empty($accountGroupId) || empty($modules)){
+                        $response      = new Response(404, "Please send required data(account_group_id, modules_array)");
+                        $response->send_response();
+                    }else{
+                        //Check if the modules already exist
+                        $unassignedModules           = [];
+                        $assignedModules             = [];
+                        foreach ($modules as $moduleId) {
+                            $moduleTest    = $newUserRole->check_user_group_unassigned_modules($accountGroupId, $moduleId);
+                            if($moduleTest != 301){
+                                $unassignedModules[] = $moduleTest;
+                            }else{
+                                $assignedModules[]   = $moduleTest;
+                            }
+                        }
+                        if(!empty($assignedModules) && $assignedModules != null){
+                            $response = new Response(200, "Some module(s) are not assigned and you want tu unassign them.");
+                            $response->send_response();
+                        }else{
+                            foreach ($unassignedModules as $value) {
+                                $result       = $assignModuleToGroup->unassign_modules_to_account_group($accountGroupId, $value);
+                                if($result === 500){
+                                    $response = new Response(500, "Error Adding User Role", $result);
+                                    $response->send_response();
+                                }else{
+                                    $response = new Response(200, "Modules have been unassigned successfully.", $result);
                                     $response->send_response();
                                 }
                             }
@@ -246,8 +302,5 @@ class UserHandler{
             } 
         }
     }
-
 }
-
 (new UserHandler);
-

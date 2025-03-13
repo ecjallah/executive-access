@@ -403,4 +403,36 @@ class Helper{
             return 500;
         }
     }
+
+    //This method return a department id from a staff id
+    public static function get_department_id_from_staff_id($staffId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `department_staff` WHERE staff_id = $staffId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count = $query->num_rows;
+            if($count === 1){
+                $data =  $query->fetch_assoc()['department_id'];
+                return ['status' => 200, 'data' => $data] ;
+            }else{
+                return ['status' => 404] ;
+            }
+        }
+    }
+
+    //This method returns a minisrty id from a staff id
+    public static function get_ministry_id_from_staff_id($staffId){
+        $query     = CustomSql::quick_select(" SELECT * FROM `staff_accounts` WHERE staff_id = $staffId ");
+        if($query === false){
+            return 500;
+        }else{
+            $count = $query->num_rows;
+            if($count === 1){
+                $data =  $query->fetch_assoc()['business_id'];
+                return ['status' => 200, 'data' => $data] ;
+            }else{
+                return ['status' => 404] ;
+            }
+        }
+    }
 }

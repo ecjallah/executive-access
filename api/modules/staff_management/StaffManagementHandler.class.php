@@ -47,10 +47,6 @@ class StaffManagementHandler{
                 $this->assign_module_rights_to_role();
                 $this->view_staff_roles();
                 $this->lookup_users();
-                $this->assign_pollwatcher_to_center();
-                $this->unassign_pollwatcher_from_center();
-                $this->find_polling_centers();
-                $this->find_precints_centers();
             }else{
                 $response = new Response($moduelCheck, 'Unauthorized Module: Contact Admin');
                 $response->send_response();
@@ -155,6 +151,7 @@ class StaffManagementHandler{
                     $county         = InputCleaner::sanitize($_POST['county']);
                     $number         = InputCleaner::sanitize($_POST['number']);
                     $username       = InputCleaner::sanitize($_POST['username']);
+                    $status         = InputCleaner::sanitize($_POST['status']);
                     if(empty($email) || empty($roleId) || empty($firstName)|| empty($lastName)|| empty($address)|| empty($sex)|| empty($number) || empty($username) || empty($county)){
                         $response   = new Response(400, "Please provide the following: role_id, first_name, email, last_name, sex, address, number, username");
                         $response->send_response();
@@ -163,6 +160,10 @@ class StaffManagementHandler{
                         $hashed_password        = password_hash('password@123', PASSWORD_DEFAULT);
                         //Create staff regular account
                         $companyId              = Helper::get_staff_company_id($this->account_character, $this->userId);
+                        if($status == 'enumerator'){
+                            $roleId            = 10;
+                        }
+
                         $staffDetails           =  [
                             "business_id"       => $companyId,
                             "role_id"           => $roleId,
@@ -493,156 +494,6 @@ class StaffManagementHandler{
                 }
             }else{
                 $response = new Response(300, "This endpoint accepts the GET method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint assigns poll watchers to polling centers
-    public function assign_pollwatcher_to_center(){
-        if($this->url == "/api/assign-watcher-to-center")
-        {
-            if($this->method == "POST"){
-                $_POST                    = json_decode(file_get_contents("php://input"), true);
-                $businessId               = Helper::get_business_id($this->userId, $this->account_character);
-                $addPollingcenter         = new AddpollingManagement();
-                if($addPollingcenter->permission === 200){
-                    if(empty($_POST['user_id']) || empty($_POST['center_ids'])){
-                        $response         = new Response(404, " Please provide the following keys: user_id, and center_ids");
-                        $response->send_response();
-                    }else{
-                        $userId           = InputCleaner::sanitize($_POST['user_id']);
-                        $centerIds        = InputCleaner::sanitize($_POST['center_ids']);
-                        $result           = $addPollingcenter->assign_staff_to_polling_center($businessId, $userId, $centerIds);
-                        if($result === 500){
-                            $response     = new Response(500, " Error assigning watcher to center. ");
-                            $response->send_response();
-                        }else if($result === 404){
-                            $response     = new Response(200, "This watcher was already assigned to some centers.");
-                            $response->send_response();
-                        }else{
-                            $response     = new Response(200, "Watcher assigned to center successfully.");
-                            $response->send_response();
-                        }
-                    }
-                }else{
-                    $response = new Response(301, "Unauthorized Module: Contact Admin");
-                    $response->send_response();
-                }
-            }else{                
-                $response = new Response(300, "This endpoint accepts the POST method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint UNASSIGN poll watchers to polling centers
-    public function unassign_pollwatcher_from_center(){ 
-        if($this->url == "/api/unassign-watcher-from-center")
-        {
-            if($this->method == "POST"){
-                $_POST                    = json_decode(file_get_contents("php://input"), true);
-                $businessId               = Helper::get_business_id($this->userId, $this->account_character);
-                $addPollingcenter         = new AddpollingManagement();
-                if($addPollingcenter->permission === 200){
-                    if(empty($_POST['user_id']) || empty($_POST['center_ids'])){
-                        $response         = new Response(404, " Please provide the following keys: user_id, and center_ids");
-                        $response->send_response();
-                    }else{
-                        $userId           = InputCleaner::sanitize($_POST['user_id']);
-                        $centerIds        = InputCleaner::sanitize($_POST['center_ids']);
-                        $result           = $addPollingcenter->unassign_staff_to_polling_center($businessId, $userId, $centerIds);
-                        if($result === 500){
-                            $response     = new Response(500, " Error unassigning watcher to center. ");
-                            $response->send_response();
-                        }else if($result === 404){
-                            $response     = new Response(200, "This watcher could not be removed from some centers because he/she was not even assigned.");
-                            $response->send_response();
-                        }else{
-                            $response     = new Response(200, "Watcher unassigned to center successfully.");
-                            $response->send_response();
-                        }
-                    }
-                }else{
-                    $response = new Response(301, "Unauthorized Module: Contact Admin");
-                    $response->send_response();
-                }
-            }else{                
-                $response = new Response(300, "This endpoint accepts the POST method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint SEARCHES POLLING CENTERS
-    public function find_polling_centers(){ 
-        if($this->url == "/api/search-polling-centers")
-        {
-            if($this->method == "POST"){
-                $_POST                    = json_decode(file_get_contents("php://input"), true);
-                $businessId               = Helper::get_business_id($this->userId, $this->account_character);
-                $searchPollingCenters     = new Viewwatcher();
-                if($searchPollingCenters->permission === 200){
-                    if(empty($_POST['search_value'])){
-                        $response         = new Response(404, " Please provide the following keys: search_value");
-                        $response->send_response();
-                    }else{
-                        $searchValue      = InputCleaner::sanitize($_POST['search_value']);
-                        $result           = $searchPollingCenters->search_polling_centers($searchValue);
-                        if($result === 500){
-                            $response     = new Response(500, " Error making search. ");
-                            $response->send_response();
-                        }else if($result === 404){
-                            $response     = new Response(404, "Sorry, there is no polling center matching your search.");
-                            $response->send_response();
-                        }else{
-                            $response     = new Response(200, "Polling center matches.", $result);
-                            $response->send_response();
-                        }
-                    }
-                }else{
-                    $response = new Response(301, "Unauthorized Module: Contact Admin");
-                    $response->send_response();
-                }
-            }else{                
-                $response = new Response(300, "This endpoint accepts the POST method");
-                $response->send_response();
-            } 
-        }
-    }
-
-    //This endpoint SEARCHES PRECINTS CENTERS
-    public function find_precints_centers(){ 
-        if($this->url == "/api/search-precincts")
-        {
-            if($this->method == "POST"){
-                $_POST                    = json_decode(file_get_contents("php://input"), true);
-                $businessId               = Helper::get_business_id($this->userId, $this->account_character);
-                $searchPollingCenters     = new Viewwatcher();
-                if($searchPollingCenters->permission === 200){
-                    if(empty($_POST['search_value'])){
-                        $response         = new Response(404, " Please provide the following keys: search_value");
-                        $response->send_response();
-                    }else{
-                        $searchValue      = InputCleaner::sanitize($_POST['search_value']);
-                        $result           = $searchPollingCenters->search_precints_centers($searchValue);
-                        if($result === 500){
-                            $response     = new Response(500, " Error making search. ");
-                            $response->send_response();
-                        }else if($result === 404){
-                            $response     = new Response(404, "Sorry, there is no precints center matching your search.");
-                            $response->send_response();
-                        }else{
-                            $response     = new Response(200, "Precints matches.", $result);
-                            $response->send_response();
-                        }
-                    }
-                }else{
-                    $response = new Response(301, "Unauthorized Module: Contact Admin");
-                    $response->send_response();
-                }
-            }else{                
-                $response = new Response(300, "This endpoint accepts the POST method");
                 $response->send_response();
             } 
         }
