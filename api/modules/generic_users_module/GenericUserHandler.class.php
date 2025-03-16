@@ -189,20 +189,21 @@ class GenericUserHandler{
         if($this->url == '/api/change-user-password')
         {
             if($this->method == 'POST'){
-                $_POST                = json_decode(file_get_contents('php://input'), true);
+                $_POST                    = json_decode(file_get_contents('php://input'), true);
                 if(empty($_POST['current_password']) || empty($_POST['new_password'])){
-                    $response         = new Response(400, "Provide the following: current_password and new_password");
+                    $response             = new Response(400, "Provide the following: current_password and new_password");
                     $response->send_response();
                 }else{
-                    $oldPassword      = InputCleaner::sanitize($_POST['current_password']);
-                    $userInfo         = Helper::user_details($this->userId);
+                    $oldPassword          = InputCleaner::sanitize($_POST['current_password']);
+                    $userInfo             = Helper::user_details($this->userId);
                     if(password_verify($oldPassword, $userInfo[0]['password'])){
                         $password         = InputCleaner::sanitize($_POST['new_password']);
                         $hashPassword     = password_hash($password, PASSWORD_DEFAULT);
                         $last_updated     = gmdate('Y-m-d H:i:s');
                         $details          = [
-                            'password'      => $hashPassword,
-                            'last_updated'  => $last_updated
+                            'password'                      => $hashPassword,
+                            'default_password_change'       => 1,
+                            'last_updated'                  => $last_updated
                         ];
                         $update_user_info   = new UpdateUserProfile();
                         $identity           = ['column' => 'user_id', 'value' => $this->userId];

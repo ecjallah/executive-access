@@ -45,17 +45,20 @@ class AppLogin extends Auth{
                     $login       = $this->auth_user_login($number, $password);
                     if($login === 200){
                         //Get user assigned modules icons
-                        $userId         = $_SESSION['user_id'];
-                        $returnDetails  = null;
-                        $getSessions    = new ModulesManager();
-                        $sessions       = $getSessions->return_active_user_session();
-                        $roleDetails    = $this->side_bar_items(is_array($sessions)?$sessions['userType']:$sessions, is_array($sessions)?$sessions['userId']:$sessions, $sessions['account_character']);
-                        $roleDetails['side_bar_items'] = "N/A";
-                        $returnDetails  = [
-                            'user_id'                   => $userId, 
-                            'hashed_credentials'        => base64_encode("$number<>$password"),
-                            'role_details'              => $roleDetails
-                        ];
+                        $userId             = $_SESSION['user_id'];
+                        $returnDetails      = null;
+                            $getSessions    = new ModulesManager();
+                            $sessions       = $getSessions->return_active_user_session();
+                            $roleDetails    = $this->side_bar_items(is_array($sessions)?$sessions['userType']:$sessions, is_array($sessions)?$sessions['userId']:$sessions, $sessions['account_character']);
+                            $roleDetails['side_bar_items'] = "N/A";
+                            $returnDetails = [
+                                'user_id'                   => $userId, 
+                                'hashed_credentials'        => base64_encode("$number<>$password"),
+                                'role_details'              => $roleDetails
+                            ];
+                            if($_SESSION['user_type'] == 5){
+                                $returnDetails['default_password_status'] = $_SESSION['default_password_status'];
+                            }
                         $response = new Response(200, "Login Successful", $returnDetails);
                         $response->send_response();
                     }else if($login == 404){
@@ -245,7 +248,6 @@ class AppLogin extends Auth{
                         $data['user_type_id']        = $userDetails['user_type'];
                         $data['user_type']           = Helper::return_user_type_from_id($userId);
                     }
-                    
                     if($_SESSION['user_type'] == 5){
                         $data['default_password_status'] = $_SESSION['default_password_status'];
                     }
