@@ -55,6 +55,9 @@ class UpdateUserProfile{
         if($query === false){
             return 500;
         }else{
+            if($_SESSION['user_type'] == 5){
+                $_SESSION['default_password_status'] = 1;
+            }
             return 200;
         }
     }
