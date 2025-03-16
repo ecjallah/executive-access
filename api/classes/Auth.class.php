@@ -38,7 +38,6 @@ class Auth{
                         //GET USER TYPE CHARACTER/TYPE FROM USER TYPE ID
                         $account_character        = new ViewUserGroup();
                         $character                = $account_character->return_account_group_by_id($row['user_type']);
-                        $passwordChangeStatus     = ''; 
                         if(is_array($character)){
                             $sessionController    = $this->session_power_on($row['user_type'], $row['user_id'], $character['account_type'], $row['default_password_change']);
                             return $sessionController;
@@ -62,7 +61,7 @@ class Auth{
         $_SESSION['user_id']                    = $userId;
         $_SESSION['user_type']                  = $userType;
         $_SESSION['account_character']          = $accountCharacter;
-        $_SESSION['default_password_status']    = $defaultPasswordStatus;
+        $_SESSION['default_password_status']    = $defaultPasswordStatus==null?0:$defaultPasswordStatus;
         session_write_close();
         if(isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && isset($_SESSION['account_character'])){
             return 200;

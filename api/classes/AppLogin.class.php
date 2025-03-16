@@ -56,9 +56,9 @@ class AppLogin extends Auth{
                                 'hashed_credentials'        => base64_encode("$number<>$password"),
                                 'role_details'              => $roleDetails
                             ];
-                            // if($_SESSION['user_type'] == 5){
-                            //     $returnDetails['default_password_status'] = $_SESSION['default_password_status'];
-                            // }
+                            if($_SESSION['user_type'] == 5){
+                                $returnDetails['default_password_status'] = $_SESSION['default_password_status'];
+                            }
                         $response = new Response(200, "Login Successful", $returnDetails);
                         $response->send_response();
                     }else if($login == 404){
