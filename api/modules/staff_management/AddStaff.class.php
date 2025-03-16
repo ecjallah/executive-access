@@ -55,13 +55,13 @@ class AddStaff{
 
         //REGULAR USER SECURITY INFOK
         $regularSecurity = [
-            'user_id'        => $basic_details['user_id'],
-            'number'         => $details['number'],
-            'user_type'      => $details['account_type'],
-            'username'       => $details['username'],
-            'country'        => "Liberia",
-            'password'       => $details['hashed_password'],
-            'last_updated'   => Helper::get_current_date()
+            'user_id'                   => $basic_details['user_id'],
+            'number'                    => $details['number'],
+            'user_type'                 => $details['account_type'],
+            'username'                  => $details['username'],
+            'country'                   => "Liberia",
+            'password'                  => $details['hashed_password'],
+            'last_updated'              => Helper::get_current_date()
         ];
 
         $result              =  $this->create_regular_account($basic_details, $regularSecurity, $details);

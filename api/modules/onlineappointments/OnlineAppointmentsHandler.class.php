@@ -62,7 +62,7 @@
                             $response               = new Response(400, "Sorry, you are not in a department. Only staff(s) that are assigned to a given department is allowed to performn this action.");
                             $response->send_response();
                         }else{
-                            $result                 = $appointmentSettings->get_ministry_executives_appointment_settings($companyId, $departmentId['data']);
+                            $result                 = $appointmentSettings->get_ministry_executives_appointment_settings($companyId, $departmentId['status']==404?0:$departmentId['data']);
                             if($result === 500){
                                 $response           = new Response(500, "Error returing appointment settings.");
                                 $response->send_response();
@@ -135,7 +135,7 @@
                         $response->send_response();
                     }else{
                         $companyId          = Helper::get_business_id($this->userId, $this->account_character);
-                        $departmentId       = Helper::get_staff_department_id($this->userId)['data'];
+                        $departmentId       = Helper::get_staff_department_id($this->userId);
                         $todayDate          = Helper::get_current_date();
                         $executiveId        = InputCleaner::sanitize($_POST['executive_id']);
                         $details            = [
@@ -155,7 +155,7 @@
                             "added_date"    => $todayDate
                         ];
 
-                        $identity                 = ['column' => ['ministry_id', 'department_id', 'executive_id'], 'value' => [$companyId, $departmentId, $executiveId]];
+                        $identity                 = ['column' => ['ministry_id', 'department_id', 'executive_id'], 'value' => [$companyId, $departmentId['status']==404?0:$departmentId['data'], $executiveId]];
                         $appointmentSetting       = new EditonlineAppointments();
                         if($appointmentSetting->permission === 200){
                             $result               = $appointmentSetting->update_appointment_settings($details, $identity);
@@ -193,7 +193,7 @@
                     //Get staff department
                     $departmentId       = Helper::get_staff_department_id($this->userId);
                     if($getAppointment->permission === 200){
-                        $result         = $getAppointment->return_department_appointments($companyId, $departmentId['data'], $pager, $filter, $appointment_type);
+                        $result         = $getAppointment->return_department_appointments($companyId, $departmentId['status']==404?0:$departmentId['data'], $pager, $filter, $appointment_type);
                         if($result === 500){
                             $response   = new Response(500, "Error returning online appointments.");
                             $response->send_response();

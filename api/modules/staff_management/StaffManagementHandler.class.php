@@ -160,9 +160,6 @@ class StaffManagementHandler{
                         $hashed_password        = password_hash('password@123', PASSWORD_DEFAULT);
                         //Create staff regular account
                         $companyId              = Helper::get_staff_company_id($this->account_character, $this->userId);
-                        if($status == 'enumerator'){
-                            $roleId            = 10;
-                        }
 
                         $staffDetails           =  [
                             "business_id"       => $companyId,

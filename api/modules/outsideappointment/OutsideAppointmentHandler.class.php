@@ -100,6 +100,10 @@
                     $departmentId       = InputCleaner::sanitize($_GET['department_id']);
                     $ministries         = new ViewexecutiveList();
                     $result             = $ministries->return_department_executives_($ministryId, $departmentId);
+
+                    // print_r([$ministryId, $departmentId]);
+                    // exit;
+
                     if($result === 500){
                         $response   = new Response(500, "Error returning ministry department executives..");
                         $response->send_response();
