@@ -202,7 +202,7 @@ class GenericUserHandler{
                         $last_updated     = gmdate('Y-m-d H:i:s');
                         $details          = [
                             'password'                 => $hashPassword,
-                            'default_password_change'  => '1',
+                            'default_password_change'  => 1,
                             'last_updated'             => $last_updated
                         ];
                         $update_user_info   = new UpdateUserProfile();
